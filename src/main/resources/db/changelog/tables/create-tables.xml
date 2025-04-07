@@ -44,4 +44,33 @@
                 constraintName="fk_products_categories"/>
     </changeSet>
 
+<!--    <changeSet id="4-create-user-role-enum" author="maksims_scurovskis">-->
+<!--        <sql>-->
+<!--            CREATE TYPE user_role AS ENUM ('CLIENT', 'ADMINISTRATOR');-->
+<!--        </sql>-->
+<!--    </changeSet>-->
+
+    <changeSet id="5-create-table-users" author="maksims_scurovskis">
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+<!--            <column name="user_role" type="user_role">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
