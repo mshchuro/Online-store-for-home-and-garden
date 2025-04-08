@@ -5,28 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.telran.online_store.enums.UserRole;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="users")
-public class User {
+public class Favorite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    private String email;
-
-    private String phone;
-
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole = UserRole.CLIENT;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 }
