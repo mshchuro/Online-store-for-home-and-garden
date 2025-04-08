@@ -13,7 +13,7 @@ import org.telran.online_store.service.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -28,7 +28,7 @@ public class UserController {
         return userService.getAll();
     }
 
-    @PostMapping("/register")
+    @PostMapping("/users/register")
     public ResponseEntity<User> create(@RequestBody User user) {
         return ResponseEntity.ok(userService.create(user));
     }
