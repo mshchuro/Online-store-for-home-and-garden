@@ -1,34 +1,28 @@
 package org.telran.online_store.service;
 
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.repository.ProductJpaRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Sql("/dataInit.sql")
-@Transactional
+@Sql(value = "/prodDataInit.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class ProductServiceImplTest {
 
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private ProductJpaRepository productJpaRepository;
-
     @Test
-//    @Rollback(true)
     void testCreateProduct() {
         String productName = "Flowers";
         BigDecimal productPrice = new BigDecimal("22.99");
@@ -54,13 +48,16 @@ class ProductServiceImplTest {
 
     @Test
     void testGetProductById() {
-        assertEquals("Lily", productService.getById(1L).getName());
+        Product product = productService.getByName("Lily");
+        assertNotNull(product);
+        assertEquals("Lily", productService.getById(product.getId()).getName());
     }
 
     @Test
-//    @Rollback(true)
     void testDeleteProductById() {
-        productService.delete(2L);
+        List<Product> products = productService.getAll();
+        assertEquals(2, products.size());
+        productService.delete(products.get(0).getId());
         assertEquals(1, productService.getAll().size());
     }
 }
