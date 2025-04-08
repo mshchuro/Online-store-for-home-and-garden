@@ -40,6 +40,4 @@ public class ProductController {
         productService.delete(id);
         return ResponseEntity.accepted().build();
     }
-
-
 }
