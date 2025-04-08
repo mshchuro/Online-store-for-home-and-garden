@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-//@Sql("/dataInit.sql")
+@Sql("/dataInit.sql")
 @Transactional
 class ProductServiceImplTest {
 
@@ -26,11 +26,6 @@ class ProductServiceImplTest {
 
     @Autowired
     private ProductJpaRepository productJpaRepository;
-
-    @BeforeTransaction
-    private void initDatabase() {
-        productJpaRepository.save(new Product("Lily", "Flowers", new BigDecimal(22.08)));
-    }
 
     @Test
 //    @Rollback(true)
