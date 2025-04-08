@@ -1,23 +1,22 @@
 package org.telran.online_store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name="products")
+@Table(name = "products")
 public class Product {
 
     @Id
@@ -28,7 +27,7 @@ public class Product {
 
     private String description;
 
-    private double price;
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -36,11 +35,17 @@ public class Product {
 
     private String imageUrl;
 
-    private double discountPrice;
+    private BigDecimal discountPrice;
 
     @CreatedDate
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
+
+    public Product(String name, String desc, BigDecimal price) {
+        this.name = name;
+        this.description = desc;
+        this.price = price;
+    }
 }
