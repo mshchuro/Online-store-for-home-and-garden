@@ -43,6 +43,9 @@ public class ProductServiceImpl implements ProductService {
     @Modifying
     @Transactional
     public void delete(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Product with id " + id + " not found");
+        }
         productRepository.deleteById(id);
     }
 }
