@@ -4,6 +4,7 @@ import jakarta.servlet.ServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.telran.online_store.dto.UserUpdateRequest;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.UserRole;
@@ -28,7 +29,7 @@ public class UserController {
         return userService.getAll();
     }
 
-    @PostMapping("/users/register")
+    @PostMapping("/register")
     public ResponseEntity<User> create(@RequestBody User user) {
         return ResponseEntity.ok(userService.create(user));
     }
@@ -42,5 +43,16 @@ public class UserController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUserProfile(@PathVariable Long id, @RequestBody UserUpdateRequest updateRequest) {
+
+        User updatedUser = userService.updateProfile(
+                id,
+                updateRequest.getName(),
+                updateRequest.getPhone());
+
+        return ResponseEntity.ok(updatedUser);
     }
 }

@@ -41,4 +41,15 @@ public class UserServiceImpl implements UserService {
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
+
+    @Override
+    public User updateProfile(Long id, String name, String phone) {
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new UserNotFoundException("User with id " + id + " is not found"));
+
+        user.setName(name);
+        user.setPhone(phone);
+
+        return userRepository.save(user);
+    }
 }

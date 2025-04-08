@@ -14,4 +14,6 @@ public interface UserService {
 
     void delete(Long id);
 
+    User updateProfile(Long id, String name, String phone);
+
 }
