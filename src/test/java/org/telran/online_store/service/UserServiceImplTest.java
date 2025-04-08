@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-@Sql("/dataInit.sql")
+@Sql(value = "/userDataInit.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class UserServiceImplTest {
 
     @Autowired
