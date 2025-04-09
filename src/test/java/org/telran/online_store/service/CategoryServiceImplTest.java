@@ -4,6 +4,9 @@ package org.telran.online_store.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.repository.CategoryJpaRepository;
 
@@ -13,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@Transactional
+@ActiveProfiles("test")
+@Sql(value = "/catDataInit.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CategoryServiceImplTest {
 
     @Autowired
@@ -20,7 +26,6 @@ class CategoryServiceImplTest {
 
     @Autowired
     private CategoryService categoryService;
-
 
     @Test
     public void testGetAll() {
@@ -30,7 +35,7 @@ class CategoryServiceImplTest {
     @Test
     public void testGetById() {
         Category category = categoryService.getCategoryById(1L);
-        assertEquals("Category 1", category.getName());
+        assertEquals("ABC", category.getName());
     }
 
     @Test

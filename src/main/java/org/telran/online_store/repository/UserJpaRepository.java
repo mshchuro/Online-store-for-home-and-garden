@@ -6,5 +6,5 @@ import org.telran.online_store.entity.User;
 
 @Repository
 public interface UserJpaRepository extends JpaRepository<User, Long> {
-
+    User findByName(String name);
 }
