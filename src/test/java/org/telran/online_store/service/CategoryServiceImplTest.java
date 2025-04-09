@@ -5,20 +5,48 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.telran.online_store.entity.Category;
+import org.telran.online_store.repository.CategoryJpaRepository;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @SpringBootTest
 class CategoryServiceImplTest {
 
-   @Autowired
-   private CategoryService categoryService;
+    @Autowired
+    private CategoryJpaRepository categoryRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+
 
     @Test
-    void testGetAllCategories() {
+    public void testGetAll() {
         List<Category> categories = categoryService.getAllCategories();
-        assertNotNull(categories);
+        assertEquals(2, categories.size());
+    }
+    @Test
+    public void testGetById() {
+        Category category = categoryService.getCategoryById(1L);
+        assertEquals("Category 1", category.getName());
+    }
+
+    @Test
+    public void testCreate() {
+        Category newCategory = new Category(null, "New Category");
+        Category createdCategory = categoryService.createCategory(newCategory);
+        assertNotNull(createdCategory.getId());
+        assertEquals("New Category", createdCategory.getName());
+
+
+        assertEquals(3, categoryService.getAllCategories().size());
+    }
+
+    @Test
+    public void testDeleteById() {
+        categoryService.deleteCategory(2L);
+        assertEquals(1, categoryService.getAllCategories().size());
     }
 }

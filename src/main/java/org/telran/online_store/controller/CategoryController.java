@@ -1,6 +1,5 @@
 package org.telran.online_store.controller;
 
-import jakarta.servlet.ServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +9,7 @@ import org.telran.online_store.service.CategoryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/v1")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -21,7 +20,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<Category> getAll(ServletRequest servletRequest) {
+    public List<Category> getAll() {
         return categoryService.getAllCategories();
     }
 
