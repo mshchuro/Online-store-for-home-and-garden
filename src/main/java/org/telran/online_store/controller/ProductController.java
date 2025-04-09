@@ -26,7 +26,6 @@ public class ProductController {
         this.productConverter = productConverter;
     }
 
-    /// //
     @GetMapping("/products")
     public List<Product> getAll() {
         return productService.getAll();
