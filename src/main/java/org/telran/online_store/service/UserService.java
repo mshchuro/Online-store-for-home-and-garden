@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import org.telran.online_store.dto.UserUpdateRequest;
 import org.telran.online_store.entity.User;
 
 import java.util.List;
@@ -14,6 +15,6 @@ public interface UserService {
 
     void delete(Long id);
 
-    User updateProfile(Long id, String name, String phone);
+    User updateProfile(Long id, UserUpdateRequest updateRequest);
 
 }
