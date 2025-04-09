@@ -36,6 +36,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product getByName(String name) {
+        return productRepository.findByName(name);
+    }
+
+    @Override
     @Modifying
     @Transactional
     public void delete(Long id) {
