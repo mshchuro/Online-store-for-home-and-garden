@@ -29,9 +29,9 @@ public class Product {
 
     private BigDecimal price;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+//    @ManyToOne
+//    @JoinColumn(name = "category_id")
+//    private Category category;
 
     private String imageUrl;
 
@@ -42,10 +42,4 @@ public class Product {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    public Product(String name, String desc, BigDecimal price) {
-        this.name = name;
-        this.description = desc;
-        this.price = price;
-    }
 }

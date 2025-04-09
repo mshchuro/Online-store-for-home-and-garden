@@ -1,6 +1,5 @@
 package org.telran.online_store.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
@@ -44,6 +43,9 @@ public class ProductServiceImpl implements ProductService {
     @Modifying
     @Transactional
     public void delete(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Product with id " + id + " not found");
+        }
         productRepository.deleteById(id);
     }
 }

@@ -24,7 +24,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
+    @GetMapping("/users")
     public List<User> getAll(ServletRequest servletRequest) {
         return userService.getAll();
     }
@@ -34,23 +34,23 @@ public class UserController {
         return ResponseEntity.ok(userService.create(user));
     }
 
-    @GetMapping("/users/{id}")
-    public User getById(@PathVariable Long id) {
-        return userService.getById(id);
+    @GetMapping("/users/{userId}")
+    public User getById(@PathVariable Long userId) {
+        return userService.getById(userId);
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        userService.delete(id);
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long userId) {
+        userService.delete(userId);
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/users/{userId}")
     public ResponseEntity<User> updateProfile(
-            @PathVariable Long id,
+            @PathVariable Long userId,
             @RequestBody UserUpdateRequest updateRequest) {
 
-        User updatedUser = userService.updateProfile(id, updateRequest);
+        User updatedUser = userService.updateProfile(userId, updateRequest);
         return ResponseEntity.ok(updatedUser);
     }
 }

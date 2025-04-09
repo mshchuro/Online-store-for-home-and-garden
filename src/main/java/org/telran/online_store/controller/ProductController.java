@@ -1,43 +1,53 @@
 package org.telran.online_store.controller;
 
-import jakarta.servlet.ServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.telran.online_store.converter.Converter;
+import org.telran.online_store.dto.ProductRequestDto;
+import org.telran.online_store.dto.ProductResponseDto;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ProductService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/v1")
 public class ProductController {
 
     private final ProductService productService;
 
-    @Autowired
-    public ProductController(ProductService productService) {
+    private final Converter<ProductRequestDto, ProductResponseDto, Product> productConverter;
+
+    public ProductController(ProductService productService,
+                             Converter<ProductRequestDto, ProductResponseDto, Product> productConverter) {
         this.productService = productService;
+        this.productConverter = productConverter;
     }
 
-    @GetMapping
-    public List<Product> getAll(ServletRequest servletRequest) {
+    @GetMapping("/products")
+    public List<Product> getAll() {
         return productService.getAll();
     }
 
-    @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
-        return productService.getById(id);
+    @GetMapping("/products/{productId}")
+    public ProductResponseDto getProductById(@PathVariable Long productId) {
+        return productConverter.toDto(productService.getById(productId));
     }
 
-    @PostMapping
-    public ResponseEntity<Product> create(@RequestBody Product product) {
-        return ResponseEntity.ok(productService.create(product));
+    @PostMapping("/products")
+    public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto dto) {
+        Product product = productService.create(productConverter.toEntity(dto));
+        if (log.isDebugEnabled()) {
+            log.debug("Product created: {}", product);
+        }
+        return ResponseEntity.ok(productConverter.toDto(product));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        productService.delete(id);
+    @DeleteMapping("/products/{productId}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long productId) {
+        productService.delete(productId);
         return ResponseEntity.accepted().build();
     }
 }
