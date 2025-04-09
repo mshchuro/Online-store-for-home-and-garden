@@ -3,11 +3,9 @@ package org.telran.online_store.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.repository.ProductJpaRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
