@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.telran.online_store.dto.CategoryUpdateRequest;
-import org.telran.online_store.dto.mapper.CategoryMapper;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.repository.CategoryJpaRepository;
@@ -17,8 +15,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
    CategoryJpaRepository categoryRepository;
-    @Autowired
-    private CategoryMapper categoryMapper;
 
     @Override
     public List<Category> getAllCategories() {
@@ -48,11 +44,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Modifying
     @Transactional
-    public Category updateCategory(Long id, CategoryUpdateRequest updateRequest) {
-        Category category = categoryRepository.findById(id)
+    public Category updateCategory(Long id, Category category) {
+        Category fromDataBase = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
 
-        categoryMapper.updateCategoryFromDto(updateRequest, category);
-        return categoryRepository.save(category);
+        fromDataBase.setName(category.getName());
+        return categoryRepository.save(fromDataBase);
+
     }
 }

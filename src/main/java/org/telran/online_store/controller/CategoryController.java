@@ -3,7 +3,6 @@ package org.telran.online_store.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.telran.online_store.dto.CategoryUpdateRequest;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.service.CategoryService;
 
@@ -44,9 +43,9 @@ public class CategoryController {
     @PutMapping("/categories/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
-            @RequestBody CategoryUpdateRequest updateRequest) {
+            @RequestBody Category category) {
 
-        Category updatedCategory = categoryService.updateCategory(categoryId, updateRequest);
+        Category updatedCategory = categoryService.updateCategory(categoryId, category);
         return ResponseEntity.ok(updatedCategory);
     }
 }
