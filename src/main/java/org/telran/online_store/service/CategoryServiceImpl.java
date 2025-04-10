@@ -14,7 +14,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
-    CategoryJpaRepository categoryRepository;
+   CategoryJpaRepository categoryRepository;
 
     @Override
     public List<Category> getAllCategories() {
@@ -39,5 +39,17 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         categoryRepository.deleteById(id);
+    }
+
+    @Override
+    @Modifying
+    @Transactional
+    public Category updateCategory(Long id, Category category) {
+        Category fromDataBase = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
+
+        fromDataBase.setName(category.getName());
+        return categoryRepository.save(fromDataBase);
+
     }
 }
