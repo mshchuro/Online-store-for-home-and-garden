@@ -27,6 +27,7 @@ class CategoryServiceImplTest {
     @Autowired
     private CategoryService categoryService;
 
+
     @Test
     public void testGetAll() {
         List<Category> categories = categoryService.getAllCategories();

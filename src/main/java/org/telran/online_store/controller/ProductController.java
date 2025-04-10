@@ -27,8 +27,9 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<Product> getAll() {
-        return productService.getAll();
+    public List<ProductResponseDto> getAll() {
+        List<Product> products = productService.getAll();
+        return products.stream().map(productConverter::toDto).toList();
     }
 
     @GetMapping("/products/{productId}")
@@ -38,10 +39,14 @@ public class ProductController {
 
     @PostMapping("/products")
     public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto dto) {
-        Product product = productService.create(productConverter.toEntity(dto));
-        if (log.isDebugEnabled()) {
-            log.debug("Product created: {}", product);
-        }
+        Product product = productConverter.toEntity(dto);
+        Product saved = productService.create(product);
+        return ResponseEntity.ok(productConverter.toDto(saved));
+    }
+
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @RequestBody ProductRequestDto dto) {
+        Product product = productService.updateProduct(productId, productConverter.toEntity(dto));
         return ResponseEntity.ok(productConverter.toDto(product));
     }
 
