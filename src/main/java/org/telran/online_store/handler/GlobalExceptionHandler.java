@@ -16,4 +16,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEntityNotFoundException(Exception e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler({FavoriteNotUniqueException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<String> handleEntityNotUniqueException(Exception e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
 }
