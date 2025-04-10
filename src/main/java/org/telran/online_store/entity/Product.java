@@ -29,9 +29,9 @@ public class Product {
 
     private BigDecimal price;
 
-//    @ManyToOne
-//    @JoinColumn(name = "category_id")
-//    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     private String imageUrl;
 
