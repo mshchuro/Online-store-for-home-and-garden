@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.exception.FavoriteNotFoundException;
 import org.telran.online_store.repository.FavoriteJpaRepository;
+import org.telran.online_store.repository.ProductJpaRepository;
+import org.telran.online_store.repository.UserJpaRepository;
 
 import java.util.List;
 
@@ -15,6 +17,12 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Autowired
     FavoriteJpaRepository favoriteRepository;
+
+    @Autowired
+    UserJpaRepository userRepository;
+
+    @Autowired
+    ProductJpaRepository productRepository;
 
     @Override
     public List<Favorite> getAll() {
@@ -25,6 +33,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Modifying
     @Transactional
     public Favorite create(Favorite favorite) {
+        userRepository.findById(favorite.get)
         return favoriteRepository.save(favorite);
     }
 
