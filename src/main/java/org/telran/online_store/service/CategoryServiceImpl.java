@@ -14,7 +14,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
-   CategoryJpaRepository categoryRepository;
+    CategoryJpaRepository categoryRepository;
 
     @Override
     public List<Category> getAllCategories() {
