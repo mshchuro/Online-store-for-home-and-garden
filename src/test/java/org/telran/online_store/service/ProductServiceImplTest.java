@@ -52,6 +52,12 @@ class ProductServiceImplTest {
     }
 
     @Test
+    void testUpdateProduct(){
+        Product product = productService.getByName("Lily");
+
+    }
+
+    @Test
     void testDeleteProductById() {
         List<Product> products = productService.getAll();
         assertEquals(2, products.size());
