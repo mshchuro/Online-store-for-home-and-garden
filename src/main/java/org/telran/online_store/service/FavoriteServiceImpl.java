@@ -30,7 +30,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public List<Favorite> getAll() {
-        return favoriteRepository.findAll();
+        return favoriteRepository.findAll(); //getAllByUser
     }
 
     @Override
