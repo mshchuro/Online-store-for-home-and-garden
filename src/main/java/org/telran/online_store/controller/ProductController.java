@@ -9,6 +9,7 @@ import org.telran.online_store.dto.ProductResponseDto;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ProductService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -27,9 +28,16 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<ProductResponseDto> getAll() {
-        List<Product> products = productService.getAll();
-        return products.stream().map(productConverter::toDto).toList();
+    public ResponseEntity<List<ProductResponseDto>> getAll(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Boolean discount,
+            @RequestParam(required = false) String sort
+
+    ) {
+        List<Product> products = productService.getAll(categoryId,minPrice, maxPrice, discount, sort);
+        return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }
 
     @GetMapping("/products/{productId}")
