@@ -33,10 +33,10 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean discount,
-            @RequestParam(required = false) String sort
+            @RequestParam(required = false) List<String> sort
 
     ) {
-        List<Product> products = productService.getAll(categoryId,minPrice, maxPrice, discount, sort);
+        List<Product> products = productService.getAll(categoryId, minPrice, maxPrice, discount, sort);
         return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }
 

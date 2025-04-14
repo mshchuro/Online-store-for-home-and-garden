@@ -41,7 +41,7 @@ class ProductServiceImplTest {
 
     @Test
     void testGetAllProducts() {
-        assertEquals(2, productService.getAll().size());
+        assertEquals(2, productService.getAll(null,null,null,null,null).size());
     }
 
     @Test
@@ -59,9 +59,9 @@ class ProductServiceImplTest {
 
     @Test
     void testDeleteProductById() {
-        List<Product> products = productService.getAll();
+        List<Product> products = productService.getAll(null,null,null,null,null);
         assertEquals(2, products.size());
         productService.delete(products.get(0).getId());
-        assertEquals(1, productService.getAll().size());
+        assertEquals(1, productService.getAll(null,null,null,null,null).size());
     }
 }

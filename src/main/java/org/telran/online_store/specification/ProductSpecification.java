@@ -21,8 +21,22 @@ public class ProductSpecification {
                 predicate = cb.and(predicate, cb.equal(root.get("category").get("id"), categoryId));
             }
 
+            if (minPrice != null) {
+                predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+
+            if (maxPrice != null) {
+                predicate = cb.and(predicate, cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
+
+            if (discount != null && discount) {
+                predicate = cb.and(predicate,
+                        cb.isNotNull(root.get("discountPrice")),
+                        cb.lessThan(root.get("discountPrice"), root.get("price"))
+                );
+            }
+
             return predicate;
         };
-
     }
 }
