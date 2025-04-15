@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 
@@ -19,4 +20,9 @@ public interface ProductService {
     Product updateProduct(Long id, Product product);
 
     void delete(Long id);
+
+    List<Product> getAllByCategoryId(Long id);
+
+    void updateCategory(Long id, Category category);
+
 }
