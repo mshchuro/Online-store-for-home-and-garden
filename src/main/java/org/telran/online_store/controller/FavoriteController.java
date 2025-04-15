@@ -48,6 +48,6 @@ public class FavoriteController {
     @DeleteMapping("/favorites/{favorite_id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long favorite_id) {
         favoriteService.delete(favorite_id);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 }

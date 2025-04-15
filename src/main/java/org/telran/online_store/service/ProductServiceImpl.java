@@ -1,6 +1,8 @@
 package org.telran.online_store.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +12,10 @@ import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.repository.CategoryJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
+import org.telran.online_store.specification.ProductSpecification;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +28,37 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     CategoryJpaRepository categoryRepository;
 
-    @Override
-    public List<Product> getAll() {
-        return productRepository.findAll();
+//    @Override
+//    public List<Product> getAll() {
+//        return productRepository.findAll();
+//    }
+
+    public List<Product> getAll(Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean discount, List<String> sort) {
+
+        Specification<Product> spec = ProductSpecification.filterBy(categoryId, minPrice, maxPrice, discount);
+
+        Sort sortObj = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            List<Sort.Order> orders = new ArrayList<>();
+
+            for (String sortParam : sort) {
+
+                String[] parts = sortParam.split(":");
+                if (parts.length == 2) {
+                    String field = parts[0];
+                    String direction = parts[1];
+
+                    Sort.Order order = "desc".equalsIgnoreCase(direction) ?
+                            Sort.Order.desc(field) : Sort.Order.asc(field);
+
+                    orders.add(order);
+                }
+            }
+            if (!orders.isEmpty()) {
+                sortObj = Sort.by(orders);
+            }
+        }
+        return productRepository.findAll(spec, sortObj);
     }
 
     @Override
@@ -96,5 +129,17 @@ public class ProductServiceImpl implements ProductService {
             throw new ProductNotFoundException("Product with id " + id + " not found");
         }
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Product> getAllByCategoryId(Long id) {
+        return productRepository.findAllByCategory_Id(id);
+    }
+
+    @Override
+    public void updateCategory(Long id, Category category) {
+        Product product = getById(id);
+        product.setCategory(category);
+        productRepository.save(product);
     }
 }
