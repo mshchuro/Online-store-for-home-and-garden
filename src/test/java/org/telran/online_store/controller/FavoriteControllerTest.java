@@ -125,7 +125,7 @@ public class FavoriteControllerTest {
         when()
                 .delete("/v1/favorites/" + favorite.getId())
                 .then()
-                .statusCode(202);
+                .statusCode(200);
 
         assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
     }

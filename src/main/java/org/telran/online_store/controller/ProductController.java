@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -27,7 +27,7 @@ public class ProductController {
         this.productConverter = productConverter;
     }
 
-    @GetMapping("/products")
+    @GetMapping()
     public ResponseEntity<List<ProductResponseDto>> getAll(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -40,25 +40,25 @@ public class ProductController {
         return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }
 
-    @GetMapping("/products/{productId}")
+    @GetMapping("/{productId}")
     public ProductResponseDto getProductById(@PathVariable Long productId) {
         return productConverter.toDto(productService.getById(productId));
     }
 
-    @PostMapping("/products")
+    @PostMapping()
     public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto dto) {
         Product product = productConverter.toEntity(dto);
         Product saved = productService.create(product);
         return ResponseEntity.ok(productConverter.toDto(saved));
     }
 
-    @PutMapping("/products/{productId}")
+    @PutMapping("/{productId}")
     public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @RequestBody ProductRequestDto dto) {
         Product product = productService.updateProduct(productId, productConverter.toEntity(dto));
         return ResponseEntity.ok(productConverter.toDto(product));
     }
 
-    @DeleteMapping("/products/{productId}")
+    @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteById(@PathVariable Long productId) {
         productService.delete(productId);
         return ResponseEntity.ok().build();
