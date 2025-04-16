@@ -136,6 +136,6 @@ public class ProductControllerTest {
                 .when()
                 .delete("/v1/products/" + id)
                 .then()
-                .statusCode(202);
+                .statusCode(200);
     }
 }
