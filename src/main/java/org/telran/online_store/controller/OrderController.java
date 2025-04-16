@@ -15,5 +15,4 @@ import java.util.List;
 @RequestMapping("/v1/orders")
 public class OrderController {
 
-
 }

@@ -50,6 +50,7 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody UserUpdateRequest updateRequest) {
 
+
         User updatedUser = userService.updateProfile(userId, updateRequest);
         return ResponseEntity.ok(updatedUser);
     }
