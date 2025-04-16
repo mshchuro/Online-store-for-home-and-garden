@@ -20,7 +20,7 @@ public class Cart {
 
     @OneToOne
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private User userId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
