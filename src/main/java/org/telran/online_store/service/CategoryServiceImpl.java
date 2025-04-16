@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.dto.UserUpdateRequest;
 import org.telran.online_store.entity.Category;
+
 import org.telran.online_store.entity.User;
+
+import org.telran.online_store.entity.Product;
+
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.repository.CategoryJpaRepository;
 
@@ -17,6 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryJpaRepository categoryRepository;
+
+
+    @Autowired
+    private ProductService productService;
 
     @Override
     public List<Category> getAllCategories() {
@@ -37,9 +45,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Modifying
     @Transactional
     public void deleteCategory(Long id) {
+        List<Product> products = productService.getAllByCategoryId(id);
+        products.forEach(product -> productService.updateCategory(product.getId(), null));
         categoryRepository.deleteById(id);
     }
 

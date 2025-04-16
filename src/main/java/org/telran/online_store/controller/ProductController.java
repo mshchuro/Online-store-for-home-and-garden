@@ -9,11 +9,12 @@ import org.telran.online_store.dto.ProductResponseDto;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ProductService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -26,33 +27,40 @@ public class ProductController {
         this.productConverter = productConverter;
     }
 
-    @GetMapping("/products")
-    public List<ProductResponseDto> getAll() {
-        List<Product> products = productService.getAll();
-        return products.stream().map(productConverter::toDto).toList();
+    @GetMapping()
+    public ResponseEntity<List<ProductResponseDto>> getAll(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Boolean discount,
+            @RequestParam(required = false) List<String> sort
+
+    ) {
+        List<Product> products = productService.getAll(categoryId, minPrice, maxPrice, discount, sort);
+        return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }
 
-    @GetMapping("/products/{productId}")
+    @GetMapping("/{productId}")
     public ProductResponseDto getProductById(@PathVariable Long productId) {
         return productConverter.toDto(productService.getById(productId));
     }
 
-    @PostMapping("/products")
+    @PostMapping()
     public ResponseEntity<ProductResponseDto> create(@RequestBody ProductRequestDto dto) {
         Product product = productConverter.toEntity(dto);
         Product saved = productService.create(product);
         return ResponseEntity.ok(productConverter.toDto(saved));
     }
 
-    @PutMapping("/products/{productId}")
+    @PutMapping("/{productId}")
     public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @RequestBody ProductRequestDto dto) {
         Product product = productService.updateProduct(productId, productConverter.toEntity(dto));
         return ResponseEntity.ok(productConverter.toDto(product));
     }
 
-    @DeleteMapping("/products/{productId}")
+    @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteById(@PathVariable Long productId) {
         productService.delete(productId);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 }

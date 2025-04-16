@@ -20,13 +20,16 @@ import java.util.Optional;
 public class FavoriteServiceImpl implements FavoriteService {
 
     @Autowired
-    FavoriteJpaRepository favoriteRepository;
+    private FavoriteJpaRepository favoriteRepository;
 
     @Autowired
-    UserJpaRepository userRepository;
+    private UserJpaRepository userRepository;
 
     @Autowired
-    ProductJpaRepository productRepository;
+    private ProductJpaRepository productRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public List<Favorite> getAll() {
@@ -37,17 +40,16 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Modifying
     @Transactional
     public Favorite create(Favorite favorite) {
-        Optional.ofNullable(favorite.getUser()).map(User::getId).ifPresent(id -> {
-            User user = userRepository.findById(id).orElseThrow(
-                    () -> new UserNotFoundException("User with id " + id + " is not found"));
-            favorite.setUser(user);
-        });
-
-        Optional.ofNullable(favorite.getProduct()).map(Product::getId).ifPresent(id -> {
-            Product product = productRepository.findById(id).orElseThrow(
-                    () -> new ProductNotFoundException("Product with id " + id + " is not found"));
-            favorite.setProduct(product);
-        });
+//        Optional.ofNullable(favorite.getUser()).map(User::getId).ifPresent(id -> {
+//            User user = userService.getById(id);
+//            favorite.setUser(user);
+//        });
+//
+//        Optional.ofNullable(favorite.getProduct()).map(Product::getId).ifPresent(id -> {
+//            Product product = productRepository.findById(id).orElseThrow(
+//                    () -> new ProductNotFoundException("Product with id " + id + " is not found"));
+//            favorite.setProduct(product);
+//        });
         boolean exists = favoriteRepository.existsByUserAndProduct(favorite.getUser(), favorite.getProduct());
         if (exists) {
             throw new FavoriteNotUniqueException("Product with id " + favorite.getProduct().getId()

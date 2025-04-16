@@ -9,7 +9,7 @@ import org.telran.online_store.service.CategoryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -19,32 +19,31 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/categories")
+    @GetMapping()
     public List<Category> getAll() {
         return categoryService.getAllCategories();
     }
 
-    @GetMapping("/categories/{categoryId}")
+    @GetMapping("/{categoryId}")
     public Category getCategoryById(@PathVariable Long categoryId) {
         return categoryService.getCategoryById(categoryId);
     }
 
-    @PostMapping("/categories")
+    @PostMapping()
     public ResponseEntity<Category> create(@RequestBody Category category) {
         return ResponseEntity.ok(categoryService.createCategory(category));
     }
 
-    @DeleteMapping("/categories/{categoryId}")
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> deleteById(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/categories/{categoryId}")
+    @PutMapping("/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
             @RequestBody Category category) {
-
         Category updatedCategory = categoryService.updateCategory(categoryId, category);
         return ResponseEntity.ok(updatedCategory);
     }

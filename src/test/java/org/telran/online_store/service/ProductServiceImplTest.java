@@ -41,7 +41,7 @@ class ProductServiceImplTest {
 
     @Test
     void testGetAllProducts() {
-        assertEquals(2, productService.getAll().size());
+        assertEquals(2, productService.getAll(null, null, null, null, null).size());
     }
 
     @Test
@@ -52,16 +52,19 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void testUpdateProduct(){
-        Product product = productService.getByName("Lily");
-
+    void testUpdateProduct() {
+        Long productId = productService.getByName("Lily").getId();
+        Product newProduct = new Product();
+        newProduct.setName("Lily updated");
+        productService.updateProduct(productId, newProduct);
+        assertEquals("Lily updated", productService.getById(productId).getName());
     }
 
     @Test
     void testDeleteProductById() {
-        List<Product> products = productService.getAll();
+        List<Product> products = productService.getAll(null, null, null, null, null);
         assertEquals(2, products.size());
         productService.delete(products.get(0).getId());
-        assertEquals(1, productService.getAll().size());
+        assertEquals(1, productService.getAll(null, null, null, null, null).size());
     }
 }

@@ -30,7 +30,7 @@ public class UserControllerTest {
                   "name": "John Doe",
                   "email": "john@example.com",
                   "password": "secret",
-                  "role": "CUSTOMER"
+                  "userRole": "ADMINISTRATOR"
                 }
                 """;
 
@@ -43,7 +43,7 @@ public class UserControllerTest {
                 .statusCode(200)
                 .body("id", notNullValue())
                 .body("email", equalTo("john@example.com"))
-                .body("role", equalTo("CUSTOMER"));
+                .body("userRole", equalTo("ADMINISTRATOR"));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class UserControllerTest {
                   "name": "John Doe",
                   "email": "john@example.com",
                   "password": "secret",
-                  "role": "CUSTOMER"
+                  "userRole": "ADMINISTRATOR"
                 }
                 """;
 
@@ -83,7 +83,7 @@ public class UserControllerTest {
                           "name": "Jane Doe",
                           "email": "jane@example.com",
                           "password": "123456",
-                          "role": "CUSTOMER"
+                          "userRole": "ADMINISTRATOR"
                         }
                         """)
                 .post("/v1/users/register")
@@ -109,7 +109,7 @@ public class UserControllerTest {
                           "name": "Update Me",
                           "email": "update@me.com",
                           "password": "oldpass",
-                          "role": "CUSTOMER"
+                          "userRole": "ADMINISTRATOR"
                         }
                         """)
                 .post("/v1/users/register")
@@ -122,7 +122,7 @@ public class UserControllerTest {
                 .body("""
                         {
                           "name": "Updated User",
-                          "email": "updated@example.com"
+                          "phone": "4915123456789"
                         }
                         """)
                 .when()
@@ -130,7 +130,7 @@ public class UserControllerTest {
                 .then()
                 .statusCode(200)
                 .body("name", equalTo("Updated User"))
-                .body("email", equalTo("updated@example.com"));
+                .body("phone", equalTo("4915123456789"));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class UserControllerTest {
                           "name": "ToDelete",
                           "email": "delete@me.com",
                           "password": "pass",
-                          "role": "CUSTOMER"
+                          "userRole": "ADMINISTRATOR"
                         }
                         """)
                 .post("/v1/users/register")

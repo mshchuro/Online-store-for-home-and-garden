@@ -13,7 +13,7 @@ import org.telran.online_store.service.FavoriteService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
@@ -27,27 +27,27 @@ public class FavoriteController {
         this.favoriteConverter = favoriteConverter;
     }
 
-    @GetMapping("/favorites")
+    @GetMapping()
     public ResponseEntity<List<FavoriteResponseDto>> getAll() {
         return ResponseEntity.ok(favoriteService.getAll().stream().map(favoriteConverter::toDto).toList());
     }
 
-    @GetMapping("/favorites/{favorite_id}")
+    @GetMapping("/{favorite_id}")
     public ResponseEntity<FavoriteResponseDto> getById(@PathVariable Long favorite_id) {
         Favorite favorite = favoriteService.getById(favorite_id);
         return ResponseEntity.ok(favoriteConverter.toDto(favorite));
     }
 
-    @PostMapping("/favorites")
+    @PostMapping()
     public ResponseEntity<FavoriteResponseDto> create(@RequestBody FavoriteRequestDto requestDto) {
         Favorite favorite = favoriteConverter.toEntity(requestDto);
         Favorite saved = favoriteService.create(favorite);
         return ResponseEntity.ok(favoriteConverter.toDto(saved));
     }
 
-    @DeleteMapping("/favorites/{favorite_id}")
+    @DeleteMapping("/{favorite_id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long favorite_id) {
         favoriteService.delete(favorite_id);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 }

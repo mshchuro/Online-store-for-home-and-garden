@@ -12,7 +12,7 @@ import org.telran.online_store.service.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/orders")
 public class OrderController {
 
 }
