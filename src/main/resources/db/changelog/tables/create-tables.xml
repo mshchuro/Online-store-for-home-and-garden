@@ -92,4 +92,49 @@
                 constraintName="fk_product"/>
         <addUniqueConstraint constraintName="uk_favorites" tableName="favorites" columnNames="user_id, product_id"/>
     </changeSet>
+
+    <changeSet id="5-create table-carts" author="yuliya_fralova">
+        <createTable tableName="carts">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_carts" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="carts"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_user"/>
+    </changeSet>
+
+    <changeSet id="6-create table-cart-items" author="yuliya_fralova">
+        <createTable tableName="cart_items">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_cart_items" nullable="false"/>
+            </column>
+            <column name="cart_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="cart_items"
+                baseColumnNames="cart_id"
+                referencedTableName="carts"
+                referencedColumnNames="id"
+                constraintName="fk_cart"/>
+        <addForeignKeyConstraint
+                baseTableName="cart_items"
+                baseColumnNames="product_id"
+                referencedTableName="products"
+                referencedColumnNames="id"
+                constraintName="fk_product"/>
+        <addUniqueConstraint constraintName="uk_cart_items" tableName="cart_items" columnNames="cart_id, product_id"/>
+    </changeSet>
 </databaseChangeLog>
