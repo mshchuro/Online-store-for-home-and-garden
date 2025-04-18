@@ -3,11 +3,11 @@ package org.telran.online_store.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.telran.online_store.converter.Converter;
 import org.telran.online_store.dto.AddToCartRequest;
-import org.telran.online_store.entity.CartItem;
+import org.telran.online_store.dto.CartResponseDto;
+import org.telran.online_store.entity.Cart;
 import org.telran.online_store.service.CartService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/cart")
@@ -15,13 +15,16 @@ public class CartController {
 
     private final CartService cartService;
 
-    public CartController(CartService cartService) {
+    private final Converter<AddToCartRequest, CartResponseDto, Cart> cartConverter;
+
+    public CartController(CartService cartService, Converter<AddToCartRequest, CartResponseDto, Cart> cartConverter) {
         this.cartService = cartService;
+        this.cartConverter = cartConverter;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<CartItem>> getAllItems(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getAllItems(userId));
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<CartResponseDto> getAllItems(@PathVariable Long userId) {
+        return ResponseEntity.ok(cartConverter.toDto(cartService.getCart(userId)));
     }
 
     @PostMapping
@@ -30,9 +33,9 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@RequestParam Long userId, Long productId) {
-        cartService.removeFromCart(userId, productId);
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> delete(@PathVariable Long productId) {
+        cartService.removeFromCart(1L, productId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

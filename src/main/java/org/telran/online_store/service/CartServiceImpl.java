@@ -2,6 +2,7 @@ package org.telran.online_store.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.dto.AddToCartRequest;
 import org.telran.online_store.entity.Cart;
 import org.telran.online_store.entity.CartItem;
@@ -25,27 +26,30 @@ public class CartServiceImpl implements CartService {
     private CartJpaRepository cartRepository;
 
     @Autowired
-    private UserJpaRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private ProductJpaRepository productRepository;
+    private ProductService productService;
+
+    @Override
+    public Cart getCart(Long userId) {
+        return cartRepository.findByUserId(userId);
+    }
 
     @Override
     public List<CartItem> getAllItems(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()
-                -> new UserNotFoundException("No user with id " + userId + " is found"));
+        User user = userService.getById(userId);
         return cartRepository.findByUser(user)
                 .map(cart -> cart.getItems().stream().toList())
                 .orElse(List.of());
     }
 
     @Override
+    @Transactional
     public void addToCart(Long userId, AddToCartRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(()
-                -> new UserNotFoundException("No user with id " + userId + " is found"));
+        User user = userService.getById(userId);
 
-        Product product = productRepository.findById(request.getProductId()).orElseThrow(()
-                -> new ProductNotFoundException("No product with id " + request.getProductId() + " is found"));
+        Product product = productService.getById(request.getProductId());
 
         Cart cart = cartRepository.findByUser(user).orElse(new Cart(null, user, new ArrayList<>()));
         CartItem item = cart.getItems().stream()
@@ -61,9 +65,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void removeFromCart(Long userId, Long productId) {
-        User user = userRepository.findById(userId).orElseThrow(()
-                -> new UserNotFoundException("No user with id " + userId + " is found"));
+        User user = userService.getById(userId);
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
         CartItem item = cart.getItems().stream()

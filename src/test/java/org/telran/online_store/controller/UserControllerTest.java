@@ -29,8 +29,9 @@ public class UserControllerTest {
                 {
                   "name": "John Doe",
                   "email": "john@example.com",
+                  "phone": "+4915123456789"
                   "password": "secret",
-                  "role": "CUSTOMER"
+                  "role": "CLIENT"
                 }
                 """;
 
@@ -52,8 +53,9 @@ public class UserControllerTest {
                 {
                   "name": "John Doe",
                   "email": "john@example.com",
+                  "phone": "+4915123456789",
                   "password": "secret",
-                  "role": "CUSTOMER"
+                  "role": "CLIENT"
                 }
                 """;
 
@@ -82,6 +84,7 @@ public class UserControllerTest {
                         {
                           "name": "Jane Doe",
                           "email": "jane@example.com",
+                          "phone": "+4915123456789",
                           "password": "123456",
                           "role": "CUSTOMER"
                         }
@@ -108,8 +111,9 @@ public class UserControllerTest {
                         {
                           "name": "Update Me",
                           "email": "update@me.com",
+                          "phone": "+4915123456789",
                           "password": "oldpass",
-                          "role": "CUSTOMER"
+                          "role": "CLIENT"
                         }
                         """)
                 .post("/v1/users/register")
@@ -141,8 +145,9 @@ public class UserControllerTest {
                         {
                           "name": "ToDelete",
                           "email": "delete@me.com",
+                          "phone": "+4915123456789",
                           "password": "pass",
-                          "role": "CUSTOMER"
+                          "role": "CLIENT"
                         }
                         """)
                 .post("/v1/users/register")
@@ -154,6 +159,6 @@ public class UserControllerTest {
                 .when()
                 .delete("/v1/users/" + id)
                 .then()
-                .statusCode(202);
+                .statusCode(200);
     }
 }
