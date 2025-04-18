@@ -8,6 +8,7 @@ import org.telran.online_store.entity.Cart;
 import org.telran.online_store.entity.CartItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.exception.CartItemNotFoundException;
 import org.telran.online_store.exception.CartNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.exception.UserNotFoundException;
@@ -33,15 +34,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getCart(Long userId) {
-        return cartRepository.findByUserId(userId);
-    }
-
-    @Override
-    public List<CartItem> getAllItems(Long userId) {
-        User user = userService.getById(userId);
-        return cartRepository.findByUser(user)
-                .map(cart -> cart.getItems().stream().toList())
-                .orElse(List.of());
+        return Optional.ofNullable(cartRepository.findByUserId(userId))
+                .orElseThrow(() ->
+                        new CartNotFoundException("Cart is not found")
+                );
     }
 
     @Override
@@ -73,7 +69,7 @@ public class CartServiceImpl implements CartService {
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getProduct().getId().equals(productId))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new CartItemNotFoundException("Cart item is not found"));
         if (item != null) {
             cart.getItems().remove(item);
             cartRepository.save(cart);
@@ -81,7 +77,11 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void clearCart(Long userId) {
-
+        User user = userService.getById(userId);
+        Cart cart = cartRepository.findByUser(user).orElseThrow(()
+                -> new CartNotFoundException("No such cart is found"));
+        cartRepository.delete(cart);
     }
 }

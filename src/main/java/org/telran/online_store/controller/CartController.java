@@ -28,14 +28,20 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody AddToCartRequest addToCartRequest) {
+    public ResponseEntity<Void> createCartItem(@RequestBody AddToCartRequest addToCartRequest) {
         cartService.addToCart(1L, addToCartRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> delete(@PathVariable Long productId) {
+    public ResponseEntity<Void> deleteCartItem(@PathVariable Long productId) {
         cartService.removeFromCart(1L, productId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<Void> deleteCart(@PathVariable Long userId) {
+        cartService.clearCart(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

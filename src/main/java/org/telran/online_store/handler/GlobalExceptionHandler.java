@@ -11,7 +11,8 @@ import org.telran.online_store.exception.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({ProductNotFoundException.class, UserNotFoundException.class
-            , CategoryNotFoundException.class, FavoriteNotFoundException.class, OrderNotFoundException.class})
+            , CategoryNotFoundException.class, FavoriteNotFoundException.class, OrderNotFoundException.class,
+            CartNotFoundException.class, CartItemNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleEntityNotFoundException(Exception e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
