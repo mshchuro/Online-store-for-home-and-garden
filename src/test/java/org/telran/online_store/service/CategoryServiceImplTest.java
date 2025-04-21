@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.telran.online_store.dto.UserUpdateRequest;
 import org.telran.online_store.entity.Category;
+import org.telran.online_store.entity.User;
 import org.telran.online_store.repository.CategoryJpaRepository;
 
 import java.util.List;
@@ -55,15 +57,15 @@ class CategoryServiceImplTest {
         assertEquals(2, categoryService.getAllCategories().size());
     }
 
-//    @Test
-//    public void testUpdate() {
-//        CategoryUpdateRequest updateRequest = new CategoryUpdateRequest();
-//        //updateRequest.setName("Updated Category");
-//
-//        Category updated = categoryService.updateCategory(2L, null);
-//
-//        assertNotNull(updated.getId());
-//        assertEquals("Updated Category", updated.getName());
-//        assertEquals(3, categoryService.getAllCategories().size());
-//    }
+    @Test
+    public void testUpdate() {
+        Category categoryBeforeUpdate = categoryService.getByName("Fertilizer");
+        Long id = categoryBeforeUpdate.getId();
+        Category category = new Category();
+        category.setName("Fertilizerrrrr");
+        categoryService.updateCategory(id, category);
+
+        assertEquals("Fertilizerrrrr", categoryService.getCategoryById(id).getName());
+
+    }
 }

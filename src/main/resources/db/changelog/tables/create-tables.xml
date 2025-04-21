@@ -97,10 +97,17 @@
         <createTable tableName="carts">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="pk_carts" nullable="false"/>
+              
+    <changeSet id="5-create-table-orders" author="maksims_scurovskis">
+        <createTable tableName="orders">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+
             </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+
         </createTable>
         <addForeignKeyConstraint
                 baseTableName="carts"
@@ -136,5 +143,26 @@
                 referencedColumnNames="id"
                 constraintName="fk_cart_items_product"/>
         <addUniqueConstraint constraintName="uk_cart_items" tableName="cart_items" columnNames="cart_id, product_id"/>
+
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_address" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contact_phone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_method" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
     </changeSet>
 </databaseChangeLog>

@@ -14,7 +14,7 @@ import org.telran.online_store.service.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -24,31 +24,32 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
+    @GetMapping()
     public List<User> getAll(ServletRequest servletRequest) {
         return userService.getAll();
     }
 
-    @PostMapping("/users/register")
+    @PostMapping("/register")
     public ResponseEntity<User> create(@RequestBody User user) {
         return ResponseEntity.ok(userService.create(user));
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public User getById(@PathVariable Long userId) {
         return userService.getById(userId);
     }
 
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteById(@PathVariable Long userId) {
         userService.delete(userId);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/users/{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<User> updateProfile(
             @PathVariable Long userId,
             @RequestBody UserUpdateRequest updateRequest) {
+
 
         User updatedUser = userService.updateProfile(userId, updateRequest);
         return ResponseEntity.ok(updatedUser);
