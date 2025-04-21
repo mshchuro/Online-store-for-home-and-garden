@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.dto.UserUpdateRequest;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.repository.UserJpaRepository;
 
 import java.math.BigDecimal;
@@ -50,11 +51,15 @@ class UserServiceImplTest {
         String userName = "Max";
         String email = "123qwe@gmail.com";
         String phone = "555666777";
+        String password = "secret";
+        UserRole userRole = UserRole.CLIENT;
 
         User user = new User();
         user.setName(userName);
         user.setEmail(email);
         user.setPhone(phone);
+        user.setPassword(password);
+        user.setUserRole(userRole);
 
         userService.create(user);
 

@@ -1,4 +1,7 @@
-DELETE FROM users;
+DELETE
+FROM users;
 
-INSERT INTO users (name, email, phone) VALUES ('alex', 'alex@example.com', '12345678');
-INSERT INTO users (name, email, phone) VALUES ('john', 'john@example.com', '00112233');
+INSERT INTO users (name, password, email, phone, user_role)
+VALUES ('alex', 'secret', 'alex@example.com', '12345678', 'CLIENT');
+INSERT INTO users (name, password, email, phone, user_role)
+VALUES ('john', 'secret', 'john@example.com', '00112233', 'CLIENT');
