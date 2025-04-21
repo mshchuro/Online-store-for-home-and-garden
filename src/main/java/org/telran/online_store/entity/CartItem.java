@@ -1,5 +1,7 @@
 package org.telran.online_store.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,14 +15,14 @@ public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartItemId;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "cartId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Cart cart;
 
-    @ManyToOne
-    @JoinColumn(name = "productId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
 
     private Integer quantity;

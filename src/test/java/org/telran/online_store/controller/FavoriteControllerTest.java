@@ -14,6 +14,7 @@ import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.repository.FavoriteJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
 import org.telran.online_store.repository.UserJpaRepository;
@@ -56,8 +57,11 @@ public class FavoriteControllerTest {
         productRepository.deleteAll();
 
         testUser = userRepository.save(User.builder()
+                .name("Lily")
+                .phone("12123123123123")
                 .email("test@example.com")
                 .password("123456")
+                .userRole(UserRole.CLIENT)
                 .build());
 
         testProduct = productRepository.save(Product.builder()
