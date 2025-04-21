@@ -10,14 +10,9 @@ import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.CartItemNotFoundException;
 import org.telran.online_store.exception.CartNotFoundException;
-import org.telran.online_store.exception.ProductNotFoundException;
-import org.telran.online_store.exception.UserNotFoundException;
 import org.telran.online_store.repository.CartJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
-import org.telran.online_store.repository.UserJpaRepository;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
