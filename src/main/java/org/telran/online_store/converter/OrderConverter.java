@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderConverter implements Converter<OrderRequestDto, OrderResponseDto, Order>{
 
-
     @Override
     public OrderResponseDto toDto(Order order) {
 
@@ -32,8 +31,9 @@ public class OrderConverter implements Converter<OrderRequestDto, OrderResponseD
 
     @Override
     public Order toEntity(OrderRequestDto dto) {
+
         return null;
-//        Order.builder()
+//        return Order.builder()
 //                .items(dto.items())
 //                .deliveryAddress(dto.deliveryAddress())
 //                .deliveryMethod(dto.deliveryMethod())
