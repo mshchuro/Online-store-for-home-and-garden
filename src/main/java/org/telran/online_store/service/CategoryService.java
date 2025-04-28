@@ -1,8 +1,6 @@
 package org.telran.online_store.service;
 
-import org.telran.online_store.dto.UserUpdateRequest;
 import org.telran.online_store.entity.Category;
-import org.telran.online_store.entity.User;
 
 import java.util.List;
 

@@ -1,22 +1,17 @@
 package org.telran.online_store.controller;
 
-import jakarta.servlet.ServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.telran.online_store.converter.Converter;
 import org.telran.online_store.converter.UserRegistrationConverter;
-import org.telran.online_store.dto.UserRegistrationRequest;
-import org.telran.online_store.dto.UserRegistrationResponse;
-import org.telran.online_store.dto.UserUpdateRequest;
-import org.telran.online_store.entity.Category;
-import org.telran.online_store.entity.Product;
+import org.telran.online_store.dto.*;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.service.UserService;
 
-import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -26,7 +21,10 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
     private final UserRegistrationConverter userRegistrationConverter;
+
+    private final Converter<UserUpdateRequestDto, UserUpdateResponseDto, User> userConverter;
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
@@ -41,7 +39,7 @@ public class UserController {
         if (log.isDebugEnabled()) {
             log.debug("User has been registered: {}", savedUser);
         }
-        return ResponseEntity.ok(userRegistrationConverter.toDto(savedUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userRegistrationConverter.toDto(savedUser));
     }
 
     @GetMapping("/{userId}")
@@ -59,10 +57,8 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public ResponseEntity<User> updateProfile(
-            @PathVariable Long userId,
-            @RequestBody UserUpdateRequest updateRequest) {
-        User updatedUser = userService.updateProfile(userId, updateRequest);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<UserUpdateResponseDto> updateProfile(@PathVariable Long userId, @RequestBody UserUpdateRequestDto dto) {
+        User user = userService.updateProfile(userId, userConverter.toEntity(dto));
+        return ResponseEntity.ok(userConverter.toDto(user));
     }
 }

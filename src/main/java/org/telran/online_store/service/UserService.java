@@ -1,6 +1,6 @@
 package org.telran.online_store.service;
 
-import org.telran.online_store.dto.UserUpdateRequest;
+import org.telran.online_store.dto.UserUpdateRequestDto;
 import org.telran.online_store.entity.User;
 
 import java.util.List;
@@ -17,6 +17,6 @@ public interface UserService {
 
     User getByEmail(String email);
 
-    User updateProfile(Long id, UserUpdateRequest updateRequest);
+    User updateProfile(Long id, User user);
 
 }
