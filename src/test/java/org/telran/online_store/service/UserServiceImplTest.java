@@ -75,5 +75,6 @@ class UserServiceImplTest {
 //        User updatedUser = userService.getByEmail("Alexander");
 //        assertEquals("Alexander", updatedUser.getName());
 //        assertEquals("98989898", updatedUser.getPhone());
+
     }
 }
