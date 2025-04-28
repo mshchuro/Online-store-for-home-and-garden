@@ -3,4 +3,3 @@ target/
 .DS_Store
 *.iml
 src/main/resources/config/application.properties
-src/main/resources/config/application.properties
