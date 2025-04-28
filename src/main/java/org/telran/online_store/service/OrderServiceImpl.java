@@ -22,8 +22,8 @@ public class OrderServiceImpl implements OrderService {
     private ProductService productService;
 
     @Override
-    public List<Order> getAll() {
-        return orderRepository.findAll();
+    public List<Order> getAllUserOrders(Long userId) {
+        return orderRepository.findAllByUserId(userId);
     }
 
     @Override
@@ -35,9 +35,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Modifying
     @Transactional
-    public Order create(OrderRequestDto orderRequestDto) {
-//        Product product = productService.getById(orderRequestDto.items().);
-//        return orderRepository.save(order);
-        return null;
+    public Order create(Order order) {
+        return orderRepository.save(order);
     }
 }

@@ -4,9 +4,19 @@ import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.OrderItemRequestDto;
 import org.telran.online_store.dto.OrderItemResponseDto;
 import org.telran.online_store.entity.OrderItem;
+import org.telran.online_store.entity.Product;
+import org.telran.online_store.service.ProductService;
+
+import java.math.BigDecimal;
 
 @Component
-public class OrderItemConverter implements Converter<OrderItemRequestDto, OrderItemResponseDto, OrderItem>{
+public class OrderItemConverter implements Converter<OrderItemRequestDto, OrderItemResponseDto, OrderItem> {
+
+    private final ProductService productService;
+
+    public OrderItemConverter(ProductService productService) {
+        this.productService = productService;
+    }
 
     @Override
     public OrderItemResponseDto toDto(OrderItem orderItem) {
@@ -20,6 +30,13 @@ public class OrderItemConverter implements Converter<OrderItemRequestDto, OrderI
 
     @Override
     public OrderItem toEntity(OrderItemRequestDto orderItemRequestDto) {
-        return null;
+        Product product = productService.getById(orderItemRequestDto.productId());
+        BigDecimal discount = product.getDiscountPrice() == null ? BigDecimal.ZERO : product.getDiscountPrice();
+
+        return OrderItem.builder()
+                .product(product)
+                .quantity(orderItemRequestDto.quantity())
+                .priceAtPurchase(product.getPrice().subtract(discount))
+                .build();
     }
 }

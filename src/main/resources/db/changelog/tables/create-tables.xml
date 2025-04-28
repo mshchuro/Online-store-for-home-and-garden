@@ -171,7 +171,7 @@
             <column name="delivery_method" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="order_status" type="VARCHAR(255)">
+            <column name="status" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="updated_at" type="TIMESTAMP">
@@ -188,7 +188,7 @@
     </changeSet>
 
     <changeSet id="9-create-table-order-items" author="maksims_scurovskis">
-        <createTable tableName="order-items">
+        <createTable tableName="order_items">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

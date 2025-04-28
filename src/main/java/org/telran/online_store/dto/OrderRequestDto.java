@@ -14,5 +14,4 @@ public record OrderRequestDto (
         String deliveryMethod,
 
         String contactPhone
-
 ) {}
