@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.UserUpdateRequest;
+import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.service.ProductService;
 import org.telran.online_store.service.UserService;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -31,7 +33,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> create(@RequestBody User user) {
-        return ResponseEntity.ok(userService.create(user));
+        User createdUser = userService.create(user);
+        URI location = URI.create("/api/users/" + createdUser.getId());
+        return ResponseEntity.created(location).body(createdUser);
     }
 
     @GetMapping("/{userId}")
@@ -49,8 +53,6 @@ public class UserController {
     public ResponseEntity<User> updateProfile(
             @PathVariable Long userId,
             @RequestBody UserUpdateRequest updateRequest) {
-
-
         User updatedUser = userService.updateProfile(userId, updateRequest);
         return ResponseEntity.ok(updatedUser);
     }
