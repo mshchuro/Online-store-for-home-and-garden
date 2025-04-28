@@ -60,10 +60,14 @@
             <column name="password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="user_role" type="VARCHAR(255)">
+            <column name="role" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addUniqueConstraint
+                constraintName="uk_users"
+                tableName="users"
+                columnNames="email"/>
     </changeSet>
 
     <changeSet id="4-create-table-favorites" author="yuliya_fralova">

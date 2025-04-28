@@ -15,7 +15,7 @@ public interface UserService {
 
     void delete(Long id);
 
-    User getByName(String name);
+    User getByEmail(String email);
 
     User updateProfile(Long id, UserUpdateRequest updateRequest);
 

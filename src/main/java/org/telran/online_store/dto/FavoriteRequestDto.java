@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record FavoriteRequestDto(
-        Long userId,
+        //Long userId,
         Long productId
 ) {
 }
