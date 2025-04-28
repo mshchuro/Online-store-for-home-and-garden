@@ -1,6 +1,7 @@
 package org.telran.online_store.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +34,13 @@ public class CategoryController {
     @PostMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Category> create(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(category));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(category));
     }
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> deleteById(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{categoryId}")
