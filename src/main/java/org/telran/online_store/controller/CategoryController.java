@@ -40,12 +40,14 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Void> deleteById(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
             @RequestBody Category category) {

@@ -1,6 +1,7 @@
 package org.telran.online_store.converter;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.OrderItemRequestDto;
 import org.telran.online_store.dto.OrderItemResponseDto;
@@ -15,11 +16,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderConverter implements Converter<OrderRequestDto, OrderResponseDto, Order>{
 
+    private final OrderItemConverter orderItemConverter;
+
     @Override
     public OrderResponseDto toDto(Order order) {
 
         return OrderResponseDto.builder()
                 .id(order.getOrderId())
+                .items(order.getItems().stream().map(orderItemConverter::toDto).toList())
                 .status(order.getStatus())
                 .deliveryAddress(order.getDeliveryAddress())
                 .deliveryMethod(order.getDeliveryMethod())
@@ -34,11 +38,5 @@ public class OrderConverter implements Converter<OrderRequestDto, OrderResponseD
     public Order toEntity(OrderRequestDto dto) {
 
         return null;
-//        return Order.builder()
-//                .items(dto.items())
-//                .deliveryAddress(dto.deliveryAddress())
-//                .deliveryMethod(dto.deliveryMethod())
-//                .contactPhone(dto.contactPhone())
-//                .build();
     }
 }

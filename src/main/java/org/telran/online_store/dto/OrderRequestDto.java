@@ -15,5 +15,4 @@ public record OrderRequestDto (
 
         String contactPhone
 
-        // Удалить
 ) {}

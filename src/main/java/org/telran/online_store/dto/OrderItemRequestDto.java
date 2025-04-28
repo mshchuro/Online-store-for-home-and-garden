@@ -9,5 +9,4 @@ public record OrderItemRequestDto(
 
         int quantity
 
-        // Удалить
 ) {}

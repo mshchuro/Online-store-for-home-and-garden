@@ -19,7 +19,9 @@ public class OrderController {
     private final Converter<OrderRequestDto, OrderResponseDto, Order> orderConverter;
 
     public OrderController(OrderService orderService,
-                           Converter<OrderRequestDto, OrderResponseDto, Order> orderConverter) {
+                           Converter<OrderRequestDto,
+                           OrderResponseDto,
+                           Order> orderConverter) {
         this.orderService = orderService;
         this.orderConverter = orderConverter;
     }
@@ -31,21 +33,15 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponseDto> getById(@PathVariable Long orderId) {
-        Order order = orderService.getById(orderId);
+    public ResponseEntity<OrderResponseDto> getStatus(@PathVariable Long orderId) {
+        Order order = orderService.getStatus(orderId);
         return ResponseEntity.ok(orderConverter.toDto(order));
     }
 
-    @PostMapping
-    public ResponseEntity<OrderResponseDto> create(@RequestBody OrderRequestDto dto) {
-        Order order = orderConverter.toEntity(dto);
-        Order saved = orderService.create(order);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderConverter.toDto(saved));
-    }
-
-    @DeleteMapping("/{orderId}")
-    public ResponseEntity<Void> delete(@PathVariable Long orderId) {
-        orderService.delete(orderId);
-        return ResponseEntity.noContent().build();
-    }
+//    @PostMapping
+//    public ResponseEntity<OrderResponseDto> create(@RequestBody OrderRequestDto dto) {
+//        Order order = orderConverter.toEntity(dto);
+//        Order saved = orderService.create(order);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(orderConverter.toDto(saved));
+//    }
 }

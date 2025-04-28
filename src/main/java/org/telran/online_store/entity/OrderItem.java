@@ -8,11 +8,11 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "order_items")
 @Data
-public class OrderItems {
+public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderItemId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
