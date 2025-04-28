@@ -45,7 +45,4 @@ public class Product {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "product")
-    private List<Favorite> favorites;
 }

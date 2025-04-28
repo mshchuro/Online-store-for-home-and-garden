@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Favorite;
-import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.*;
 import org.telran.online_store.repository.FavoriteJpaRepository;
@@ -14,7 +12,6 @@ import org.telran.online_store.repository.ProductJpaRepository;
 import org.telran.online_store.repository.UserJpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FavoriteServiceImpl implements FavoriteService {
@@ -32,8 +29,8 @@ public class FavoriteServiceImpl implements FavoriteService {
     private UserService userService;
 
     @Override
-    public List<Favorite> getAll() {
-        return favoriteRepository.findAll(); //getAllByUser
+    public List<Favorite> getAllByUser(User user) {
+        return favoriteRepository.findAllByUser(user); //getAllByUser
     }
 
     @Override

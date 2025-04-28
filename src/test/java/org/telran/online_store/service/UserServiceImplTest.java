@@ -1,6 +1,5 @@
 package org.telran.online_store.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,11 +7,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.dto.UserUpdateRequest;
-import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
-import org.telran.online_store.repository.UserJpaRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +29,7 @@ class UserServiceImplTest {
 
     @Test
     void testGetById() {
-        Long id = userService.getByName("john").getId();
+        Long id = userService.getByEmail("john").getId();
         assertEquals("john", userService.getById(id).getName());
     }
 
@@ -58,7 +54,7 @@ class UserServiceImplTest {
 
         userService.create(user);
 
-        User fromDb = userService.getByName(userName);
+        User fromDb = userService.getByEmail(userName);
 
         assertNotNull(fromDb);
         assertEquals(userName, fromDb.getName());
@@ -68,7 +64,7 @@ class UserServiceImplTest {
 
     @Test
     void testUpdateUser() {
-        User userBeforeUpdate = userService.getByName("alex");
+        User userBeforeUpdate = userService.getByEmail("alex");
         Long id = userBeforeUpdate.getId();
         assertEquals("alex", userBeforeUpdate.getName());
         assertEquals("12345678", userBeforeUpdate.getPhone());
@@ -79,7 +75,7 @@ class UserServiceImplTest {
 
         userService.updateProfile(id, updateRequest);
 
-        User updatedUser = userService.getByName("Alexander");
+        User updatedUser = userService.getByEmail("Alexander");
         assertEquals("Alexander", updatedUser.getName());
         assertEquals("98989898", updatedUser.getPhone());
     }

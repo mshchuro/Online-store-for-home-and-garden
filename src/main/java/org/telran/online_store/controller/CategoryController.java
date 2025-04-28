@@ -2,6 +2,7 @@ package org.telran.online_store.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.service.CategoryService;
@@ -31,6 +32,7 @@ public class CategoryController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Category> create(@RequestBody Category category) {
         Category createdCategory = categoryService.createCategory(category);
         URI location = URI.create("/categories/" + createdCategory.getId());

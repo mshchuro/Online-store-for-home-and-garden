@@ -9,6 +9,7 @@ import org.telran.online_store.dto.mapper.UserMapper;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.exception.UserNotFoundException;
+import org.telran.online_store.exception.UserNotUniqueException;
 import org.telran.online_store.repository.UserJpaRepository;
 
 import java.util.List;
@@ -31,6 +32,9 @@ public class UserServiceImpl implements UserService {
     @Modifying
     @Transactional
     public User create(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserNotUniqueException("User with email " + user.getEmail() + " already exists");
+        }
         return userRepository.save(user);
     }
 
@@ -51,8 +55,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByName(String name) {
-        return userRepository.findByName(name);
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({FavoriteNotUniqueException.class})
+    @ExceptionHandler({FavoriteNotUniqueException.class, UserNotUniqueException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<String> handleEntityNotUniqueException(Exception e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
