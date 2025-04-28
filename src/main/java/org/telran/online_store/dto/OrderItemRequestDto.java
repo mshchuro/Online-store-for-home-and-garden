@@ -8,4 +8,6 @@ public record OrderItemRequestDto(
         Long productId,
 
         int quantity
+
+        // Удалить
 ) {}

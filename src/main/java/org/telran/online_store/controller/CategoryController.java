@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.service.CategoryService;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,9 @@ public class CategoryController {
     @PostMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Category> create(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(category));
+        Category createdCategory = categoryService.createCategory(category);
+        URI location = URI.create("/categories/" + createdCategory.getId());
+        return ResponseEntity.created(location).body(createdCategory);
     }
 
     @DeleteMapping("/{categoryId}")
