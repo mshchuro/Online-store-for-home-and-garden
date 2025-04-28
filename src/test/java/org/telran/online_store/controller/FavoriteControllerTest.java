@@ -61,7 +61,7 @@ public class FavoriteControllerTest {
                 .phone("12123123123123")
                 .email("test@example.com")
                 .password("123456")
-                .userRole(UserRole.CLIENT)
+                .role(UserRole.CLIENT)
                 .build());
 
         testProduct = productRepository.save(Product.builder()
@@ -73,7 +73,6 @@ public class FavoriteControllerTest {
     @Test
     void testCreateFavorite() {
         FavoriteRequestDto request = FavoriteRequestDto.builder()
-                .userId(testUser.getId())
                 .productId(testProduct.getId())
                 .build();
 

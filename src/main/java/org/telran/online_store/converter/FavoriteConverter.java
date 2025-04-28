@@ -31,10 +31,8 @@ public class FavoriteConverter implements Converter<FavoriteRequestDto, Favorite
 
     @Override
     public Favorite toEntity(FavoriteRequestDto favoriteRequestDto) {
-        User user = userService.getById(favoriteRequestDto.userId());
         Product product = productService.getById(favoriteRequestDto.productId());
         return Favorite.builder()
-                .user(user)
                 .product(product)
                 .build();
     }

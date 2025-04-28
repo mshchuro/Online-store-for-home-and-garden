@@ -24,7 +24,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUser() {
+    void testRegisterUser() {
         String requestBody = """
                 {
                   "name": "John Doe",

@@ -1,3 +1,9 @@
+-- USERS
+INSERT INTO Users (name, email, phone, password, role)
+VALUES ('Alice Green', 'alice@example.com', '1234567890', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'CLIENT'),
+       ('Bob Gardener', 'bob@example.com', '0987654321', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'CLIENT'),
+       ('Admin Joe', 'admin@example.com', '5555555555', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'ADMINISTRATOR');
+
 -- CATEGORIES
 INSERT INTO Categories (name)
 VALUES ('Plants'),
@@ -18,11 +24,11 @@ VALUES ('Rose Bush', 'Beautiful red rose bush for your garden', 15.99, 1, 'image
        ('Garden Gloves', 'Waterproof gloves with anti-slip grip', 9.99, 2, 'images/gloves.jpg', NULL,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- USERS
-INSERT INTO Users (name, email, phone, password, user_role)
-VALUES ('Alice Green', 'alice@example.com', '1234567890', 'hash1', 'CLIENT'),
-       ('Bob Gardener', 'bob@example.com', '0987654321', 'hash2', 'CLIENT'),
-       ('Admin Joe', 'admin@example.com', '5555555555', 'adminhash', 'ADMINISTRATOR');
+-- FAVORITES
+INSERT INTO Favorites (user_id, product_id)
+VALUES (1, 2),
+       (2, 1),
+       (3, 2);
 
 -- CART
 -- INSERT INTO Cart (CartID, UserID)
@@ -35,11 +41,7 @@ VALUES ('Alice Green', 'alice@example.com', '1234567890', 'hash1', 'CLIENT'),
 --        (2, 1, 3, 1),
 --        (3, 2, 4, 3);
 
--- FAVORITES
--- INSERT INTO Favorites (id, UserID, ProductID)
--- VALUES (1, 1, 1),
---        (2, 1, 5),
---        (3, 2, 2);
+
 
 -- ORDERS
 -- INSERT INTO Orders (OrderID, UserID, CreatedAt, DeliveryAddress, ContactPhone, DeliveryMethod, Status, UpdatedAt)
