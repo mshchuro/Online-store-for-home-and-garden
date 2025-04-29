@@ -24,6 +24,7 @@ public class ProductConverter implements Converter<ProductRequestDto, ProductRes
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .discountPrice(product.getDiscountPrice())
                 .categoryId(Optional.ofNullable(product.getCategory()).map(Category::getId).orElse(null))
                 .image(product.getImageUrl())
                 .createdAt(product.getCreatedAt())
@@ -38,6 +39,7 @@ public class ProductConverter implements Converter<ProductRequestDto, ProductRes
                 .name(productDto.name())
                 .description(productDto.description())
                 .price(productDto.price())
+                .discountPrice(productDto.discountPrice())
                 .category(
                         productDto.categoryId() != null
                                 ? categoryService.getCategoryById(productDto.categoryId())

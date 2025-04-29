@@ -109,6 +109,10 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setImageUrl(product.getImageUrl());
         }
 
+        if (product.getDiscountPrice() != null) {
+            existingProduct.setDiscountPrice(product.getDiscountPrice());
+        }
+
         Long categoryId = Optional.ofNullable(product.getCategory()).map(Category::getId).orElse(null);
 
         if (categoryId != null) {
