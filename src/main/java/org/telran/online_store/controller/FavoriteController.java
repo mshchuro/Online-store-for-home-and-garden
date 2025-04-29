@@ -2,22 +2,17 @@ package org.telran.online_store.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.security.SecurityUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.converter.Converter;
-import org.telran.online_store.converter.FavoriteConverter;
 import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.dto.FavoriteResponseDto;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.service.FavoriteService;
 import org.telran.online_store.service.UserService;
-
 import java.util.List;
 
 @Slf4j
