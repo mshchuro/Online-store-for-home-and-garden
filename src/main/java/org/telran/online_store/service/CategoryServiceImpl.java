@@ -46,7 +46,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Long id) {
         List<Product> products = productService.getAllByCategoryId(id);
         products.forEach(product -> productService.updateCategory(product.getId(), null));
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository.findById(id).orElseThrow(()
+                -> new CategoryNotFoundException("Category with id " + id + " not found"));
+        categoryRepository.deleteById(category.getId());
     }
 
     @Override
