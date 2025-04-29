@@ -42,6 +42,34 @@ import org.springframework.test.context.ActiveProfiles;
     }
 
     @Test
+    void testGetAllCategories() {
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Category One\"}")
+                .post("/v1/categories")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Category Two\"}")
+                .post("/v1/categories")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
+
+        given()
+                .get("/v1/categories")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", greaterThanOrEqualTo(2));
+    }
+
+
+
+    @Test
     void testCreateCategory() {
         given()
                 .header("Authorization", "Bearer " + token)
@@ -109,6 +137,6 @@ import org.springframework.test.context.ActiveProfiles;
                 .header("Authorization", "Bearer " + token)
                 .delete("/v1/categories/" + categoryId)
                 .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value());
     }
     }
