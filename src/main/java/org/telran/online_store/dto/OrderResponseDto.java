@@ -11,8 +11,6 @@ public record OrderResponseDto(
 
         Long id,
 
-        Long userId,
-
         String contactPhone,
 
         String deliveryAddress,
@@ -26,4 +24,5 @@ public record OrderResponseDto(
         LocalDateTime updatedAt,
 
         List<OrderItemResponseDto> items
-) {}
+) {
+}

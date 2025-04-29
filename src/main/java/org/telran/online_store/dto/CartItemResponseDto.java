@@ -6,6 +6,4 @@ import lombok.Builder;
 public record CartItemResponseDto(
         Long productId,
         Integer quantity
-) {
-
-}
+) {}

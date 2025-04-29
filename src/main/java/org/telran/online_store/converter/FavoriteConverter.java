@@ -1,5 +1,6 @@
 package org.telran.online_store.converter;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.FavoriteRequestDto;
@@ -11,13 +12,10 @@ import org.telran.online_store.service.ProductService;
 import org.telran.online_store.service.UserService;
 
 @Component
+@RequiredArgsConstructor
 public class FavoriteConverter implements Converter<FavoriteRequestDto, FavoriteResponseDto, Favorite> {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @Override
     public FavoriteResponseDto toDto(Favorite favorite) {
