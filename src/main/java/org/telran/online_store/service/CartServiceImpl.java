@@ -28,8 +28,9 @@ public class CartServiceImpl implements CartService {
     private ProductService productService;
 
     @Override
-    public Cart getCart(Long userId) {
-        return Optional.ofNullable(cartRepository.findByUserId(userId))
+    public Cart getCart() {
+        Long currentUserId = userService.getCurrentUser().getId();
+        return Optional.ofNullable(cartRepository.findByUserId(currentUserId))
                 .orElseThrow(() ->
                         new CartNotFoundException("Cart is not found")
                 );
@@ -37,12 +38,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void addToCart(Long userId, AddToCartRequest request) {
-        User user = userService.getById(userId);
-
+    public void addToCart(AddToCartRequest request) {
+        User currentUser = userService.getCurrentUser();
         Product product = productService.getById(request.getProductId());
 
-        Cart cart = cartRepository.findByUser(user).orElse(new Cart(null, user, new ArrayList<>()));
+        Cart cart = cartRepository.findByUser(currentUser).orElse(new Cart(null, currentUser, new ArrayList<>()));
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getProduct().equals(product))
                 .findFirst()
@@ -57,8 +57,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void removeFromCart(Long userId, Long productId) {
-        User user = userService.getById(userId);
+    public void removeFromCart(Long productId) {
+        User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
         CartItem item = cart.getItems().stream()
@@ -73,8 +73,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void clearCart(Long userId) {
-        User user = userService.getById(userId);
+    public void clearCart() {
+        User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
         cartRepository.delete(cart);

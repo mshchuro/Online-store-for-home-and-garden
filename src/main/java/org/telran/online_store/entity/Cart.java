@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "carts")
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Builder
@@ -26,15 +26,6 @@ public class Cart {
     @JsonBackReference
     private User user;
 
-//    @JoinColumn(name = "user_Id", nullable = false)
-//    private User userId;
-
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
-
-    public Cart(Long id, User user, List<CartItem> items) {
-        this.id = id;
-        this.user = user;
-        this.items = items;
-    }
 }

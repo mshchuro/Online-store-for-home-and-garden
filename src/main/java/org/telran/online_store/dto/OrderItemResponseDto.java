@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 @Builder
 public record OrderItemResponseDto(
 
-        String productName,
+        Long productId,
 
         Integer quantity,
 
