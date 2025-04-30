@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,18 +21,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    ProductJpaRepository productRepository;
+    private final ProductJpaRepository productRepository;
 
-    @Autowired
-    CategoryJpaRepository categoryRepository;
-
-//    @Override
-//    public List<Product> getAll() {
-//        return productRepository.findAll();
-//    }
+    private final CategoryJpaRepository categoryRepository;
 
     public List<Product> getAll(Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean discount, List<String> sort) {
 
