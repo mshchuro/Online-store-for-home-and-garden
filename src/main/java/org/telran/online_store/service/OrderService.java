@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    List<Order> getAllUserOrders(Long userId);
+    List<Order> getAllUserOrders();
 
     Order getStatus(Long id);
 
