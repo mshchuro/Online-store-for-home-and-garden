@@ -18,4 +18,5 @@ public interface UserService {
 
     User updateProfile(Long id, User user);
 
+    User getCurrentUser();
 }

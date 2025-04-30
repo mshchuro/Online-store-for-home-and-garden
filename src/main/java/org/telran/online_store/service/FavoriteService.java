@@ -9,9 +9,7 @@ public interface FavoriteService {
 
     Favorite create(Favorite favorite);
 
-    Favorite getById(Long id);
-
     void delete(Long id);
 
-    List<Favorite> getAllByUser(User user);
+    List<Favorite> getAll();
 }

@@ -1,5 +1,6 @@
 package org.telran.online_store.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.telran.online_store.service.UserService;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/orders")
 public class OrderController {
 
@@ -23,18 +25,9 @@ public class OrderController {
     private final Converter<OrderRequestDto, OrderResponseDto, Order> orderConverter;
     private final UserService userService;
 
-    public OrderController(OrderService orderService,
-                           Converter<OrderRequestDto,
-                                   OrderResponseDto,
-                                   Order> orderConverter, UserService userService) {
-        this.orderService = orderService;
-        this.orderConverter = orderConverter;
-        this.userService = userService;
-    }
-
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getAll() {
-        List<Order> orders = orderService.getAllUserOrders(1L);
+        List<Order> orders = orderService.getAllUserOrders();
         return ResponseEntity.ok(orders.stream().map(orderConverter::toDto).toList());
     }
 

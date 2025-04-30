@@ -2,8 +2,13 @@ package org.telran.online_store.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.expression.AccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.*;
@@ -20,17 +25,12 @@ public class FavoriteServiceImpl implements FavoriteService {
     private FavoriteJpaRepository favoriteRepository;
 
     @Autowired
-    private UserJpaRepository userRepository;
-
-    @Autowired
-    private ProductJpaRepository productRepository;
-
-    @Autowired
     private UserService userService;
 
     @Override
-    public List<Favorite> getAllByUser(User user) {
-        return favoriteRepository.findAllByUser(user); //getAllByUser
+    public List<Favorite> getAll() {
+        User currentUser = userService.getCurrentUser();
+        return favoriteRepository.findAllByUser(currentUser); //getAllByUser
     }
 
     @Override
@@ -47,6 +47,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 //                    () -> new ProductNotFoundException("Product with id " + id + " is not found"));
 //            favorite.setProduct(product);
 //        });
+        favorite.setUser(userService.getCurrentUser());
         boolean exists = favoriteRepository.existsByUserAndProduct(favorite.getUser(), favorite.getProduct());
         if (exists) {
             throw new FavoriteNotUniqueException("Product with id " + favorite.getProduct().getId()
@@ -57,14 +58,17 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public Favorite getById(Long id) {
-        return favoriteRepository.findById(id).orElseThrow(()
-                -> new FavoriteNotFoundException("Favorite product with id " + id + " is not found"));
-    }
-
-    @Override
     @Transactional
     public void delete(Long id) {
+        Favorite favorite = favoriteRepository.findById(id).orElseThrow(()
+                -> new FavoriteNotFoundException("Favorite with id " + id + " for current user is not found :("));
+        User currentUser = userService.getCurrentUser();
+        User user = favorite.getUser();
+
+        if (!currentUser.equals(user)) {
+            throw new AccessDeniedException("You are not allowed to delete this favorite.");
+        }
+
         favoriteRepository.deleteById(id);
     }
 }
