@@ -25,7 +25,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final UserService userService;
 
-
     @Override
     public List<Order> getAllUserOrders() {
         Long currentUserId = userService.getCurrentUser().getId();

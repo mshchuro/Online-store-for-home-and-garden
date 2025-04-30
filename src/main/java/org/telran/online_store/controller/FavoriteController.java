@@ -17,7 +17,9 @@ import java.util.List;
 @RequestMapping("/v1/favorites")
 @RequiredArgsConstructor
 public class FavoriteController {
+
     private final FavoriteService favoriteService;
+
     private final Converter<FavoriteRequestDto, FavoriteResponseDto, Favorite> favoriteConverter;
 
     @GetMapping

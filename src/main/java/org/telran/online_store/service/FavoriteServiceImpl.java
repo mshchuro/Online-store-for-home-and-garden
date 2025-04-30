@@ -37,16 +37,6 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Modifying
     @Transactional
     public Favorite create(Favorite favorite) {
-//        Optional.ofNullable(favorite.getUser()).map(User::getId).ifPresent(id -> {
-//            User user = userService.getById(id);
-//            favorite.setUser(user);
-//        });
-//
-//        Optional.ofNullable(favorite.getProduct()).map(Product::getId).ifPresent(id -> {
-//            Product product = productRepository.findById(id).orElseThrow(
-//                    () -> new ProductNotFoundException("Product with id " + id + " is not found"));
-//            favorite.setProduct(product);
-//        });
         favorite.setUser(userService.getCurrentUser());
         boolean exists = favoriteRepository.existsByUserAndProduct(favorite.getUser(), favorite.getProduct());
         if (exists) {
