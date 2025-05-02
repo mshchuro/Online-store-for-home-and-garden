@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import static io.restassured.RestAssured.given;
@@ -18,9 +19,25 @@ public class UserControllerTest {
     @LocalServerPort
     private int port;
 
+    private String adminToken;
+
     @BeforeEach
-    void setup() {
+    void setUp() {
         RestAssured.port = port;
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"email\":\"admin@example.com\",\"password\":\"password\", \"name\":\"Admin\"}")
+                .post("/v1/users/register");
+
+        adminToken = given()
+                .contentType(ContentType.JSON)
+                .body("{\"email\":\"admin@example.com\",\"password\":\"password\"}")
+                .post("/v1/users/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("token");
     }
 
     @Test
@@ -29,10 +46,8 @@ public class UserControllerTest {
                 {
                   "name": "John Doe",
                   "email": "john@example.com",
-                  "phone": "+4915123456789"
-                  "password": "secret",
-                  "role": "CLIENT"
-                  "userRole": "ADMINISTRATOR"
+                  "phone": "+4915123456789",
+                  "password": "secret"
                 }
                 """;
 
@@ -42,89 +57,89 @@ public class UserControllerTest {
                 .when()
                 .post("/v1/users/register")
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue())
                 .body("email", equalTo("john@example.com"))
-                .body("userRole", equalTo("ADMINISTRATOR"));
+                .body(not(contains("role")))
+                .body(not(contains("userRole")));
     }
 
     @Test
     void testGetAllUsers() {
-        String requestBody = """
-                {
-                  "name": "John Doe",
-                  "email": "john@example.com",
-                  "phone": "+4915123456789",
-                  "password": "secret",
-                  "role": "CLIENT"
-                  "userRole": "ADMINISTRATOR"
-                }
-                """;
-
+        // рег. тестового пользователя
         given()
                 .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
+                .body("""
+                        {
+                          "name": "John Doe",
+                          "email": "john@example.com",
+                          "phone": "+4915123456789",
+                          "password": "secret"
+                        }
+                        """)
                 .post("/v1/users/register")
                 .then()
-                .statusCode(200);
+                .statusCode(HttpStatus.CREATED.value());
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .accept(ContentType.JSON)
                 .when()
                 .get("/v1/users")
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("$", is(not(empty())));
     }
 
     @Test
     void testGetUserById() {
-        int id = given()
+        // рег. тестового пользователя и получаем его ID
+        int userId = given()
                 .contentType(ContentType.JSON)
                 .body("""
                         {
                           "name": "Jane Doe",
                           "email": "jane@example.com",
                           "phone": "+4915123456789",
-                          "password": "123456",
-                          "userRole": "ADMINISTRATOR"
+                          "password": "123456"
                         }
                         """)
                 .post("/v1/users/register")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .when()
-                .get("/v1/users/" + id)
+                .get("/v1/users/" + userId)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo("Jane Doe"))
                 .body("email", equalTo("jane@example.com"));
     }
 
     @Test
     void testUpdateUser() {
-        int id = given()
+        int userId = given()
                 .contentType(ContentType.JSON)
                 .body("""
                         {
                           "name": "Update Me",
                           "email": "update@me.com",
                           "phone": "+4915123456789",
-                          "password": "oldpass",
-                          "role": "CLIENT"
-                          "userRole": "ADMINISTRATOR"
+                          "password": "oldpass"
                         }
                         """)
                 .post("/v1/users/register")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .contentType(ContentType.JSON)
                 .body("""
                         {
@@ -133,36 +148,44 @@ public class UserControllerTest {
                         }
                         """)
                 .when()
-                .put("/v1/users/" + id)
+                .put("/v1/users/" + userId)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo("Updated User"))
                 .body("phone", equalTo("4915123456789"));
     }
 
     @Test
     void testDeleteUser() {
-        int id = given()
+        int userId = given()
                 .contentType(ContentType.JSON)
                 .body("""
                         {
                           "name": "ToDelete",
                           "email": "delete@me.com",
                           "phone": "+4915123456789",
-                          "password": "pass",
-                          "role": "CLIENT"
-                          "userRole": "ADMINISTRATOR"
+                          "password": "pass"
                         }
                         """)
                 .post("/v1/users/register")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .when()
-                .delete("/v1/users/" + id)
+                .delete("/v1/users/" + userId)
                 .then()
-                .statusCode(200);
+                .statusCode(HttpStatus.OK.value());
+
+        // проверка, что пользователь удален
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .when()
+                .get("/v1/users/" + userId)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 }
