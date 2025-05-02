@@ -1,18 +1,13 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.telran.online_store.dto.OrderRequestDto;
 import org.telran.online_store.entity.Order;
-import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.OrderNotFoundException;
-import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.repository.OrderJpaRepository;
 
 import java.util.List;
@@ -24,6 +19,11 @@ public class OrderServiceImpl implements OrderService {
     private final OrderJpaRepository orderRepository;
 
     private final UserService userService;
+
+    @Override
+    public List<Order> getAll() {
+        return orderRepository.findAll();
+    }
 
     @Override
     public List<Order> getAllUserOrders() {
