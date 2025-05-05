@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import org.springframework.data.domain.Pageable;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
@@ -24,5 +25,12 @@ public interface ProductService {
     List<Product> getAllByCategoryId(Long id);
 
     void updateCategory(Long id, Category category);
+
+    List<String> getTopTenPurchasedProducts();
+
+    List<String> getTopTenCancelledProducts();
+
+    List<String> getNotPaidProducts(Long days);
+
 
 }
