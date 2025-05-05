@@ -34,6 +34,10 @@ public class ProductSpecification {
                         cb.isNotNull(root.get("discountPrice")),
                         cb.lessThan(root.get("discountPrice"), root.get("price"))
                 );
+            } else if (discount != null){
+                predicate = cb.or(
+                        cb.isNull(root.get("discountPrice"))
+                );
             }
 
             return predicate;
