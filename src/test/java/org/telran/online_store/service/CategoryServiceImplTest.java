@@ -1,69 +1,85 @@
 package org.telran.online_store.service;
 
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.telran.online_store.entity.Category;
-import org.telran.online_store.repository.CategoryJpaRepository;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
-@Sql(value = "/catDataInit.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CategoryServiceImplTest {
-
-    @Autowired
-    private CategoryJpaRepository categoryRepository;
 
     @Autowired
     private CategoryService categoryService;
 
+    private Category cat1;
+    private Category cat2;
+
+    @BeforeEach
+    void setup() {
+        categoryService.getAllCategories().forEach(c -> categoryService.deleteCategory(c.getId()));
+
+        cat1 = new Category();
+        cat1.setName("Fertilizer");
+        cat1 = categoryService.createCategory(cat1);
+
+        cat2 = new Category();
+        cat2.setName("Tools");
+        cat2 = categoryService.createCategory(cat2);
+    }
 
     @Test
-    public void testGetAll() {
+    void testGetAll() {
         List<Category> categories = categoryService.getAllCategories();
         assertEquals(2, categories.size());
     }
+
     @Test
-    public void testGetById() {
-        Category category = categoryService.getCategoryById(1L);
+    void testGetById() {
+        Category category = categoryService.getCategoryById(cat1.getId());
         assertEquals("Fertilizer", category.getName());
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Category newCategory = new Category();
         newCategory.setName("New Category");
 
-        Category createdCategory = categoryService.createCategory(newCategory);
-        assertNotNull(createdCategory.getId());
-        assertEquals("New Category", createdCategory.getName());
+        Category created = categoryService.createCategory(newCategory);
+
+        assertNotNull(created.getId());
+        assertEquals("New Category", created.getName());
 
         assertEquals(3, categoryService.getAllCategories().size());
     }
 
     @Test
-    public void testDeleteById() {
-        categoryService.deleteCategory(2L);
-        assertEquals(2, categoryService.getAllCategories().size());
+    void testDeleteById() {
+        categoryService.deleteCategory(cat2.getId());
+        List<Category> categories = categoryService.getAllCategories();
+        assertEquals(1, categories.size());
     }
 
     @Test
-    public void testUpdate() {
-        Category categoryBeforeUpdate = categoryService.getByName("Fertilizer");
-        Long id = categoryBeforeUpdate.getId();
-        Category category = new Category();
-        category.setName("Fertilizerrrrr");
-        categoryService.updateCategory(id, category);
+    void testUpdate() {
+        Category update = new Category();
+        update.setName("Updated Fertilizer");
+        categoryService.updateCategory(cat1.getId(), update);
 
-        assertEquals("Fertilizerrrrr", categoryService.getCategoryById(id).getName());
+        Category result = categoryService.getCategoryById(cat1.getId());
+        assertEquals("Updated Fertilizer", result.getName());
+    }
 
+    @Test
+    void testGetByName() {
+        Category result = categoryService.getByName("Fertilizer");
+        assertNotNull(result);
+        assertEquals(cat1.getId(), result.getId());
     }
 }

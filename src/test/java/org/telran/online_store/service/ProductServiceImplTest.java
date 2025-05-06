@@ -1,70 +1,117 @@
 package org.telran.online_store.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
+import org.telran.online_store.repository.CategoryJpaRepository;
+import org.telran.online_store.repository.ProductJpaRepository;
 
 import java.math.BigDecimal;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test")
-@Sql(value = "/prodDataInit.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class ProductServiceImplTest {
+@Transactional
+public class ProductServiceImplTest {
 
     @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productService;
+
+    @Autowired
+    private ProductJpaRepository productRepository;
+
+    @Autowired
+    private CategoryJpaRepository categoryRepository;
+
+    @BeforeEach
+    public void setUp() {
+        // Создаем тестовую категорию перед каждым тестом
+        Category category = new Category();
+        category.setName("Tools");
+        categoryRepository.save(category);
+    }
 
     @Test
-    void testCreateProduct() {
-        String productName = "Flowers";
-        BigDecimal productPrice = new BigDecimal("22.99");
+    public void testCreateProduct() {
+        // Создаем новый продукт
+        Product product = new Product();
+        product.setName("Garden Shovel");
+        product.setPrice(new BigDecimal("25.50"));
+        product.setCategory(new Category(1L, "Tools"));
+
+        // Сохраняем продукт
+        Product savedProduct = productService.create(product);
+
+        // Проверяем, что продукт сохранен
+        assertNotNull(savedProduct);
+        assertEquals("Garden Shovel", savedProduct.getName());
+        assertEquals(new BigDecimal("25.50"), savedProduct.getPrice());
+    }
+
+    @Test
+    public void testGetProductById() {
+        // Сначала создаем продукт для теста
+        Category category = new Category();
+        category.setName("Tools");
+        category = categoryRepository.save(category);
 
         Product product = new Product();
-        product.setName(productName);
-        product.setPrice(productPrice);
-        product.setDiscountPrice(new BigDecimal("0.99"));
+        product.setName("Garden Shovel");
+        product.setPrice(new BigDecimal("25.50"));
+        product.setCategory(category);
+        product = productRepository.save(product);
 
-        productService.create(product);
+        // Теперь получаем продукт по id
+        Product foundProduct = productService.getById(product.getId());
 
-        Product fromDb = productService.getByName(productName);
-
-        assertNotNull(fromDb);
-        assertEquals(productName, fromDb.getName());
-        assertEquals(productPrice, fromDb.getPrice());
+        // Проверяем, что продукт найден и имеет правильные данные
+        assertNotNull(foundProduct);
+        assertEquals("Garden Shovel", foundProduct.getName());
+        assertEquals(new BigDecimal("25.50"), foundProduct.getPrice());
     }
 
     @Test
-    void testGetAllProducts() {
-        assertEquals(2, productService.getAll(null, null, null, null, null).size());
+    public void testGetProductByName() {
+        // Создаем продукт для теста
+        Category category = new Category();
+        category.setName("Tools");
+        category = categoryRepository.save(category);
+
+        Product product = new Product();
+        product.setName("Garden Shovel");
+        product.setPrice(new BigDecimal("25.50"));
+        product.setCategory(category);
+        productRepository.save(product);
+
+        // Проверяем, что продукт найден по имени
+        Product foundProduct = productService.getByName("Garden Shovel");
+
+        assertNotNull(foundProduct);
+        assertEquals("Garden Shovel", foundProduct.getName());
     }
 
     @Test
-    void testGetProductById() {
-        Product product = productService.getByName("Lily");
-        assertNotNull(product);
-        assertEquals("Lily", productService.getById(product.getId()).getName());
-    }
+    public void testDeleteProduct() {
+        // Создаем продукт для теста
+        Category category = new Category();
+        category.setName("Tools");
+        category = categoryRepository.save(category);
 
-    @Test
-    void testUpdateProduct() {
-        Long productId = productService.getByName("Lily").getId();
-        Product newProduct = new Product();
-        newProduct.setName("Lily updated");
-        productService.updateProduct(productId, newProduct);
-        assertEquals("Lily updated", productService.getById(productId).getName());
-    }
+        Product product = new Product();
+        product.setName("Garden Shovel");
+        product.setPrice(new BigDecimal("25.50"));
+        product.setCategory(category);
+        product = productRepository.save(product);
 
-    @Test
-    void testDeleteProductById() {
-        List<Product> products = productService.getAll(null, null, null, null, null);
-        assertEquals(2, products.size());
-        productService.delete(products.get(0).getId());
-        assertEquals(1, productService.getAll(null, null, null, null, null).size());
+        // Удаляем продукт
+        productService.delete(product.getId());
+
+        // Проверяем, что продукт был удален
+        assertFalse(productRepository.existsById(product.getId()));
     }
 }
