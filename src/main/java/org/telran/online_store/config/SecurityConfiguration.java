@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "v1/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "v1/reports/**").permitAll()
                         .anyRequest().authenticated() //
                 )
                 .exceptionHandling(exceptionHandling ->

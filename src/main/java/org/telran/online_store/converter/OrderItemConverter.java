@@ -32,11 +32,12 @@ public class OrderItemConverter implements Converter<OrderItemRequestDto, OrderI
     public OrderItem toEntity(OrderItemRequestDto orderItemRequestDto) {
         Product product = productService.getById(orderItemRequestDto.productId());
         BigDecimal discount = product.getDiscountPrice() == null ? BigDecimal.ZERO : product.getDiscountPrice();
+        int quantity = orderItemRequestDto.quantity();
 
         return OrderItem.builder()
                 .product(product)
-                .quantity(orderItemRequestDto.quantity())
-                .priceAtPurchase(product.getPrice().subtract(discount))
+                .quantity(quantity)
+                .priceAtPurchase(product.getPrice().subtract(discount).multiply(new BigDecimal(quantity)))
                 .build();
     }
 }
