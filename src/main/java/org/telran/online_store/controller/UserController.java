@@ -1,5 +1,10 @@
 package org.telran.online_store.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +17,8 @@ import org.telran.online_store.converter.Converter;
 import org.telran.online_store.converter.UserRegistrationConverter;
 import org.telran.online_store.dto.*;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.exception.UserNotUniqueException;
+import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.service.UserService;
 
 import java.util.List;
@@ -30,6 +37,11 @@ public class UserController {
 
     private final Converter<UserUpdateRequestDto, UserUpdateResponseDto, User> userConverter;
 
+    @Operation(
+            summary = "Get all users",
+            description = "Only user with role ADMINISTRATOR can view all the users. Authentication is required"
+    )
+
     @GetMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public List<User> getAll() {
@@ -37,6 +49,18 @@ public class UserController {
     }
 
     @PostMapping("/register")
+    @Operation(
+            summary = "New user registration",
+            description = "Allows to register a new user"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = UserRegistrationResponse.class))}),
+            @ApiResponse(responseCode = "409", description = "User already exists", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ApiErrorResponse.class))})
+    })
     public ResponseEntity<UserRegistrationResponse> register(@RequestBody UserRegistrationRequest request) {
         User user = userRegistrationConverter.toEntity(request);
         User savedUser = userService.create(user);

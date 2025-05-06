@@ -1,17 +1,15 @@
 package org.telran.online_store.handler;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.telran.online_store.dto.ApiErrorResponse;
 import org.telran.online_store.exception.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,7 +24,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({FavoriteNotUniqueException.class, UserNotUniqueException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<String> handleEntityNotUniqueException(Exception e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<ApiErrorResponse> handleEntityNotUniqueException(Exception e, HttpServletRequest request) {
+        ApiErrorResponse response = new ApiErrorResponse();
+        response.setStatus(HttpStatus.CONFLICT.value());
+        response.setMessage(e.getMessage());
+        response.setPath(request.getRequestURI());
+        response.setTimestamp(LocalDateTime.now().toString());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 }
