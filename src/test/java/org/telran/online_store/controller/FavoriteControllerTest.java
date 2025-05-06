@@ -13,10 +13,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.Product;
+import org.telran.online_store.entity.User;
+import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.repository.FavoriteJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
 import org.telran.online_store.repository.UserJpaRepository;
+
 import java.math.BigDecimal;
+
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -40,6 +44,7 @@ public class FavoriteControllerTest {
     private ProductJpaRepository productRepository;
 
     private Product testProduct;
+    private User testUser;
     private String token;
     private Long userId;
 
@@ -48,34 +53,33 @@ public class FavoriteControllerTest {
         RestAssured.port = port;
 
         favoriteRepository.deleteAll();
-        userRepository.deleteAll();
         productRepository.deleteAll();
+        userRepository.deleteAll();
+
+        testUser = userRepository.save(User.builder()
+                .name("Alice Green")
+                .email("alice@example.com")
+                .phone("1234567890")
+                .password("$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u")
+                .role(UserRole.CLIENT)
+                .build());
+        userId = testUser.getId();
 
         testProduct = productRepository.save(Product.builder()
-                .name("Test Product")
-                .price(BigDecimal.valueOf(99.99))
+                .name("Shovel")
+                .description("Durable steel shovel with wooden handle")
+                .price(BigDecimal.valueOf(25.50))
+                .imageUrl("images/shovel.jpg")
                 .build());
 
-        // Регистрация пользователя через API
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"test@example.com\",\"password\":\"123456\", \"name\":\"Lily\", \"phone\":\"1234567890123\"}")
-                .post("/v1/users/register")
-                .then()
-                .statusCode(201);
-
-        // Авторизация для получения токена
         token = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"test@example.com\",\"password\":\"123456\"}")
+                .body("{\"email\":\"alice@example.com\",\"password\":\"password\"}") // Используем пароль из тестов, а не хеш из БД
                 .post("/v1/users/login")
                 .then()
                 .statusCode(200)
                 .extract()
                 .path("token");
-
-        // Получаем userId для сравнения
-        userId = userRepository.findByEmail("test@example.com").getId();
     }
 
     @Test
@@ -94,12 +98,16 @@ public class FavoriteControllerTest {
                 .statusCode(200)
                 .body("userId", equalTo(userId.intValue()))
                 .body("productId", equalTo(testProduct.getId().intValue()));
+
+        // Проверяем, что запись появилась в базе данных
+        assertThat(favoriteRepository.existsByUserAndProduct(testUser, testProduct)).isTrue();
     }
 
     @Test
     void testGetAllFavorites() {
+        // Добавляем запись в избранное
         favoriteRepository.save(Favorite.builder()
-                .user(userRepository.findById(userId).orElseThrow())
+                .user(testUser)
                 .product(testProduct)
                 .build());
 
@@ -108,14 +116,16 @@ public class FavoriteControllerTest {
                 .get("/v1/favorites")
                 .then()
                 .statusCode(200)
-                .body("size()", greaterThan(0));
+                .body("size()", greaterThan(0))
+                .body("[0].userId", equalTo(userId.intValue()))
+                .body("[0].productId", equalTo(testProduct.getId().intValue()));
     }
-
 
     @Test
     void testDeleteFavorite() {
+        // Создаем запись в избранном
         Favorite favorite = favoriteRepository.save(Favorite.builder()
-                .user(userRepository.findById(userId).orElseThrow())
+                .user(testUser)
                 .product(testProduct)
                 .build());
 
@@ -125,6 +135,7 @@ public class FavoriteControllerTest {
                 .then()
                 .statusCode(200);
 
+        // Проверяем, что запись удалена из базы данных
         assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
     }
 }

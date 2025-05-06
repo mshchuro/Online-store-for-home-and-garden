@@ -10,8 +10,10 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.UUID;
+
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -21,41 +23,48 @@ class CartControllerTest {
     private int port;
 
     private String token;
-    private Long productId1;
-    private Long productId2;
+    private int categoryId;
+    private int productId;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        String uniqueEmail = UUID.randomUUID().toString().substring(0, 8) + "@example.com";
 
+        // Регистрация пользователя
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"name\":\"Test User\",\"email\":\"user@example.com\",\"password\":\"password\", \"phone\":\"+123456789\"}")
-                .post("/v1/users/register");
+                .body(String.format("{\"name\":\"Alice Green\", \"email\":\"%s\", \"password\":\"password\", \"phone\":\"123-456-7890\"}", uniqueEmail))
+                .post("/v1/users/register")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
 
+        // Логин и получение токена
         token = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"user@example.com\",\"password\":\"password\"}")
+                .body(String.format("{\"email\":\"%s\", \"password\":\"password\"}", uniqueEmail))
                 .post("/v1/users/login")
                 .then()
-                .statusCode(HttpStatus.OK.value()) // Исправлено: ожидаем 200 OK после логина
+                .statusCode(HttpStatus.OK.value())
                 .extract()
                 .path("token");
 
-        productId1 = given()
+        // Создание категории
+        categoryId = given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
-                .body("{\"name\":\"Test Product 1\", \"description\":\"Nice 1\", \"price\":10.0}")
-                .post("/v1/products")
+                .body("{\"name\":\"Plants\"}") // Обновлено название категории
+                .post("/v1/categories")
                 .then()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
-        productId2 = given()
+        // Создание продукта
+        productId = given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
-                .body("{\"name\":\"Test Product 2\", \"description\":\"Nice 2\", \"price\":20.0}")
+                .body(String.format("{ \"name\": \"Rose Bush\", \"description\": \"Beautiful red rose bush for your garden\", \"price\": 15.99, \"category_id\": %d }", categoryId)) // Обновлены название и описание продукта
                 .post("/v1/products")
                 .then()
                 .statusCode(HttpStatus.OK.value())
@@ -64,101 +73,105 @@ class CartControllerTest {
     }
 
     @Test
-    void testAddAndRemoveItemsInCart() {
-        // добавление
+    void testAddToCartAndGetCart() {
+        // Добавляем товар в корзину
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
-                .body("{\"productId\":" + productId1 + "{\"quantity\":1}}")
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // добавление
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"productId\":" + productId2 + "{\"quantity\":2}}")
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // проверка на 2
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("items.size()", equalTo(2));
-
-        // удаление
-        given()
-                .header("Authorization", "Bearer " + token)
-                .delete("/v1/cart/" + productId1)
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // проверка на 1
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("items.size()", equalTo(1))
-                .body("items[0].productId", equalTo(productId2.intValue()));
-    }
-
-    @Test
-    void testDeletedCart() {
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"productId\":" + productId1 + "{\"quantity\":1}}")
+                .body(String.format("{\"product_id\":%d, \"quantity\":2}", productId))
                 .post("/v1/cart")
                 .then()
                 .statusCode(HttpStatus.CREATED.value());
 
+        // Получаем корзину и проверяем содержимое
+        given()
+                .header("Authorization", "Bearer " + token)
+                .get("/v1/cart")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("items.size()", is(1))
+                .body("items[0].product.id", equalTo(productId))
+                .body("items[0].product.name", equalTo("Rose Bush")) // Добавлена проверка названия продукта
+                .body("items[0].quantity", equalTo(2));
+    }
+
+    @Test
+    void testUpdateCartItemQuantity() {
+        // Сначала добавим 1 товар
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(String.format("{\"product_id\":%d, \"quantity\":1}", productId))
+                .post("/v1/cart")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
+
+        // Повторно добавим тот же товар (увеличим количество)
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(String.format("{\"product_id\":%d, \"quantity\":3}", productId))
+                .post("/v1/cart")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
+
+        // Проверка, что количество увеличилось, а товар не продублировался
+        given()
+                .header("Authorization", "Bearer " + token)
+                .get("/v1/cart")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("items.size()", is(1))
+                .body("items[0].quantity", equalTo(4));
+    }
+
+    @Test
+    void testDeleteItemFromCart() {
+        // Добавим товар
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(String.format("{\"product_id\":%d, \"quantity\":1}", productId))
+                .post("/v1/cart");
+
+        // Удалим товар
+        given()
+                .header("Authorization", "Bearer " + token)
+                .delete("/v1/cart/" + productId)
+                .then()
+                .statusCode(HttpStatus.OK.value());
+
+        // Проверим, что корзина пустая
+        given()
+                .header("Authorization", "Bearer " + token)
+                .get("/v1/cart")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("items.size()", is(0));
+    }
+
+    @Test
+    void testClearCart() {
+        // Добавим товар
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(String.format("{\"product_id\":%d, \"quantity\":2}", productId))
+                .post("/v1/cart");
+
+        // Очистим корзину
         given()
                 .header("Authorization", "Bearer " + token)
                 .delete("/v1/cart")
                 .then()
                 .statusCode(HttpStatus.OK.value());
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value()) // Исправлено: Ожидаем 200 OK для пустой корзины
-                .body("items.size()", equalTo(0));
-    }
-
-    @Test
-    void testUpdateQuantityIfProductAlreadyInCart() {
-        // Add product with quantity 1
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"productId\":" + productId1 + "{\"quantity\":1}}")
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-
-        // Update quantity to 5
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"productId\":" + productId1 + "{\"quantity\":5}}")
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value()); // Исправлено: Ожидаем 200 OK при обновлении
-
-        // Verify quantity is 5
+        // Проверим, что корзина пустая
         given()
                 .header("Authorization", "Bearer " + token)
                 .get("/v1/cart")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("items.size()", equalTo(1))
-                .body("items[0].quantity", equalTo(5));
+                .body("items.size()", is(0));
     }
 }

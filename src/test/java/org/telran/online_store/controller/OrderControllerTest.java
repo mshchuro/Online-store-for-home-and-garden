@@ -27,7 +27,7 @@ class OrderControllerTest {
     void setUp() {
         RestAssured.port = port;
 
-        // Регистрация и логин обычного пользователя
+        // Регистрация и логин пользователя
         given()
                 .contentType(ContentType.JSON)
                 .body("{\"email\":\"user@example.com\",\"password\":\"password\", \"name\":\"Test User\"}")
@@ -41,7 +41,7 @@ class OrderControllerTest {
                 .extract()
                 .path("token");
 
-        // Регистрация и логин администратора (если это необходимо для каких-либо действий)
+        // Регистрация и логин администратора
         given()
                 .contentType(ContentType.JSON)
                 .body("{\"email\":\"admin@example.com\",\"password\":\"admin\", \"name\":\"Admin User\"}")
