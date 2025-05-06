@@ -19,16 +19,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     private String name;
 
-    @NotBlank
-    @Pattern(regexp = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")
     private String email;
 
-    @NotBlank
     private String phone;
-    @NotBlank
+
     private String password;
 
     @Enumerated(EnumType.STRING)

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,11 +58,14 @@ public class UserController {
             @ApiResponse(responseCode = "201", description = "Created", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = UserRegistrationResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Not valid data", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "409", description = "User already exists", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = ApiErrorResponse.class))})
     })
-    public ResponseEntity<UserRegistrationResponse> register(@RequestBody UserRegistrationRequest request) {
+    public ResponseEntity<UserRegistrationResponse> register(@Valid @RequestBody UserRegistrationRequest request) {
         User user = userRegistrationConverter.toEntity(request);
         User savedUser = userService.create(user);
         if (log.isDebugEnabled()) {
