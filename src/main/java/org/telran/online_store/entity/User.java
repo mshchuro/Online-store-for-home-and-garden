@@ -1,6 +1,8 @@
 package org.telran.online_store.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.telran.online_store.enums.UserRole;
 
@@ -10,7 +12,7 @@ import org.telran.online_store.enums.UserRole;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User {
 
     @Id
