@@ -39,17 +39,24 @@ public class UserController {
     private final Converter<UserUpdateRequestDto, UserUpdateResponseDto, User> userConverter;
 
     @Operation(
-            summary = "Get all users",
-            description = "Only user with role ADMINISTRATOR can view all the users. Authentication is required"
+            summary = "Allows to view all users' information",
+            description = "Only user with role ADMINISTRATOR can view the information of all the users. Authorisation is required"
     )
-
-    @GetMapping()
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = UserRegistrationResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler
+                            .UnauthorizedErrorResponse.class))
+            })
+    })
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @GetMapping()
     public List<User> getAll() {
         return userService.getAll();
     }
 
-    @PostMapping("/register")
     @Operation(
             summary = "New user registration",
             description = "Allows to register a new user"
@@ -58,13 +65,12 @@ public class UserController {
             @ApiResponse(responseCode = "201", description = "Created", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = UserRegistrationResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Not valid data", content =
+            @ApiResponse(responseCode = "400", description = "Not valid data", content =
                     {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ApiErrorResponse.class))}),
-            @ApiResponse(responseCode = "409", description = "User already exists", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ApiErrorResponse.class))})
+                    @Schema(implementation = UserRegistrationResponse.class))}),
+            @ApiResponse(responseCode = "409", description = "User already exists")
     })
+    @PostMapping("/register")
     public ResponseEntity<UserRegistrationResponse> register(@Valid @RequestBody UserRegistrationRequest request) {
         User user = userRegistrationConverter.toEntity(request);
         User savedUser = userService.create(user);
@@ -74,21 +80,70 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userRegistrationConverter.toDto(savedUser));
     }
 
-    @GetMapping("/{userId}")
+    @Operation(
+            summary = "Allows to view the user's information",
+            description = "Only user with role ADMINISTRATOR can view the user's information. Authorisation is required"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = UserRegistrationResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "Not found", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler
+                            .UnauthorizedErrorResponse.class))
+            })
+    })
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public User getById(@PathVariable Long userId) {
-        return userService.getById(userId);
+    @GetMapping("/{userId}")
+    public UserUpdateResponseDto getById(@PathVariable Long userId) {
+        return userConverter.toDto(userService.getById(userId));
     }
 
-    @DeleteMapping("/{userId}")
+    @Operation(
+            summary = "Allows to delete the user",
+            description = "Only user with role ADMINISTRATOR can delete the user. Authorisation is required"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "404", description = "Not found", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler
+                            .UnauthorizedErrorResponse.class))
+            })
+    })
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteById(@PathVariable Long userId) {
         userService.delete(userId);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{userId}")
+    @Operation(
+            summary = "Allows to update the user's info",
+            description = "Only user with role ADMINISTRATOR can update the user's info. Authorisation is required"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = UserUpdateResponseDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Not found", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "Not valid data", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content =
+                    {@Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler
+                            .UnauthorizedErrorResponse.class))
+                    })
+    })
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PutMapping("/{userId}")
     public ResponseEntity<UserUpdateResponseDto> updateProfile(@PathVariable Long userId, @RequestBody UserUpdateRequestDto dto) {
         User user = userService.updateProfile(userId, userConverter.toEntity(dto));
         return ResponseEntity.ok(userConverter.toDto(user));

@@ -1,9 +1,9 @@
 package org.telran.online_store.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
+
 @Schema(description = "User entity")
 public record UserRegistrationRequest(
 
@@ -12,7 +12,7 @@ public record UserRegistrationRequest(
         String name,
 
         @NotBlank
-        @Pattern(regexp = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")
+        @Email
         @Schema(description = "Email", example = "smith@mail.com")
         String email,
 

@@ -22,6 +22,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.telran.online_store.security.CustomAuthenticationEntryPoint;
 import org.telran.online_store.security.JwtAuthFilter;
 
 import java.io.IOException;
@@ -33,6 +34,8 @@ import java.io.IOException;
 public class SecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,7 +51,7 @@ public class SecurityConfiguration {
                 )
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
-                                .authenticationEntryPoint(unauthorizedEntryPoint())
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
                                 .accessDeniedHandler(accessDeniedHandler())
                 )
                 .sessionManagement(session ->
@@ -58,11 +61,11 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public AuthenticationEntryPoint unauthorizedEntryPoint() {
-        return (request, response, authException)
-                -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization is required");
-    }
+//    @Bean
+//    public AuthenticationEntryPoint unauthorizedEntryPoint() {
+//        return (request, response, authException)
+//                -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization is required");
+//    }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
