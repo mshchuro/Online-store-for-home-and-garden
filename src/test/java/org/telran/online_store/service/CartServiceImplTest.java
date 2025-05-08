@@ -102,7 +102,7 @@ public class CartServiceImplTest {
     }
 
     @Test
-    @Transactional  // Обеспечивает откат изменений после теста
+    @Transactional
     public void testClearCart() {
         // Создаем запрос на добавление товара в корзину
         AddToCartRequest request = new AddToCartRequest();
