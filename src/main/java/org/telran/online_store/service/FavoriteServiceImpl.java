@@ -2,19 +2,13 @@ package org.telran.online_store.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.expression.AccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.*;
 import org.telran.online_store.repository.FavoriteJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
-import org.telran.online_store.repository.UserJpaRepository;
 
 import java.util.List;
 

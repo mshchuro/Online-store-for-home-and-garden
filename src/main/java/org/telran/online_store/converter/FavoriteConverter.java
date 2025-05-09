@@ -1,15 +1,12 @@
 package org.telran.online_store.converter;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.dto.FavoriteResponseDto;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.entity.User;
 import org.telran.online_store.service.ProductService;
-import org.telran.online_store.service.UserService;
 
 @Component
 @RequiredArgsConstructor

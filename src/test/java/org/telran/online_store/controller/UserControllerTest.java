@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import static io.restassured.RestAssured.given;
@@ -18,23 +19,42 @@ public class UserControllerTest {
     @LocalServerPort
     private int port;
 
+    private String adminToken;
+
     @BeforeEach
-    void setup() {
+    void setUp() {
         RestAssured.port = port;
+
+        // Регистрация администратора (если еще не зарегистрирован)
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Admin Joe\",\"email\":\"admin@example.com\",\"phone\":\"5555555555\",\"password\":\"password\"}") // Адаптировано к БД
+                .post("/v1/users/register");
+
+        // Получение токена администратора
+        adminToken = given()
+                .contentType(ContentType.JSON)
+                .body("{\"email\":\"admin@example.com\",\"password\":\"password\"}")
+                .post("/v1/users/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("token");
     }
 
     @Test
     void testRegisterUser() {
-        String requestBody = """
+        String newUserEmail = "john" + System.currentTimeMillis() + "@example.com";
+        String newUserName = "John New";
+        String newUserPhone = "9876543210";
+        String requestBody = String.format("""
                 {
-                  "name": "John Doe",
-                  "email": "john@example.com",
-                  "phone": "+4915123456789"
-                  "password": "secret",
-                  "role": "CLIENT"
-                  "userRole": "ADMINISTRATOR"
+                  "name": "%s",
+                  "email": "%s",
+                  "phone": "%s",
+                  "password": "secret"
                 }
-                """;
+                """, newUserName, newUserEmail, newUserPhone);
 
         given()
                 .contentType(ContentType.JSON)
@@ -42,127 +62,150 @@ public class UserControllerTest {
                 .when()
                 .post("/v1/users/register")
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue())
-                .body("email", equalTo("john@example.com"))
-                .body("userRole", equalTo("ADMINISTRATOR"));
+                .body("email", equalTo(newUserEmail))
+                .body("name", equalTo(newUserName))
+                .body("phone", equalTo(newUserPhone))
+                .body(not(contains("role")))
+                .body(not(contains("userRole")));
     }
 
     @Test
     void testGetAllUsers() {
-        String requestBody = """
-                {
-                  "name": "John Doe",
-                  "email": "john@example.com",
-                  "phone": "+4915123456789",
-                  "password": "secret",
-                  "role": "CLIENT"
-                  "userRole": "ADMINISTRATOR"
-                }
-                """;
-
+        // Сначала регистрируем тестового пользователя с уникальным email
+        String testUserEmail = "test" + System.currentTimeMillis() + "@example.com";
         given()
                 .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
+                .body(String.format("""
+                        {
+                          "name": "Test User",
+                          "email": "%s",
+                          "phone": "1122334455",
+                          "password": "password"
+                        }
+                        """, testUserEmail))
                 .post("/v1/users/register")
                 .then()
-                .statusCode(200);
+                .statusCode(HttpStatus.CREATED.value());
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .accept(ContentType.JSON)
                 .when()
                 .get("/v1/users")
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("$", is(not(empty())));
     }
 
     @Test
     void testGetUserById() {
-        int id = given()
+        // Сначала регистрируем тестового пользователя с уникальным email и получаем его ID
+        String testUserEmail = "jane" + System.currentTimeMillis() + "@example.com";
+        String testUserName = "Jane New";
+        String testUserPhone = "5544332211";
+        int userId = given()
                 .contentType(ContentType.JSON)
-                .body("""
+                .body(String.format("""
                         {
-                          "name": "Jane Doe",
-                          "email": "jane@example.com",
-                          "phone": "+4915123456789",
-                          "password": "123456",
-                          "userRole": "ADMINISTRATOR"
+                          "name": "%s",
+                          "email": "%s",
+                          "phone": "%s",
+                          "password": "123456"
                         }
-                        """)
+                        """, testUserName, testUserEmail, testUserPhone))
                 .post("/v1/users/register")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .when()
-                .get("/v1/users/" + id)
+                .get("/v1/users/" + userId)
                 .then()
-                .statusCode(200)
-                .body("name", equalTo("Jane Doe"))
-                .body("email", equalTo("jane@example.com"));
+                .statusCode(HttpStatus.OK.value())
+                .body("name", equalTo(testUserName))
+                .body("email", equalTo(testUserEmail))
+                .body("phone", equalTo(testUserPhone));
     }
 
     @Test
     void testUpdateUser() {
-        int id = given()
+        // Сначала регистрируем пользователя для обновления с уникальным email
+        String testUserEmail = "update" + System.currentTimeMillis() + "@example.com";
+        int userId = given()
                 .contentType(ContentType.JSON)
-                .body("""
+                .body(String.format("""
                         {
                           "name": "Update Me",
-                          "email": "update@me.com",
-                          "phone": "+4915123456789",
-                          "password": "oldpass",
-                          "role": "CLIENT"
-                          "userRole": "ADMINISTRATOR"
+                          "email": "%s",
+                          "phone": "0123456789",
+                          "password": "oldpass"
                         }
-                        """)
+                        """, testUserEmail))
                 .post("/v1/users/register")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
+        String updatedUserName = "Updated Person";
+        String updatedUserPhone = "9876501234";
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .contentType(ContentType.JSON)
-                .body("""
+                .body(String.format("""
                         {
-                          "name": "Updated User",
-                          "phone": "4915123456789"
+                          "name": "%s",
+                          "phone": "%s"
                         }
-                        """)
+                        """, updatedUserName, updatedUserPhone))
                 .when()
-                .put("/v1/users/" + id)
+                .put("/v1/users/" + userId)
                 .then()
-                .statusCode(200)
-                .body("name", equalTo("Updated User"))
-                .body("phone", equalTo("4915123456789"));
+                .statusCode(HttpStatus.OK.value())
+                .body("name", equalTo(updatedUserName))
+                .body("phone", equalTo(updatedUserPhone));
     }
 
     @Test
     void testDeleteUser() {
-        int id = given()
+        // Сначала регистрируем пользователя для удаления с уникальным email
+        String testUserEmail = "delete" + System.currentTimeMillis() + "@example.com";
+        String testUserName = "ToDelete User";
+        String testUserPhone = "1199228833";
+        int userId = given()
                 .contentType(ContentType.JSON)
-                .body("""
+                .body(String.format("""
                         {
-                          "name": "ToDelete",
-                          "email": "delete@me.com",
-                          "phone": "+4915123456789",
-                          "password": "pass",
-                          "role": "CLIENT"
-                          "userRole": "ADMINISTRATOR"
+                          "name": "%s",
+                          "email": "%s",
+                          "phone": "%s",
+                          "password": "pass"
                         }
-                        """)
+                        """, testUserName, testUserEmail, testUserPhone))
                 .post("/v1/users/register")
                 .then()
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
         given()
+                .header("Authorization", "Bearer " + adminToken)
                 .when()
-                .delete("/v1/users/" + id)
+                .delete("/v1/users/" + userId)
                 .then()
-                .statusCode(200);
+                .statusCode(HttpStatus.OK.value());
+
+        // Проверяем, что пользователь действительно удален
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .when()
+                .get("/v1/users/" + userId)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 }
