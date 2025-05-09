@@ -31,7 +31,7 @@ class CartControllerTest {
         RestAssured.port = port;
         String uniqueEmail = UUID.randomUUID().toString().substring(0, 8) + "@example.com";
 
-        // Регистрация пользователя
+        // Регистрация обычного пользователя
         given()
                 .contentType(ContentType.JSON)
                 .body(String.format("{\"name\":\"Alice Green\", \"email\":\"%s\", \"password\":\"password\", \"phone\":\"123-456-7890\"}", uniqueEmail))
@@ -39,7 +39,7 @@ class CartControllerTest {
                 .then()
                 .statusCode(HttpStatus.CREATED.value());
 
-        // Логин и получение токена
+        // Логин и получение токена для обычного пользователя
         token = given()
                 .contentType(ContentType.JSON)
                 .body(String.format("{\"email\":\"%s\", \"password\":\"password\"}", uniqueEmail))
@@ -49,22 +49,31 @@ class CartControllerTest {
                 .extract()
                 .path("token");
 
-        // Создание категории
-        categoryId = given()
-                .header("Authorization", "Bearer " + token)
+        // Получение токена админа
+        String adminToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"name\":\"Plants\"}") // Обновлено название категории
+                .body("{\"email\":\"admin@example.com\", \"password\":\"password\"}")
+                .post("/v1/users/login")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .path("token");
+
+        // Создание категории и продукта с токеном администратора
+        categoryId = given()
+                .header("Authorization", "Bearer " + adminToken) // Используем админский токен
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Plants\"}")
                 .post("/v1/categories")
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .path("id");
 
-        // Создание продукта
         productId = given()
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + adminToken) // Используем админский токен
                 .contentType(ContentType.JSON)
-                .body(String.format("{ \"name\": \"Rose Bush\", \"description\": \"Beautiful red rose bush for your garden\", \"price\": 15.99, \"category_id\": %d }", categoryId)) // Обновлены название и описание продукта
+                .body(String.format("{ \"name\": \"Rose Bush\", \"description\": \"Beautiful red rose bush for your garden\", \"price\": 15.99, \"category_id\": %d }", categoryId))
                 .post("/v1/products")
                 .then()
                 .statusCode(HttpStatus.OK.value())

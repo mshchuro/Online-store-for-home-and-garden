@@ -133,4 +133,67 @@ class OrderControllerTest {
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", containsString("Order with id 999 is not found"));
     }
+
+//    @Test
+//    void testUpdateOrderStatusByAdmin() {
+//        // Сначала создаем заказ (как пользователь)
+//        int orderId = given()
+//                .header("Authorization", "Bearer " + userToken)
+//                .contentType(ContentType.JSON)
+//                .body("{\"totalPrice\": 100.00, \"orderDate\": \"2025-05-06\"}")
+//                .post("/v1/orders")
+//                .then()
+//                .statusCode(HttpStatus.CREATED.value())
+//                .extract()
+//                .path("id");
+//
+//        // Администратор обновляет статус заказа
+//        given()
+//                .header("Authorization", "Bearer " + adminToken)
+//                .contentType(ContentType.JSON)
+//                .body("{\"status\": \"PROCESSING\"}")
+//                .patch("/v1/orders/" + orderId) // Предполагаемый эндпоинт
+//                .then()
+//                .statusCode(HttpStatus.OK.value())
+//                .body("status", equalTo("PROCESSING"));
+//
+//        // Проверяем, что обычный пользователь не может обновить статус
+//        given()
+//                .header("Authorization", "Bearer " + userToken)
+//                .contentType(ContentType.JSON)
+//                .body("{\"status\": \"SHIPPED\"}")
+//                .patch("/v1/orders/" + orderId) // Предполагаемый эндпоинт
+//                .then()
+//                .statusCode(HttpStatus.FORBIDDEN.value());
+//    }
+//
+//    @Test
+//    void testGetAllOrdersByAdmin() {
+//        // Создаем несколько заказов (как пользователи)
+//        given()
+//                .header("Authorization", "Bearer " + userToken)
+//                .contentType(ContentType.JSON)
+//                .body("{\"totalPrice\": 50.00, \"orderDate\": \"2025-05-07\"}")
+//                .post("/v1/orders");
+//        given()
+//                .header("Authorization", "Bearer " + userToken)
+//                .contentType(ContentType.JSON)
+//                .body("{\"totalPrice\": 75.00, \"orderDate\": \"2025-05-08\"}")
+//                .post("/v1/orders");
+//
+//        // Администратор получает список всех заказов
+//        given()
+//                .header("Authorization", "Bearer " + adminToken)
+//                .get("/v1/orders/all") // Предполагаемый эндпоинт
+//                .then()
+//                .statusCode(HttpStatus.OK.value())
+//                .body("size()", greaterThanOrEqualTo(2));
+//
+//        // Проверяем, что обычный пользователь не может получить все заказы
+//        given()
+//                .header("Authorization", "Bearer " + userToken)
+//                .get("/v1/orders/all") // Предполагаемый эндпоинт
+//                .then()
+//                .statusCode(HttpStatus.FORBIDDEN.value());
+//    }
 }
