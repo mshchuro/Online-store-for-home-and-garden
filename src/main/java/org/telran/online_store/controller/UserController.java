@@ -67,7 +67,7 @@ public class UserController {
                     @Schema(implementation = UserRegistrationResponse.class))}),
             @ApiResponse(responseCode = "400", description = "Not valid data", content =
                     {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = UserRegistrationResponse.class))}),
+                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
             @ApiResponse(responseCode = "409", description = "User already exists")
     })
     @PostMapping("/register")
