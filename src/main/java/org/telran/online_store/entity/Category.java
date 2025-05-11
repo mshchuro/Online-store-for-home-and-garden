@@ -1,13 +1,14 @@
 package org.telran.online_store.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,18 +18,13 @@ import java.util.List;
 @Table(name="categories")
 public class Category {
 
+    @Hidden
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Category name must not be blank")
+    @Size(min = 3, max = 255, message = "Category name must be at least 3 and at most 255 characters")
+    @Schema(description = "Category name", example = "Flowers")
     private String name;
-
-//    @OneToMany(mappedBy = "category")
-//    @JsonBackReference
-//    private List<Product> products;
-
-    public Category(String name, Long id) {
-        this.name = name;
-        this.id = id;
-    }
 }

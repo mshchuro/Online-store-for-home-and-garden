@@ -1,5 +1,7 @@
 package org.telran.online_store.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +16,10 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/favorites")
 @RequiredArgsConstructor
+@Tag(name = "Favorite Product", description = "API endpoints for favorite products")
+@SecurityRequirement(name = "bearerAuth")
+@RequestMapping("/v1/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
