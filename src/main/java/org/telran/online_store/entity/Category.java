@@ -18,7 +18,6 @@ import lombok.Setter;
 @Table(name="categories")
 public class Category {
 
-    @Hidden
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

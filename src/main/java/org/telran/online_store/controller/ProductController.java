@@ -144,9 +144,7 @@ public class ProductController {
             description = "Allows to delete a product. Available only for Administrator"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ProductResponseDto.class))}),
+            @ApiResponse(responseCode = "200", description = "Ok"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),

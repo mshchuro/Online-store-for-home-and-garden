@@ -1,15 +1,25 @@
 package org.telran.online_store.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.converter.Converter;
 import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.dto.FavoriteResponseDto;
+import org.telran.online_store.dto.ProductResponseDto;
+import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Favorite;
+import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.service.FavoriteService;
 
 import java.util.List;
@@ -17,7 +27,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Favorite Product", description = "API endpoints for favorite products")
+@Tag(name = "Favorite Product", description = "API endpoints for favorite products. Authorisation is required for all end-points")
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/favorites")
 public class FavoriteController {
@@ -26,6 +36,18 @@ public class FavoriteController {
 
     private final Converter<FavoriteRequestDto, FavoriteResponseDto, Favorite> favoriteConverter;
 
+    @Operation(
+            summary = "Allows to get a list of favorite products",
+            description = "Allows to view a list of current user's favorite products information. Authorisation is required"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = FavoriteResponseDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
+    })
     @GetMapping
     public ResponseEntity<List<FavoriteResponseDto>> getAll() {
         return ResponseEntity.ok(favoriteService.getAll()
@@ -34,13 +56,47 @@ public class FavoriteController {
                 .toList());
     }
 
+    @Operation(
+            summary = "Making a product favorite",
+            description = "Allows to making a product favorite for current user"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = FavoriteResponseDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Not valid data", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
+            @ApiResponse(responseCode = "409", description = "Already exists", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotUniqueErrorResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "Product is not found", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
+    })
     @PostMapping()
-    public ResponseEntity<FavoriteResponseDto> create(@RequestBody FavoriteRequestDto requestDto) {
+    public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto) {
         Favorite favorite = favoriteConverter.toEntity(requestDto);
         Favorite saved = favoriteService.create(favorite);
-        return ResponseEntity.ok(favoriteConverter.toDto(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(favoriteConverter.toDto(saved));
     }
 
+    @Operation(
+            summary = "Favorite product deleting",
+            description = "Allows to delete a product from favorite"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "Not found", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
+    })
     @DeleteMapping("/{favorite_id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long favorite_id) {
         favoriteService.delete(favorite_id);

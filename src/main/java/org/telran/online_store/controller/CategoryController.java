@@ -71,7 +71,7 @@ public class CategoryController {
                     @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
                     @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
+                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
     @PostMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
