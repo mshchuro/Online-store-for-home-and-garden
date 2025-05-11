@@ -37,7 +37,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void addToCart(AddToCartRequest request) {
+    public Cart addToCart(AddToCartRequest request) {
         User currentUser = userService.getCurrentUser();
         Product product = productService.getById(request.getProductId());
 
@@ -49,9 +49,10 @@ public class CartServiceImpl implements CartService {
         if (item == null) {
             cart.getItems().add(new CartItem(null, cart, product, request.getQuantity()));
         } else {
-            item.setQuantity(request.getQuantity());
+            Integer quantity = item.getQuantity();
+            item.setQuantity(quantity + request.getQuantity());
         }
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override

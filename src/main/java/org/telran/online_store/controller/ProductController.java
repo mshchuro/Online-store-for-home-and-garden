@@ -147,6 +147,9 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Ok", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = ProductResponseDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "Not found", content =
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
