@@ -14,4 +14,5 @@ public interface FavoriteJpaRepository extends JpaRepository<Favorite, Long> {
 
     boolean existsByUserAndProduct(User user, Product product);
 
+    void removeAllByProduct_Id(Long id);
 }

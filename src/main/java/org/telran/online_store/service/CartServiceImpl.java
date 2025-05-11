@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,17 +16,15 @@ import org.telran.online_store.repository.CartJpaRepository;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
 
-    @Autowired
-    private CartJpaRepository cartRepository;
+    private final CartJpaRepository cartRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @Override
     public Cart getCart() {
