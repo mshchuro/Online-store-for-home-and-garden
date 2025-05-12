@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,7 +67,7 @@ public class CartController {
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
     @PostMapping
-    public ResponseEntity<CartResponseDto> createCartItem(@RequestBody AddToCartRequest addToCartRequest) {
+    public ResponseEntity<CartResponseDto> createCartItem(@Valid @RequestBody AddToCartRequest addToCartRequest) {
         Cart cart = cartService.addToCart(addToCartRequest);
         return ResponseEntity.status(HttpStatus.OK).body(cartConverter.toDto(cart));
     }
