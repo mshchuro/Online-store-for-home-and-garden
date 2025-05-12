@@ -37,8 +37,9 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ProductResponseDto getProductById(@PathVariable Long productId) {
-        return productConverter.toDto(productService.getById(productId));
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
+        Product product = productService.getById(productId);
+        return ResponseEntity.ok(productConverter.toDto(product));
     }
 
     @PostMapping()
