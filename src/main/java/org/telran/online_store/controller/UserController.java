@@ -28,8 +28,9 @@ public class UserController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public List<User> getAll() {
-        return userService.getAll();
+    public ResponseEntity<List<User>> getAll() {
+        userService.getAll();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/register")
@@ -44,8 +45,9 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public User getById(@PathVariable Long userId) {
-        return userService.getById(userId);
+    public ResponseEntity<User> getById(@PathVariable Long userId) {
+        userService.getById(userId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}")
