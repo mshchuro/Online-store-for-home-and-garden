@@ -37,8 +37,8 @@ public class CartController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> deleteCart() {
-        cartService.clearCart();
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<CartResponseDto> deleteCart() {
+        Cart cart = cartService.clearCart();
+        return ResponseEntity.status(HttpStatus.OK).body(cartConverter.toDto(cart));
     }
 }
