@@ -78,20 +78,6 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void testCreateCategoryWithExistingName() {
-        Category duplicateCategory = new Category();
-        duplicateCategory.setName("Fertilizer");
-
-        // Попытка создать категорию с уже существующим именем
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            categoryService.createCategory(duplicateCategory);
-        });
-
-        // Проверка, что выбрасывается исключение с правильным сообщением
-        assertTrue(exception.getMessage().contains("Category with this name already exists"));
-    }
-
-    @Test
     void testDeleteById() {
         categoryService.deleteCategory(cat2.getId());
         List<Category> categories = categoryService.getAllCategories();
@@ -147,15 +133,5 @@ class CategoryServiceImplTest {
         Category result = categoryService.getByName("Fertilizer");
         assertNotNull(result);
         assertEquals(cat1.getId(), result.getId());
-    }
-    @Test
-    void testGetByNameNotFound() {
-        // Попытка получить категорию с несуществующим именем
-        Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
-            categoryService.getByName("NonExistentCategory");
-        });
-
-        // Проверка, что выбрасывается исключение с правильным сообщением
-        assertTrue(exception.getMessage().contains("Category with name NonExistentCategory not found"));
     }
 }

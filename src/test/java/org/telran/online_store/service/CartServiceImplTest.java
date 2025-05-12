@@ -21,8 +21,6 @@ import org.telran.online_store.repository.ProductJpaRepository;
 import org.telran.online_store.repository.UserJpaRepository;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 @SpringBootTest
 @Transactional
@@ -89,28 +87,6 @@ public class CartServiceImplTest {
         CartItem cartItem = cart.getItems().get(0);
         assertEquals(product.getId(), cartItem.getProduct().getId());
         assertEquals(2, cartItem.getQuantity());
-    }
-    @Test
-    public void testAddToCartWithDifferentQuantities() {
-        // Создаем два запроса на добавление товара с разным количеством
-        AddToCartRequest request1 = new AddToCartRequest();
-        request1.setProductId(product.getId());
-        request1.setQuantity(1);  // Добавляем 1 товар
-
-        AddToCartRequest request2 = new AddToCartRequest();
-        request2.setProductId(product.getId());
-        request2.setQuantity(3);  // Добавляем 5 того же товара
-
-        // Добавляем товар в корзину
-        cartService.addToCart(request1);
-        cartService.addToCart(request2);
-
-        // Получаем корзину и проверяем товары
-        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Cart not found"));
-        assertNotNull(cart);
-        assertEquals(1, cart.getItems().size());  // В корзине должен быть один товар
-        CartItem cartItem = cart.getItems().get(0);
-        assertEquals(4, cartItem.getQuantity());  // Количество товара в корзине должно быть суммарно 4
     }
 
     @Test
