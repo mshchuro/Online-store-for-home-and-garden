@@ -38,8 +38,9 @@ public class CategoryController {
                     @Schema(implementation = Category.class))})
     })
     @GetMapping()
-    public List<Category> getAll() {
-        return categoryService.getAllCategories();
+    public ResponseEntity<List<Category>> getAll() {
+        categoryService.getAllCategories();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -54,8 +55,9 @@ public class CategoryController {
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
     @GetMapping("/{categoryId}")
-    public Category getCategoryById(@PathVariable Long categoryId) {
-        return categoryService.getCategoryById(categoryId);
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
+        Category getCategoryById = categoryService.getCategoryById(categoryId);
+        return ResponseEntity.status(HttpStatus.OK).body(getCategoryById);
     }
 
     @Operation(
