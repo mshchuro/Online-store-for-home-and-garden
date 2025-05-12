@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.entity.Category;
+import org.telran.online_store.entity.Product;
+import org.telran.online_store.exception.CategoryNotFoundException;
 
 import java.util.List;
 
@@ -17,6 +19,9 @@ class CategoryServiceImplTest {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ProductService productService;
 
     private Category cat1;
     private Category cat2;
@@ -45,6 +50,19 @@ class CategoryServiceImplTest {
         Category category = categoryService.getCategoryById(cat1.getId());
         assertEquals("Fertilizer", category.getName());
     }
+    @Test
+    void testGetCategoryByIdNotFound() {
+        // Попытка получить категорию с несуществующим ID
+        Long nonExistentId = 999L;
+
+        // Проверяем, что выбрасывается исключение CategoryNotFoundException
+        Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.getCategoryById(nonExistentId);
+        });
+
+        // Проверка, что исключение содержит правильное сообщение
+        assertTrue(exception.getMessage().contains("Category with id 999 not found"));
+    }
 
     @Test
     void testCreate() {
@@ -60,10 +78,58 @@ class CategoryServiceImplTest {
     }
 
     @Test
+    void testCreateCategoryWithExistingName() {
+        Category duplicateCategory = new Category();
+        duplicateCategory.setName("Fertilizer");
+
+        // Попытка создать категорию с уже существующим именем
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            categoryService.createCategory(duplicateCategory);
+        });
+
+        // Проверка, что выбрасывается исключение с правильным сообщением
+        assertTrue(exception.getMessage().contains("Category with this name already exists"));
+    }
+
+    @Test
     void testDeleteById() {
         categoryService.deleteCategory(cat2.getId());
         List<Category> categories = categoryService.getAllCategories();
         assertEquals(1, categories.size());
+    }
+    @Test
+    void testDeleteCategoryNotFound() {
+        // Попытка удалить категорию с несуществующим ID
+        Long nonExistentId = 999L;
+
+        // Проверяем, что выбрасывается исключение CategoryNotFoundException
+        Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.deleteCategory(nonExistentId);
+        });
+
+        // Проверка, что исключение содержит правильное сообщение
+        assertTrue(exception.getMessage().contains("Category with id 999 not found"));
+    }
+
+    @Test
+    void testDeleteCategoryWithProducts() {
+        // Создаем новую категорию
+        Category category = new Category();
+        category.setName("Electronics");
+        category = categoryService.createCategory(category);
+
+        // Создаем продукт и связываем его с категорией
+        Product product = new Product();
+        product.setName("Laptop");
+        product.setCategory(category);
+        productService.create(product);
+
+        // Удаляем категорию
+        categoryService.deleteCategory(category.getId());
+
+        // Проверяем, что продукты больше не привязаны к этой категории
+        Product updatedProduct = productService.getById(product.getId());
+        assertNull(updatedProduct.getCategory());  // Продукт не должен иметь категорию
     }
 
     @Test
@@ -81,5 +147,15 @@ class CategoryServiceImplTest {
         Category result = categoryService.getByName("Fertilizer");
         assertNotNull(result);
         assertEquals(cat1.getId(), result.getId());
+    }
+    @Test
+    void testGetByNameNotFound() {
+        // Попытка получить категорию с несуществующим именем
+        Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.getByName("NonExistentCategory");
+        });
+
+        // Проверка, что выбрасывается исключение с правильным сообщением
+        assertTrue(exception.getMessage().contains("Category with name NonExistentCategory not found"));
     }
 }

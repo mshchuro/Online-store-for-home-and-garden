@@ -1,4 +1,4 @@
-DELETE FROM categories;
+-- DELETE FROM categories;
 
-INSERT INTO categories (name) VALUES ('Fertilizer');
-INSERT INTO categories (name) VALUES ('Tools and equipment');
+--INSERT INTO categories (name) VALUES ('Fertilizer');
+--INSERT INTO categories (name) VALUES ('Tools and equipment');

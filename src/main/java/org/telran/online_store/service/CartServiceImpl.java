@@ -71,12 +71,21 @@ public class CartServiceImpl implements CartService {
         }
     }
 
+//    @Override
+//    @Transactional
+//    public void clearCart() {
+//        User user = userService.getCurrentUser();
+//        Cart cart = cartRepository.findByUser(user).orElseThrow(()
+//                -> new CartNotFoundException("No such cart is found"));
+//        cartRepository.delete(cart);
+//    }
     @Override
     @Transactional
     public void clearCart() {
         User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
-                -> new CartNotFoundException("No such cart is found"));
-        cartRepository.delete(cart);
+                          -> new CartNotFoundException("Cart not found"));
+        cart.getItems().clear();
+        cartRepository.save(cart);
     }
 }

@@ -15,11 +15,14 @@ import org.telran.online_store.entity.Cart;
 import org.telran.online_store.entity.CartItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.exception.CartNotFoundException;
 import org.telran.online_store.repository.CartJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
 import org.telran.online_store.repository.UserJpaRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 @Transactional
@@ -30,6 +33,9 @@ public class CartServiceImplTest {
 
     @Autowired
     private CartJpaRepository cartRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private UserJpaRepository userRepository;
@@ -84,6 +90,28 @@ public class CartServiceImplTest {
         assertEquals(product.getId(), cartItem.getProduct().getId());
         assertEquals(2, cartItem.getQuantity());
     }
+    @Test
+    public void testAddToCartWithDifferentQuantities() {
+        // Создаем два запроса на добавление товара с разным количеством
+        AddToCartRequest request1 = new AddToCartRequest();
+        request1.setProductId(product.getId());
+        request1.setQuantity(1);  // Добавляем 1 товар
+
+        AddToCartRequest request2 = new AddToCartRequest();
+        request2.setProductId(product.getId());
+        request2.setQuantity(3);  // Добавляем 5 того же товара
+
+        // Добавляем товар в корзину
+        cartService.addToCart(request1);
+        cartService.addToCart(request2);
+
+        // Получаем корзину и проверяем товары
+        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Cart not found"));
+        assertNotNull(cart);
+        assertEquals(1, cart.getItems().size());  // В корзине должен быть один товар
+        CartItem cartItem = cart.getItems().get(0);
+        assertEquals(4, cartItem.getQuantity());  // Количество товара в корзине должно быть суммарно 4
+    }
 
     @Test
     public void testRemoveFromCart() {
@@ -104,16 +132,15 @@ public class CartServiceImplTest {
     @Test
     @Transactional
     public void testClearCart() {
-        // Создаем запрос на добавление товара в корзину
+        // Создаем товар и добавляем его в корзину
         AddToCartRequest request = new AddToCartRequest();
         request.setProductId(product.getId());
         request.setQuantity(2);
+        cartService.addToCart(request); // Добавляем товар в корзину
 
-        // Добавляем товар в корзину
-        cartService.addToCart(request);
-
-        // Получаем корзину пользователя перед очисткой
-        Cart cartBeforeClear = cartRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Cart not found"));
+        // Получаем корзину перед очисткой
+        Cart cartBeforeClear = cartRepository.findByUser(user)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
 
         // Проверяем, что корзина не пуста перед очисткой
         assertFalse(cartBeforeClear.getItems().isEmpty(), "Cart should not be empty before clearing");
@@ -121,10 +148,41 @@ public class CartServiceImplTest {
         // Очищаем корзину
         cartService.clearCart();
 
-        // Получаем корзину пользователя после очистки
-        Cart cartAfterClear = cartRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Cart not found"));
+        // Получаем корзину после очистки
+        Cart cartAfterClear = cartRepository.findByUser(user)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
+
 
         // Проверяем, что корзина пуста после очистки
+        assertTrue(cartAfterClear.getItems().isEmpty(), "Cart should be empty after clearing");
+    }
+
+    @Test
+    @Transactional
+    public void testClearCartAfterAddingMultipleItems() {
+        // Добавляем несколько товаров в корзину
+        AddToCartRequest request1 = new AddToCartRequest();
+        request1.setProductId(product.getId());
+        request1.setQuantity(2);  // Добавляем 2 товара
+
+        AddToCartRequest request2 = new AddToCartRequest();
+        request2.setProductId(product.getId());
+        request2.setQuantity(4);  // Добавляем 4 товара
+
+        cartService.addToCart(request1);
+        cartService.addToCart(request2);
+
+        // Получаем корзину перед очисткой
+        Cart cartBeforeClear = cartRepository.findByUser(user)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        assertFalse(cartBeforeClear.getItems().isEmpty(), "Cart should not be empty before clearing");
+
+        // Очищаем корзину
+        cartService.clearCart();
+
+        // Получаем корзину после очистки
+        Cart cartAfterClear = cartRepository.findByUser(user)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
         assertTrue(cartAfterClear.getItems().isEmpty(), "Cart should be empty after clearing");
     }
 
