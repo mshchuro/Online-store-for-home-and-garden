@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
 
         Specification<Product> spec = ProductSpecification.filterBy(categoryId, minPrice, maxPrice, discount);
 
-        Sort sortObj = Sort.unsorted();
+        Sort sortObj;
         if (sort != null && !sort.isEmpty()) {
             List<Sort.Order> orders = new ArrayList<>();
 
@@ -43,15 +43,22 @@ public class ProductServiceImpl implements ProductService {
                     String field = parts[0];
                     String direction = parts[1];
 
-                    Sort.Order order = "desc".equalsIgnoreCase(direction) ?
-                            Sort.Order.desc(field) : Sort.Order.asc(field);
+                    Sort.Order order = "desc".equalsIgnoreCase(direction)
+                            ? Sort.Order.desc(field)
+                            : Sort.Order.asc(field);
+
+                    if ("discountPrice".equals(field)) {
+                        order = order.nullsLast();
+                    }
 
                     orders.add(order);
                 }
             }
-            if (!orders.isEmpty()) {
-                sortObj = Sort.by(orders);
-            }
+
+            sortObj = orders.isEmpty() ? Sort.by("name") : Sort.by(orders);
+
+        } else {
+            sortObj = Sort.by("name");
         }
         return productRepository.findAll(spec, sortObj);
     }
@@ -102,6 +109,10 @@ public class ProductServiceImpl implements ProductService {
 
         if (product.getImageUrl() != null) {
             existingProduct.setImageUrl(product.getImageUrl());
+        }
+
+        if (product.getDiscountPrice() != null) {
+            existingProduct.setDiscountPrice(product.getDiscountPrice());
         }
 
         Long categoryId = Optional.ofNullable(product.getCategory()).map(Category::getId).orElse(null);
