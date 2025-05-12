@@ -68,6 +68,10 @@ public class UserServiceImpl implements UserService {
             currentUser.setPhone(user.getPhone());
         }
 
+        if (user.getRole() != null) {
+            currentUser.setRole(user.getRole());
+        }
+
         return userRepository.save(currentUser);
     }
 
