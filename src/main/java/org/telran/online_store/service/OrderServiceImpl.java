@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.exception.OrderNotFoundException;
 import org.telran.online_store.repository.OrderJpaRepository;
 
@@ -50,5 +51,18 @@ public class OrderServiceImpl implements OrderService {
         User currentUser = userService.getCurrentUser();
         order.setUser(currentUser);
         return orderRepository.save(order);
+    }
+
+    @Override
+    public List<Order> getAllByStatus(OrderStatus orderStatus) {
+        return orderRepository.findAllByStatus(orderStatus);
+    }
+
+    @Override
+    public void updateStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() ->
+                new OrderNotFoundException("Order with id " + orderId + " is not found"));
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 }
