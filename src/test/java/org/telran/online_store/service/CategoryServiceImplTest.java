@@ -56,9 +56,8 @@ class CategoryServiceImplTest {
         Long nonExistentId = 999L;
 
         // Проверяем, что выбрасывается исключение CategoryNotFoundException
-        Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
-            categoryService.getCategoryById(nonExistentId);
-        });
+        Exception exception = assertThrows(CategoryNotFoundException.class,
+                () -> categoryService.getCategoryById(nonExistentId));
 
         // Проверка, что исключение содержит правильное сообщение
         assertTrue(exception.getMessage().contains("Category with id 999 not found"));
@@ -89,9 +88,8 @@ class CategoryServiceImplTest {
         Long nonExistentId = 999L;
 
         // Проверяем, что выбрасывается исключение CategoryNotFoundException
-        Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
-            categoryService.deleteCategory(nonExistentId);
-        });
+        Exception exception = assertThrows(CategoryNotFoundException.class,
+                () -> categoryService.deleteCategory(nonExistentId));
 
         // Проверка, что исключение содержит правильное сообщение
         assertTrue(exception.getMessage().contains("Category with id 999 not found"));
