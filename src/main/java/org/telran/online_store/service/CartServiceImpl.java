@@ -11,6 +11,7 @@ import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.CartItemNotFoundException;
 import org.telran.online_store.exception.CartNotFoundException;
+import org.telran.online_store.repository.CartItemJpaRepository;
 import org.telran.online_store.repository.CartJpaRepository;
 
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ import java.util.Optional;
 public class CartServiceImpl implements CartService {
 
     private final CartJpaRepository cartRepository;
+
+    @Autowired
+    private CartItemJpaRepository cartItemRepository;
 
     private final UserService userService;
 
@@ -73,10 +77,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void clearCart() {
+    public Cart clearCart() {
         User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
-        cartRepository.delete(cart);
+        cartItemRepository.removeCartItemByCart_Id(cart.getId());
+        return cartRepository.save(cart);
     }
 }

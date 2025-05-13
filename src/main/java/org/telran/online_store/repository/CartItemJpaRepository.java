@@ -7,5 +7,6 @@ import org.telran.online_store.entity.CartItem;
 @Repository
 public interface CartItemJpaRepository extends JpaRepository<CartItem, Long> {
 
-    void removeAllByProduct_Id(Long productId);
+    void removeCartItemByCart_Id(Long cartId);
+
 }
