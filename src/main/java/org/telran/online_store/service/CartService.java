@@ -10,7 +10,7 @@ public interface CartService {
 
     Cart getCart();
 
-    void addToCart(AddToCartRequest request);
+    Cart addToCart(AddToCartRequest request);
 
     void removeFromCart(Long productId);
 
