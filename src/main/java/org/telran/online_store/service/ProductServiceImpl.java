@@ -12,8 +12,7 @@ import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
-import org.telran.online_store.repository.CategoryJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
+import org.telran.online_store.repository.*;
 import org.telran.online_store.specification.ProductSpecification;
 
 import java.math.BigDecimal;
@@ -29,6 +28,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductJpaRepository productRepository;
 
     private final CategoryJpaRepository categoryRepository;
+
+    private final OrderItemJpaRepository orderItemRepository;
+
+    private final CartItemJpaRepository cartItemRepository;
+
+    private final FavoriteJpaRepository favoriteRepository;
 
     public List<Product> getAll(Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean discount, List<String> sort) {
 
@@ -136,6 +141,9 @@ public class ProductServiceImpl implements ProductService {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException("Product with id " + id + " not found");
         }
+        cartItemRepository.removeAllByProduct_Id(id);
+        orderItemRepository.removeAllByProduct_Id(id);
+        favoriteRepository.removeAllByProduct_Id(id);
         productRepository.deleteById(id);
     }
 

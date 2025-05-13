@@ -22,6 +22,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.telran.online_store.security.CustomAuthenticationEntryPoint;
 import org.telran.online_store.security.JwtAuthFilter;
 
 import java.io.IOException;
@@ -34,6 +35,8 @@ public class SecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -44,11 +47,12 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/reports/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/swagger-ui.html").permitAll()
                         .anyRequest().authenticated() //
                 )
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
-                                .authenticationEntryPoint(unauthorizedEntryPoint())
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
                                 .accessDeniedHandler(accessDeniedHandler())
                 )
                 .sessionManagement(session ->
@@ -58,11 +62,11 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public AuthenticationEntryPoint unauthorizedEntryPoint() {
-        return (request, response, authException)
-                -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization is required");
-    }
+//    @Bean
+//    public AuthenticationEntryPoint unauthorizedEntryPoint() {
+//        return (request, response, authException)
+//                -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization is required");
+//    }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {

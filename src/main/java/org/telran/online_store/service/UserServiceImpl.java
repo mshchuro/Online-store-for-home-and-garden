@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,10 +14,11 @@ import org.telran.online_store.repository.UserJpaRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserJpaRepository userRepository;
+
+    private final UserJpaRepository userRepository;
 
     @Override
     public List<User> getAll() {
@@ -66,6 +68,10 @@ public class UserServiceImpl implements UserService {
 
         if (user.getPhone() != null) {
             currentUser.setPhone(user.getPhone());
+        }
+
+        if (user.getRole() != null) {
+            currentUser.setRole(user.getRole());
         }
 
         return userRepository.save(currentUser);

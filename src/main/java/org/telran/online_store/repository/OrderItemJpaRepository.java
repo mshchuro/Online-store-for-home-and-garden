@@ -6,4 +6,6 @@ import org.telran.online_store.entity.OrderItem;
 
 @Repository
 public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
+
+    void removeAllByProduct_Id(Long productId);
 }

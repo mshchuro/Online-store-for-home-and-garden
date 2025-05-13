@@ -1,69 +1,135 @@
 package org.telran.online_store.service;
 
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.telran.online_store.entity.Category;
-import org.telran.online_store.repository.CategoryJpaRepository;
+import org.telran.online_store.entity.Product;
+import org.telran.online_store.exception.CategoryNotFoundException;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
-@Sql(value = "/catDataInit.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CategoryServiceImplTest {
-
-    @Autowired
-    private CategoryJpaRepository categoryRepository;
 
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private ProductService productService;
+
+    private Category cat1;
+    private Category cat2;
+
+    @BeforeEach
+    void setup() {
+        categoryService.getAllCategories().forEach(c -> categoryService.deleteCategory(c.getId()));
+
+        cat1 = new Category();
+        cat1.setName("Fertilizer");
+        cat1 = categoryService.createCategory(cat1);
+
+        cat2 = new Category();
+        cat2.setName("Tools");
+        cat2 = categoryService.createCategory(cat2);
+    }
 
     @Test
-    public void testGetAll() {
+    void testGetAll() {
         List<Category> categories = categoryService.getAllCategories();
         assertEquals(2, categories.size());
     }
+
     @Test
-    public void testGetById() {
-        Category category = categoryService.getCategoryById(1L);
+    void testGetById() {
+        Category category = categoryService.getCategoryById(cat1.getId());
         assertEquals("Fertilizer", category.getName());
+    }
+    @Test
+    void testGetCategoryByIdNotFound() {
+        // Попытка получить категорию с несуществующим ID
+        Long nonExistentId = 999L;
+
+        // Проверяем, что выбрасывается исключение CategoryNotFoundException
+        Exception exception = assertThrows(CategoryNotFoundException.class,
+                () -> categoryService.getCategoryById(nonExistentId));
+
+        // Проверка, что исключение содержит правильное сообщение
+        assertTrue(exception.getMessage().contains("Category with id 999 not found"));
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         Category newCategory = new Category();
         newCategory.setName("New Category");
 
-        Category createdCategory = categoryService.createCategory(newCategory);
-        assertNotNull(createdCategory.getId());
-        assertEquals("New Category", createdCategory.getName());
+        Category created = categoryService.createCategory(newCategory);
+
+        assertNotNull(created.getId());
+        assertEquals("New Category", created.getName());
 
         assertEquals(3, categoryService.getAllCategories().size());
     }
 
     @Test
-    public void testDeleteById() {
-        categoryService.deleteCategory(2L);
-        assertEquals(2, categoryService.getAllCategories().size());
+    void testDeleteById() {
+        categoryService.deleteCategory(cat2.getId());
+        List<Category> categories = categoryService.getAllCategories();
+        assertEquals(1, categories.size());
+    }
+    @Test
+    void testDeleteCategoryNotFound() {
+        // Попытка удалить категорию с несуществующим ID
+        Long nonExistentId = 999L;
+
+        // Проверяем, что выбрасывается исключение CategoryNotFoundException
+        Exception exception = assertThrows(CategoryNotFoundException.class,
+                () -> categoryService.deleteCategory(nonExistentId));
+
+        // Проверка, что исключение содержит правильное сообщение
+        assertTrue(exception.getMessage().contains("Category with id 999 not found"));
     }
 
     @Test
-    public void testUpdate() {
-        Category categoryBeforeUpdate = categoryService.getByName("Fertilizer");
-        Long id = categoryBeforeUpdate.getId();
+    void testDeleteCategoryWithProducts() {
+        // Создаем новую категорию
         Category category = new Category();
-        category.setName("Fertilizerrrrr");
-        categoryService.updateCategory(id, category);
+        category.setName("Electronics");
+        category = categoryService.createCategory(category);
 
-        assertEquals("Fertilizerrrrr", categoryService.getCategoryById(id).getName());
+        // Создаем продукт и связываем его с категорией
+        Product product = new Product();
+        product.setName("Laptop");
+        product.setCategory(category);
+        productService.create(product);
 
+        // Удаляем категорию
+        categoryService.deleteCategory(category.getId());
+
+        // Проверяем, что продукты больше не привязаны к этой категории
+        Product updatedProduct = productService.getById(product.getId());
+        assertNull(updatedProduct.getCategory());  // Продукт не должен иметь категорию
+    }
+
+    @Test
+    void testUpdate() {
+        Category update = new Category();
+        update.setName("Updated Fertilizer");
+        categoryService.updateCategory(cat1.getId(), update);
+
+        Category result = categoryService.getCategoryById(cat1.getId());
+        assertEquals("Updated Fertilizer", result.getName());
+    }
+
+    @Test
+    void testGetByName() {
+        Category result = categoryService.getByName("Fertilizer");
+        assertNotNull(result);
+        assertEquals(cat1.getId(), result.getId());
     }
 }
