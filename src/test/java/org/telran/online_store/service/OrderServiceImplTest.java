@@ -153,3 +153,4 @@ class OrderServiceImplTest {
         // Проверка, что если заказ не найден, бросается исключение
         assertThrows(OrderNotFoundException.class, () -> orderService.getStatus(99999L));
     }
+}

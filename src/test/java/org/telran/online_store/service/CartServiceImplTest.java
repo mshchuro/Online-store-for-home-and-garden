@@ -179,8 +179,4 @@ public class CartServiceImplTest {
         assertEquals(1, cart.getItems().size());
         assertEquals(3, cart.getItems().get(0).getQuantity());
     }
-
-
-class CartServiceImplTest {
-
 }
