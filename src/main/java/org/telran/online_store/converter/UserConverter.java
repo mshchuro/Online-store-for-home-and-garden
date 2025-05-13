@@ -16,6 +16,7 @@ public class UserConverter implements Converter<UserUpdateRequestDto, UserUpdate
                 .name(user.getName())
                 .phone(user.getPhone())
                 .email(user.getEmail())
+                .userRole(user.getRole())
                 .build();
     }
 
@@ -25,6 +26,7 @@ public class UserConverter implements Converter<UserUpdateRequestDto, UserUpdate
                 .builder()
                 .name(userUpdateRequestDto.name())
                 .phone(userUpdateRequestDto.phone())
+                .role(userUpdateRequestDto.userRole())
                 .build();
     }
 }
