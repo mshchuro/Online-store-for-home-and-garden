@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,20 +17,18 @@ import org.telran.online_store.repository.CartJpaRepository;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
 
-    @Autowired
-    private CartJpaRepository cartRepository;
+    private final CartJpaRepository cartRepository;
 
     @Autowired
     private CartItemJpaRepository cartItemRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @Override
     public Cart getCart() {
@@ -42,7 +41,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void addToCart(AddToCartRequest request) {
+    public Cart addToCart(AddToCartRequest request) {
         User currentUser = userService.getCurrentUser();
         Product product = productService.getById(request.getProductId());
 
@@ -54,9 +53,10 @@ public class CartServiceImpl implements CartService {
         if (item == null) {
             cart.getItems().add(new CartItem(null, cart, product, request.getQuantity()));
         } else {
-            item.setQuantity(request.getQuantity());
+            Integer quantity = item.getQuantity();
+            item.setQuantity(quantity + request.getQuantity());
         }
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 
     @Override

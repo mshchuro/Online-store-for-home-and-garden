@@ -36,7 +36,8 @@ public class OrderItemConverter implements Converter<OrderItemRequestDto, OrderI
         return OrderItem.builder()
                 .product(product)
                 .quantity(orderItemRequestDto.quantity())
-                .priceAtPurchase(product.getPrice().subtract(discount))
+                .priceAtPurchase(product.getPrice().subtract(discount)
+                        .multiply(BigDecimal.valueOf(orderItemRequestDto.quantity())))
                 .build();
     }
 }
