@@ -23,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Category", description = "API endpoints for product categories")
 @SecurityRequirement(name = "bearerAuth")
+
 @RequestMapping("/v1/categories")
 public class CategoryController {
 
@@ -37,6 +38,7 @@ public class CategoryController {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = Category.class))})
     })
+
     @GetMapping()
     public ResponseEntity<List<Category>> getAll() {
         categoryService.getAllCategories();
