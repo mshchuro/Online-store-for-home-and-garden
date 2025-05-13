@@ -1,6 +1,7 @@
 package org.telran.online_store.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,4 +179,8 @@ public class CartServiceImplTest {
         assertEquals(1, cart.getItems().size());
         assertEquals(3, cart.getItems().get(0).getQuantity());
     }
+
+
+class CartServiceImplTest {
+
 }

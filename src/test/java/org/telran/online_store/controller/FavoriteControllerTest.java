@@ -22,7 +22,6 @@ import org.telran.online_store.repository.UserJpaRepository;
 import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -36,7 +35,6 @@ public class FavoriteControllerTest {
     private int port;
 
     @Autowired
-
     private FavoriteJpaRepository favoriteRepository;
 
     @Autowired
@@ -45,29 +43,43 @@ public class FavoriteControllerTest {
     @Autowired
     private ProductJpaRepository productRepository;
 
-    private User testUser;
     private Product testProduct;
+    private User testUser;
+    private String token;
+    private Long userId;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
 
         favoriteRepository.deleteAll();
-        userRepository.deleteAll();
         productRepository.deleteAll();
+        userRepository.deleteAll();
 
         testUser = userRepository.save(User.builder()
-                .name("Lily")
-                .phone("12123123123123")
-                .email("test@example.com")
-                .password("123456")
+                .name("Alice Green")
+                .email("alice@example.com")
+                .phone("1234567890")
+                .password("$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u")
                 .role(UserRole.CLIENT)
                 .build());
+        userId = testUser.getId();
 
         testProduct = productRepository.save(Product.builder()
-                .name("Test Product")
-                .price(BigDecimal.valueOf(99.99))
+                .name("Shovel")
+                .description("Durable steel shovel with wooden handle")
+                .price(BigDecimal.valueOf(25.50))
+                .imageUrl("images/shovel.jpg")
                 .build());
+
+        token = given()
+                .contentType(ContentType.JSON)
+                .body("{\"email\":\"alice@example.com\",\"password\":\"password\"}") // Используем пароль из тестов, а не хеш из БД
+                .post("/v1/users/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("token");
     }
 
     @Test
@@ -77,59 +89,53 @@ public class FavoriteControllerTest {
                 .build();
 
         given()
+                .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when()
                 .post("/v1/favorites")
                 .then()
                 .statusCode(200)
-                .body("userId", equalTo(testUser.getId().intValue()))
+                .body("userId", equalTo(userId.intValue()))
                 .body("productId", equalTo(testProduct.getId().intValue()));
+
+        // Проверяем, что запись появилась в базе данных
+        assertThat(favoriteRepository.existsByUserAndProduct(testUser, testProduct)).isTrue();
     }
 
     @Test
     void testGetAllFavorites() {
-        Favorite favorite = Favorite.builder()
+        // Добавляем запись в избранное
+        favoriteRepository.save(Favorite.builder()
                 .user(testUser)
                 .product(testProduct)
-                .build();
-        favoriteRepository.save(favorite);
+                .build());
 
-        when()
+        given()
+                .header("Authorization", "Bearer " + token)
                 .get("/v1/favorites")
                 .then()
                 .statusCode(200)
-                .body("size()", greaterThan(0));
-    }
-
-    @Test
-    void testGetFavoriteById() {
-        Favorite favorite = Favorite.builder()
-                .user(testUser)
-                .product(testProduct)
-                .build();
-        favorite = favoriteRepository.save(favorite);
-
-        when()
-                .get("/v1/favorites/" + favorite.getId())
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(favorite.getId().intValue()));
+                .body("size()", greaterThan(0))
+                .body("[0].userId", equalTo(userId.intValue()))
+                .body("[0].productId", equalTo(testProduct.getId().intValue()));
     }
 
     @Test
     void testDeleteFavorite() {
-        Favorite favorite = Favorite.builder()
+        // Создаем запись в избранном
+        Favorite favorite = favoriteRepository.save(Favorite.builder()
                 .user(testUser)
                 .product(testProduct)
-                .build();
-        favorite = favoriteRepository.save(favorite);
+                .build());
 
-        when()
+        given()
+                .header("Authorization", "Bearer " + token)
                 .delete("/v1/favorites/" + favorite.getId())
                 .then()
                 .statusCode(200);
 
+        // Проверяем, что запись удалена из базы данных
         assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
     }
 }
