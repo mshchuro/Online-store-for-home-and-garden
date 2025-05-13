@@ -2,7 +2,6 @@ package org.telran.online_store.service;
 
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.enums.OrderStatus;
-
 import java.util.List;
 
 public interface OrderService {
