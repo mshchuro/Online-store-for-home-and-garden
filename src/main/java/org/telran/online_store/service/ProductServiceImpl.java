@@ -1,7 +1,8 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,6 +16,7 @@ import org.telran.online_store.repository.*;
 import org.telran.online_store.specification.ProductSpecification;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -155,5 +157,23 @@ public class ProductServiceImpl implements ProductService {
         Product product = getById(id);
         product.setCategory(category);
         productRepository.save(product);
+    }
+
+    @Override
+    public List<String> getTopTenPurchasedProducts() {
+        Pageable topTen = PageRequest.of(0, 10);
+        return productRepository.findTopTenPurchasedProducts(topTen);
+    }
+
+    @Override
+    public List<String> getTopTenCancelledProducts() {
+        Pageable topTen = PageRequest.of(0, 10);
+        return productRepository.findTopTenCancelledProducts(topTen);
+    }
+
+    @Override
+    public List<String> getNotPaidProducts(Long days) {
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(days);
+        return productRepository.findNotPaidProducts(thresholdDate);
     }
 }
