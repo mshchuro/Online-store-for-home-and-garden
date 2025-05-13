@@ -115,7 +115,7 @@ public class UserControllerTest {
                           "email": "update@me.com",
                           "phone": "+4915123456789",
                           "password": "oldpass",
-                          "role": "CLIENT"
+                          "role": "CLIENT",
                           "userRole": "ADMINISTRATOR"
                         }
                         """)
@@ -150,7 +150,7 @@ public class UserControllerTest {
                           "email": "delete@me.com",
                           "phone": "+4915123456789",
                           "password": "pass",
-                          "role": "CLIENT"
+                          "role": "CLIENT",
                           "userRole": "ADMINISTRATOR"
                         }
                         """)

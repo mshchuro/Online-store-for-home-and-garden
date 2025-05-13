@@ -52,9 +52,13 @@ public class UserController {
             })
     })
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+
     @GetMapping()
-    public List<User> getAll() {
-        return userService.getAll();
+
+    public ResponseEntity<List<UserUpdateResponseDto>> getAll() {
+        List<User> users = userService.getAll();
+        List<UserUpdateResponseDto> list = users.stream().map(userConverter::toDto).toList();
+        return ResponseEntity.ok(list);
     }
 
     @Operation(
