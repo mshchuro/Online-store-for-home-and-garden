@@ -28,9 +28,12 @@ public class UserController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public ResponseEntity<List<User>> getAll() {
-        userService.getAll();
-        return ResponseEntity.ok().build();
+
+    public ResponseEntity<List<UserUpdateResponseDto>> getAll() {
+        List<User> users = userService.getAll();
+        List<UserUpdateResponseDto> list = users.stream().map(userConverter::toDto).toList();
+        return ResponseEntity.ok(list);
+
     }
 
     @PostMapping("/register")
