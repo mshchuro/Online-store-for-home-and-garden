@@ -11,4 +11,7 @@ public record UserUpdateResponseDto(
 
     String email,
 
-    String phone) {}
+    String phone,
+
+    UserRole userRole
+) {}

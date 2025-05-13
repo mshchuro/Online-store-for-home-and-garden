@@ -5,5 +5,7 @@ import org.telran.online_store.enums.UserRole;
 public record UserUpdateRequestDto(
         String name,
 
-        String phone
+        String phone,
+
+        UserRole userRole
 ) {}
