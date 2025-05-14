@@ -31,23 +31,14 @@ import java.util.List;
 @Tag(name = "Product management", description = "API endpoints for managing products")
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/products")
-public class ProductController {
+public class ProductController implements ProductApi{
 
     private final ProductService productService;
 
     private final Converter<ProductRequestDto, ProductResponseDto, Product> productConverter;
 
-    @Operation(
-            summary = "Allows to get a list of products",
-            description = "Allows to filter products by category (categoryId), price range, discount \n" +
-                          "and perform sorting by fields"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ProductResponseDto.class))})
-    })
     @GetMapping()
+    @Override
     public ResponseEntity<List<ProductResponseDto>> getAll(
             @Parameter(description = "category ID for filtering")
             @RequestParam(required = false) Long categoryId,
@@ -69,92 +60,33 @@ public class ProductController {
         return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }
 
-    @Operation(
-            summary = "Allows to get a products by it's id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ProductResponseDto.class))}),
-            @ApiResponse(responseCode = "404", description = "Not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @GetMapping("/{productId}")
+    @Override
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
         Product product = productService.getById(productId);
         return ResponseEntity.ok(productConverter.toDto(product));
     }
 
-    @Operation(
-            summary = "New product creating",
-            description = "Allows to create a new product.\n Available only for Administrator"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ProductResponseDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Not valid data", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
-            @ApiResponse(responseCode = "409", description = "Already exists", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotUniqueErrorResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Product category is not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @PostMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @Override
     public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductRequestDto dto) {
         Product product = productConverter.toEntity(dto);
         Product saved = productService.create(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(productConverter.toDto(saved));
     }
 
-    @Operation(
-            summary = "Product updating",
-            description = "Allows to update product information such as name, description, price, discount, category and image url. Available only for Administrator"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ProductResponseDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Not valid data", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Product category is not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @Override
     public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductRequestDto dto) {
         Product product = productService.updateProduct(productId, productConverter.toEntity(dto));
         return ResponseEntity.ok(productConverter.toDto(product));
     }
 
-    @Operation(
-            summary = "Product deleting",
-            description = "Allows to delete a product. Available only for Administrator"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @Override
     public ResponseEntity<Void> deleteById(@PathVariable Long productId) {
         productService.delete(productId);
         return ResponseEntity.ok().build();

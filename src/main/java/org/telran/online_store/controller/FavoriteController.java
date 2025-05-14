@@ -30,25 +30,14 @@ import java.util.List;
 @Tag(name = "Favorite Product", description = "API endpoints for favorite products. Authorisation is required for all end-points")
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/favorites")
-public class FavoriteController {
+public class FavoriteController implements FavoriteApi{
 
     private final FavoriteService favoriteService;
 
     private final Converter<FavoriteRequestDto, FavoriteResponseDto, Favorite> favoriteConverter;
 
-    @Operation(
-            summary = "Allows to get a list of favorite products",
-            description = "Allows to view a list of current user's favorite products information. Authorisation is required"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = FavoriteResponseDto.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
-    })
     @GetMapping
+    @Override
     public ResponseEntity<List<FavoriteResponseDto>> getAll() {
         return ResponseEntity.ok(favoriteService.getAll()
                 .stream()
@@ -56,48 +45,16 @@ public class FavoriteController {
                 .toList());
     }
 
-    @Operation(
-            summary = "Making a product favorite",
-            description = "Allows to making a product favorite for current user"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = FavoriteResponseDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Not valid data", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
-            @ApiResponse(responseCode = "409", description = "Already exists", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotUniqueErrorResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Product is not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @PostMapping()
+    @Override
     public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto) {
         Favorite favorite = favoriteConverter.toEntity(requestDto);
         Favorite saved = favoriteService.create(favorite);
         return ResponseEntity.status(HttpStatus.CREATED).body(favoriteConverter.toDto(saved));
     }
 
-    @Operation(
-            summary = "Favorite product deleting",
-            description = "Allows to delete a product from favorite"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @DeleteMapping("/{favorite_id}")
+    @Override
     public ResponseEntity<Void> deleteById(@PathVariable Long favorite_id) {
         favoriteService.delete(favorite_id);
         return ResponseEntity.ok().build();
