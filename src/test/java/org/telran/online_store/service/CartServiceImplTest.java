@@ -17,6 +17,7 @@ import org.telran.online_store.entity.CartItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.CartNotFoundException;
+import org.telran.online_store.repository.CartItemJpaRepository;
 import org.telran.online_store.repository.CartJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
 import org.telran.online_store.repository.UserJpaRepository;
@@ -44,6 +45,8 @@ public class CartServiceImplTest {
 
     private User user;
     private Product product;
+    @Autowired
+    private CartItemJpaRepository cartItemJpaRepository;
 
     @BeforeEach
     public void setUp() {
@@ -109,57 +112,54 @@ public class CartServiceImplTest {
     @Test
     @Transactional
     public void testClearCart() {
-        // Создаем товар и добавляем его в корзину
+        // Добавим товар в корзину
         AddToCartRequest request = new AddToCartRequest();
         request.setProductId(product.getId());
-        request.setQuantity(2);
-        cartService.addToCart(request); // Добавляем товар в корзину
+        request.setQuantity(1);
+        cartService.addToCart(request);
 
-        // Получаем корзину перед очисткой
-        Cart cartBeforeClear = cartRepository.findByUser(user)
-                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
-
-        // Проверяем, что корзина не пуста перед очисткой
-        assertFalse(cartBeforeClear.getItems().isEmpty(), "Cart should not be empty before clearing");
+        // Убедимся, что корзина не пуста
+        Cart cartBefore = cartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        assertFalse(cartBefore.getItems().isEmpty());
 
         // Очищаем корзину
         cartService.clearCart();
 
-        // Получаем корзину после очистки
-        Cart cartAfterClear = cartRepository.findByUser(user)
-                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        // ❗ Получаем корзину заново, чтобы избежать stale entities
+        Cart cartAfter = cartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart not found after clear"));
 
-
-        // Проверяем, что корзина пуста после очистки
-        assertTrue(cartAfterClear.getItems().isEmpty(), "Cart should be empty after clearing");
+        // Убеждаемся, что корзина теперь пуста
+        assertTrue(cartAfter.getItems().isEmpty());
     }
 
     @Test
     @Transactional
     public void testClearCartAfterAddingMultipleItems() {
-        // Добавляем несколько товаров в корзину
+        // Arrange: добавляем товары в корзину
         AddToCartRequest request1 = new AddToCartRequest();
         request1.setProductId(product.getId());
-        request1.setQuantity(2);  // Добавляем 2 товара
+        request1.setQuantity(2);
 
         AddToCartRequest request2 = new AddToCartRequest();
         request2.setProductId(product.getId());
-        request2.setQuantity(4);  // Добавляем 4 товара
+        request2.setQuantity(3);
 
         cartService.addToCart(request1);
         cartService.addToCart(request2);
 
-        // Получаем корзину перед очисткой
-        Cart cartBeforeClear = cartRepository.findByUser(user)
-                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
-        assertFalse(cartBeforeClear.getItems().isEmpty(), "Cart should not be empty before clearing");
+        // Act: получаем корзину до очистки и убеждаемся, что в ней есть товары
+        Cart cartBeforeClear = cartService.getCart();
+        int sizeBefore = cartBeforeClear.getItems().size();
+        assertTrue(sizeBefore > 0, "Cart should have items before clearing");
 
         // Очищаем корзину
         cartService.clearCart();
 
-        // Получаем корзину после очистки
-        Cart cartAfterClear = cartRepository.findByUser(user)
-                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        // Assert: получаем корзину заново и проверяем, что она пуста
+        Cart cartAfterClear = cartService.getCart();
+        assertNotNull(cartAfterClear, "Cart should not be null after clearing");
         assertTrue(cartAfterClear.getItems().isEmpty(), "Cart should be empty after clearing");
     }
 

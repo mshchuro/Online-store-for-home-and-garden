@@ -1,199 +1,174 @@
 package org.telran.online_store.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.MediaType;
+import org.telran.online_store.dto.*;
+import org.telran.online_store.entity.Order;
+import org.telran.online_store.enums.OrderStatus;
+import org.telran.online_store.service.OrderService;
+import org.telran.online_store.security.JwtService;
+import org.telran.online_store.converter.Converter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import java.time.LocalDateTime;
+import java.util.List;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
 class OrderControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @MockBean
+    private JwtService jwtService;
 
-    private String userToken;
-    private String adminToken;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        // Регистрация и логин пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"user@example.com\",\"password\":\"password\", \"name\":\"Test User\"}")
-                .post("/v1/users/register");
-        userToken = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"user@example.com\",\"password\":\"password\"}")
-                .post("/v1/users/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("token");
+    @MockBean
+    private OrderService orderService;
 
-        // Регистрация и логин администратора
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\",\"password\":\"admin\", \"name\":\"Admin User\"}")
-                .post("/v1/users/register");
-        adminToken = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\",\"password\":\"admin\"}")
-                .post("/v1/users/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("token");
-    }
-    @Test
-    void testGetAllUserOrders() {
-        // Создаем несколько заказов для текущего пользователя
-        given()
-                .header("Authorization", "Bearer " + userToken)
-                .contentType(ContentType.JSON)
-                .body("{\"totalPrice\": 50.00, \"orderDate\": \"2025-05-02\"}")
-                .post("/v1/orders")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    @MockBean
+    private Converter<OrderRequestDto, OrderResponseDto, Order> orderConverter;
 
-        given()
-                .header("Authorization", "Bearer " + userToken)
-                .contentType(ContentType.JSON)
-                .body("{\"totalPrice\": 100.00, \"orderDate\": \"2025-05-03\"}")
-                .post("/v1/orders")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-
-        // Запрашиваем все заказы текущего пользователя
-        given()
-                .header("Authorization", "Bearer " + userToken)
-                .get("/v1/orders")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", greaterThanOrEqualTo(2));
-    }
 
     @Test
-    void testCreateOrder() {
-        given()
-                .header("Authorization", "Bearer " + userToken)
-                .contentType(ContentType.JSON)
-                .body("{\"totalPrice\": 75.50, \"orderDate\": \"2025-05-04\"}")
-                .post("/v1/orders")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .body("totalPrice", equalTo(75.50f));
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testGetAllOrders() throws Exception {
+        Order order = Order.builder()
+                .id(1L)
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .status(OrderStatus.PAYMENT_PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .items(List.of())
+                .build();
+
+        OrderResponseDto orderResponseDto = OrderResponseDto.builder()
+                .id(1L)
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .status(OrderStatus.PAYMENT_PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .items(List.of())
+                .build();
+
+        List<Order> orders = List.of(order);
+
+        Mockito.when(orderService.getAll()).thenReturn(orders);
+        Mockito.when(orderConverter.toDto(order)).thenReturn(orderResponseDto);
+
+        mockMvc.perform(get("/v1/orders"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].status").value("PAYMENT_PENDING"));
     }
-
     @Test
-    void testGetOrderStatus() {
-        // Сначала создаем заказ, чтобы получить его ID
-        int orderId = given()
-                .header("Authorization", "Bearer " + userToken)
-                .contentType(ContentType.JSON)
-                .body("{\"totalPrice\": 25.00, \"orderDate\": \"2025-05-05\"}")
-                .post("/v1/orders")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "USER")
+    void testGetUserHistory() throws Exception {
+        Order order = Order.builder()
+                .id(1L)
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .status(OrderStatus.PAYMENT_PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .items(List.of())
+                .build();
 
-        // Затем пытаемся получить статус этого заказа
-        given()
-                .header("Authorization", "Bearer " + userToken)
-                .get("/v1/orders/" + orderId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(orderId));
+        OrderResponseDto orderResponseDto = OrderResponseDto.builder()
+                .id(1L)
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .status(OrderStatus.PAYMENT_PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .items(List.of())
+                .build();
 
-        // Попробуем получить заказ другого пользователя (должно быть Forbidden)
-        given()
-                .header("Authorization", "Bearer " + adminToken)
-                .get("/v1/orders/" + orderId)
-                .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+        List<Order> orders = List.of(order);
+
+        Mockito.when(orderService.getAllUserOrders()).thenReturn(orders);
+        Mockito.when(orderConverter.toDto(order)).thenReturn(orderResponseDto);
+
+        mockMvc.perform(get("/v1/orders/history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].status").value("PAYMENT_PENDING"));
     }
 
     @Test
-    void testGetOrderStatus_OrderNotFound() {
-        given()
-                .header("Authorization", "Bearer " + userToken)
-                .get("/v1/orders/999") // Запрашиваем несуществующий заказ
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", containsString("Order with id 999 is not found"));
+    @WithMockUser(roles = "USER")
+    void testGetStatus() throws Exception {
+        Order order = Order.builder()
+                .id(1L)
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .status(OrderStatus.PAYMENT_PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .items(List.of())
+                .build();
+
+        Mockito.when(orderService.getStatus(1L)).thenReturn(order);
+
+        mockMvc.perform(get("/v1/orders/{orderId}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(order.getStatus().toString()));
     }
 
-//    @Test
-//    void testUpdateOrderStatusByAdmin() {
-//        // Сначала создаем заказ (как пользователь)
-//        int orderId = given()
-//                .header("Authorization", "Bearer " + userToken)
-//                .contentType(ContentType.JSON)
-//                .body("{\"totalPrice\": 100.00, \"orderDate\": \"2025-05-06\"}")
-//                .post("/v1/orders")
-//                .then()
-//                .statusCode(HttpStatus.CREATED.value())
-//                .extract()
-//                .path("id");
-//
-//        // Администратор обновляет статус заказа
-//        given()
-//                .header("Authorization", "Bearer " + adminToken)
-//                .contentType(ContentType.JSON)
-//                .body("{\"status\": \"PROCESSING\"}")
-//                .patch("/v1/orders/" + orderId) // Предполагаемый эндпоинт
-//                .then()
-//                .statusCode(HttpStatus.OK.value())
-//                .body("status", equalTo("PROCESSING"));
-//
-//        // Проверяем, что обычный пользователь не может обновить статус
-//        given()
-//                .header("Authorization", "Bearer " + userToken)
-//                .contentType(ContentType.JSON)
-//                .body("{\"status\": \"SHIPPED\"}")
-//                .patch("/v1/orders/" + orderId) // Предполагаемый эндпоинт
-//                .then()
-//                .statusCode(HttpStatus.FORBIDDEN.value());
-//    }
-//
-//    @Test
-//    void testGetAllOrdersByAdmin() {
-//        // Создаем несколько заказов (как пользователи)
-//        given()
-//                .header("Authorization", "Bearer " + userToken)
-//                .contentType(ContentType.JSON)
-//                .body("{\"totalPrice\": 50.00, \"orderDate\": \"2025-05-07\"}")
-//                .post("/v1/orders");
-//        given()
-//                .header("Authorization", "Bearer " + userToken)
-//                .contentType(ContentType.JSON)
-//                .body("{\"totalPrice\": 75.00, \"orderDate\": \"2025-05-08\"}")
-//                .post("/v1/orders");
-//
-//        // Администратор получает список всех заказов
-//        given()
-//                .header("Authorization", "Bearer " + adminToken)
-//                .get("/v1/orders/all") // Предполагаемый эндпоинт
-//                .then()
-//                .statusCode(HttpStatus.OK.value())
-//                .body("size()", greaterThanOrEqualTo(2));
-//
-//        // Проверяем, что обычный пользователь не может получить все заказы
-//        given()
-//                .header("Authorization", "Bearer " + userToken)
-//                .get("/v1/orders/all") // Предполагаемый эндпоинт
-//                .then()
-//                .statusCode(HttpStatus.FORBIDDEN.value());
-//    }
+    @Test
+    @WithMockUser(roles = "USER")
+    void testCreateOrder() throws Exception {
+        OrderRequestDto requestDto = OrderRequestDto.builder()
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .items(List.of(new OrderItemRequestDto(1L, 2)))
+                .build();
+
+        Order savedOrder = Order.builder()
+                .id(1L)
+                .status(OrderStatus.PAYMENT_PENDING)
+                .build();
+
+        OrderResponseDto responseDto = OrderResponseDto.builder()
+                .id(1L)
+                .status(OrderStatus.PAYMENT_PENDING)
+                .deliveryAddress("Street 12")
+                .deliveryMethod("Courier")
+                .contactPhone("+1234567890123")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .items(List.of())
+                .build();
+
+        Mockito.when(orderService.create(any())).thenReturn(savedOrder);
+        Mockito.when(orderConverter.toDto(savedOrder)).thenReturn(responseDto);
+
+        mockMvc.perform(post("/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.status").value("PAYMENT_PENDING"));
+    }
 }

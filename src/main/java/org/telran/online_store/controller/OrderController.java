@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.converter.Converter;
-import org.telran.online_store.dto.CartResponseDto;
 import org.telran.online_store.dto.OrderRequestDto;
 import org.telran.online_store.dto.OrderResponseDto;
 import org.telran.online_store.entity.Order;
