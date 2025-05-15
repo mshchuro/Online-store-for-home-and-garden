@@ -83,6 +83,8 @@ public class CartServiceImpl implements CartService {
 //                -> new CartNotFoundException("No such cart is found"));
 //        cartRepository.delete(cart);
 //    }
+
+
     @Override
     @Transactional
     public Cart clearCart() {
@@ -90,6 +92,11 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
         cartItemRepository.removeCartItemByCart_Id(cart.getId());
-        return cartRepository.save(cart);
+        cart.getItems().clear();
+        return cart;
+        //cartItemRepository.removeCartItemByCart_Id(cart.getId());
+        //return cartRepository.save(cart);
     }
 }
+
+
