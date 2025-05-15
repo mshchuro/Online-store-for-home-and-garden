@@ -62,12 +62,6 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-//    @Bean
-//    public AuthenticationEntryPoint unauthorizedEntryPoint() {
-//        return (request, response, authException)
-//                -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization is required");
-//    }
-
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) ->

@@ -1,9 +1,7 @@
 package org.telran.online_store.service;
 
-import org.springframework.data.domain.Pageable;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.entity.User;
 
 import java.math.BigDecimal;
 import java.util.List;

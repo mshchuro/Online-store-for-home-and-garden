@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 @Builder
 public record ProductRequestDto(
+
         @NotBlank(message = "Product name must not be blank")
         @Size(min = 3, max = 255, message = "Product name must be at least 3 and at most 255 characters")
         @Schema(description = "Product name", example = "Flower")
@@ -34,6 +35,6 @@ public record ProductRequestDto(
 
         @Pattern(regexp = "^/.*\\.(png|jpg|jpeg|gif)$", message = "Image must be a valid image path")
         @Schema(description = "image Url", example = "/peony.png")
-        String image) {
-
+        String image)
+{
 }

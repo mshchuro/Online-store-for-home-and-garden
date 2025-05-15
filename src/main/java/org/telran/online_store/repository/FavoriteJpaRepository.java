@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface FavoriteJpaRepository extends JpaRepository<Favorite, Long> {
+
     List<Favorite> findAllByUser(User user);
 
     boolean existsByUserAndProduct(User user, Product product);

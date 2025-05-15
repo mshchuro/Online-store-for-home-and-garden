@@ -8,8 +8,8 @@ import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ProductService;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class FavoriteConverter implements Converter<FavoriteRequestDto, FavoriteResponseDto, Favorite> {
 
     private final ProductService productService;

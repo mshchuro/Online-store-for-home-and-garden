@@ -12,13 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.telran.online_store.dto.UserRegistrationResponse;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 
-@RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
 @Tag(name = "Login", description = "API endpoint for login in application")
+@RestController
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
