@@ -25,111 +25,43 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 
 @RequestMapping("/v1/categories")
-public class CategoryController {
+public class CategoryController implements CategoryApi{
 
     private final CategoryService categoryService;
 
-    @Operation(
-            summary = "Allows to get a list of existing categories",
-            description = "Allows to view a list of categories' information"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = Category.class))})
-    })
-
     @GetMapping()
+    @Override
     public ResponseEntity<List<Category>> getAll() {
         categoryService.getAllCategories();
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Allows to get a category information by it's id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = Category.class))}),
-            @ApiResponse(responseCode = "404", description = "Not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @GetMapping("/{categoryId}")
+    @Override
     public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
         Category getCategoryById = categoryService.getCategoryById(categoryId);
         return ResponseEntity.status(HttpStatus.OK).body(getCategoryById);
     }
 
-    @Operation(
-            summary = "New category creating",
-            description = "Allows to create a new category.\n Available only for Administrator"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = Category.class))}),
-            @ApiResponse(responseCode = "400", description = "Not valid data", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
-    })
     @PostMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @Override
     public ResponseEntity<Category> create(@Valid @RequestBody Category category) {
         Category createdCategory = categoryService.createCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
-    @Operation(
-            summary = "Category deleting",
-            description = "Allows to delete a category by it's id.\n Available only for Administrator"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "400", description = "Not valid data", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Product category is not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @DeleteMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @Override
     public ResponseEntity<Void> deleteById(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Updating category's name",
-            description = "Allows to update a category's name.\n Available only for Administrator"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Created", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = Category.class))}),
-            @ApiResponse(responseCode = "400", description = "Not valid data", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
-            @ApiResponse(responseCode = "409", description = "Already exists", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotUniqueErrorResponse.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
-                    @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Product category is not found", content =
-                    {@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
-    })
     @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @Override
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
             @Valid @RequestBody Category category) {
