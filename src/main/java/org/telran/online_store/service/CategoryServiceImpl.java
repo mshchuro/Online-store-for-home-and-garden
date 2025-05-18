@@ -1,6 +1,6 @@
 package org.telran.online_store.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,15 +13,13 @@ import org.telran.online_store.repository.CategoryJpaRepository;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private CategoryJpaRepository categoryRepository;
+    private final CategoryJpaRepository categoryRepository;
 
-
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @Override
     public List<Category> getAllCategories() {

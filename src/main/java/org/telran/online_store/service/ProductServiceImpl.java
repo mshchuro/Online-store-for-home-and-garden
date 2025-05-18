@@ -1,5 +1,6 @@
 package org.telran.online_store.service;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,6 @@ import org.telran.online_store.entity.Product;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.repository.*;
-import org.telran.online_store.specification.ProductSpecification;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductJpaRepository productRepository;
@@ -37,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
 
     public List<Product> getAll(Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean discount, List<String> sort) {
 
-        Specification<Product> spec = ProductSpecification.filterBy(categoryId, minPrice, maxPrice, discount);
+        Specification<Product> spec = filterBy(categoryId, minPrice, maxPrice, discount);
 
         Sort sortObj;
         if (sort != null && !sort.isEmpty()) {
@@ -175,5 +175,41 @@ public class ProductServiceImpl implements ProductService {
     public List<String> getNotPaidProducts(Long days) {
         LocalDateTime thresholdDate = LocalDateTime.now().minusDays(days);
         return productRepository.findNotPaidProducts(thresholdDate);
+    }
+
+    public static Specification<Product> filterBy(
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean discount
+    ) {
+        return (root, query, cb) -> {
+            Predicate predicate = cb.conjunction();
+
+            if(categoryId != null){
+                predicate = cb.and(predicate, cb.equal(root.get("category").get("id"), categoryId));
+            }
+
+            if (minPrice != null) {
+                predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+
+            if (maxPrice != null) {
+                predicate = cb.and(predicate, cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
+
+            if (discount != null && discount) {
+                predicate = cb.and(predicate,
+                        cb.isNotNull(root.get("discountPrice")),
+                        cb.lessThan(root.get("discountPrice"), root.get("price"))
+                );
+            } else if (discount != null){
+                predicate = cb.or(
+                        cb.isNull(root.get("discountPrice"))
+                );
+            }
+
+            return predicate;
+        };
     }
 }

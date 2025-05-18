@@ -1,5 +1,6 @@
 package org.telran.online_store.converter;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.ProductRequestDto;
@@ -10,11 +11,11 @@ import org.telran.online_store.service.CategoryService;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Component
 public class ProductConverter implements Converter<ProductRequestDto, ProductResponseDto, Product> {
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     @Override
     public ProductResponseDto toDto(Product product) {

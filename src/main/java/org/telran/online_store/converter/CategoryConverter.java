@@ -8,7 +8,6 @@ import org.telran.online_store.entity.Category;
 @Component
 public class CategoryConverter implements Converter<CategoryRequestDto, CategoryResponseDto, Category>{
 
-
     @Override
     public CategoryResponseDto toDto(Category category) {
         return CategoryResponseDto.builder()

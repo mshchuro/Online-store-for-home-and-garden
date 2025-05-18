@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record UserRegistrationResponse(
+
         @Schema(description = "User id", example = "1")
         Long id,
 

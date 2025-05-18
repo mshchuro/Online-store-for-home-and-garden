@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class AddToCartRequest {
+
     @NotNull(message = "Product id must not be null")
     @Schema(description = "Product id", example = "1")
     private Long productId;

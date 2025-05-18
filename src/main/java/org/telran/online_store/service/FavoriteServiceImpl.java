@@ -1,6 +1,6 @@
 package org.telran.online_store.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -12,14 +12,13 @@ import org.telran.online_store.repository.FavoriteJpaRepository;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class FavoriteServiceImpl implements FavoriteService {
 
-    @Autowired
-    private FavoriteJpaRepository favoriteRepository;
+    private final FavoriteJpaRepository favoriteRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public List<Favorite> getAll() {

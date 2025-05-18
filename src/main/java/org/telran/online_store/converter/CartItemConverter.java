@@ -6,6 +6,7 @@ import org.telran.online_store.entity.CartItem;
 
 @Component
 public class CartItemConverter implements Converter<CartItemResponseDto, CartItemResponseDto, CartItem> {
+
     @Override
     public CartItemResponseDto toDto(CartItem cartItem) {
         return CartItemResponseDto.builder()

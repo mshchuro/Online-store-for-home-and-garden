@@ -6,6 +6,7 @@ import org.telran.online_store.entity.User;
 
 @Repository
 public interface UserJpaRepository extends JpaRepository<User, Long> {
+
     User findByEmail(String email);
 
     boolean existsByEmail(String email);

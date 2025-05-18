@@ -1,10 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -15,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.converter.Converter;
 import org.telran.online_store.dto.AddToCartRequest;
 import org.telran.online_store.dto.CartResponseDto;
-import org.telran.online_store.dto.ProductResponseDto;
 import org.telran.online_store.entity.Cart;
-import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.service.CartService;
 
 @RestController

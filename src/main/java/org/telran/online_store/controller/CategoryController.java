@@ -1,10 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -17,7 +12,6 @@ import org.telran.online_store.converter.CategoryConverter;
 import org.telran.online_store.dto.CategoryRequestDto;
 import org.telran.online_store.dto.CategoryResponseDto;
 import org.telran.online_store.entity.Category;
-import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.service.CategoryService;
 
 import java.util.List;
