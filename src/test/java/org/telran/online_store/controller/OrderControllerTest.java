@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.telran.online_store.dto.*;
 import org.telran.online_store.entity.Order;
+import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.service.OrderService;
 import org.telran.online_store.security.JwtService;
@@ -49,7 +50,7 @@ class OrderControllerTest {
         Order order = Order.builder()
                 .id(1L)
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .status(OrderStatus.PAYMENT_PENDING)
                 .createdAt(LocalDateTime.now())
@@ -60,7 +61,7 @@ class OrderControllerTest {
         OrderResponseDto orderResponseDto = OrderResponseDto.builder()
                 .id(1L)
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .status(OrderStatus.PAYMENT_PENDING)
                 .createdAt(LocalDateTime.now())
@@ -84,7 +85,7 @@ class OrderControllerTest {
         Order order = Order.builder()
                 .id(1L)
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .status(OrderStatus.PAYMENT_PENDING)
                 .createdAt(LocalDateTime.now())
@@ -95,7 +96,7 @@ class OrderControllerTest {
         OrderResponseDto orderResponseDto = OrderResponseDto.builder()
                 .id(1L)
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .status(OrderStatus.PAYMENT_PENDING)
                 .createdAt(LocalDateTime.now())
@@ -120,7 +121,7 @@ class OrderControllerTest {
         Order order = Order.builder()
                 .id(1L)
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .status(OrderStatus.PAYMENT_PENDING)
                 .createdAt(LocalDateTime.now())
@@ -140,7 +141,7 @@ class OrderControllerTest {
     void testCreateOrder() throws Exception {
         OrderRequestDto requestDto = OrderRequestDto.builder()
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .items(List.of(new OrderItemRequestDto(1L, 2)))
                 .build();
@@ -154,7 +155,7 @@ class OrderControllerTest {
                 .id(1L)
                 .status(OrderStatus.PAYMENT_PENDING)
                 .deliveryAddress("Street 12")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .contactPhone("+1234567890123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

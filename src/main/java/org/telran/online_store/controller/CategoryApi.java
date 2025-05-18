@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.telran.online_store.dto.CategoryRequestDto;
+import org.telran.online_store.dto.CategoryResponseDto;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 
@@ -26,7 +28,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = Category.class))})
     })
-    public ResponseEntity<List<Category>> getAll();
+    public ResponseEntity<List<CategoryResponseDto>> getAll();
 
     @Operation(
             summary = "Allows to get a category information by it's id"
@@ -39,7 +41,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId);
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long categoryId);
 
     @Operation(
             summary = "New category creating",
@@ -56,7 +58,7 @@ public interface CategoryApi {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
-    public ResponseEntity<Category> create(@Valid @RequestBody Category category);
+    public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto categoryRequestDto);
 
     @Operation(
             summary = "Category deleting",
@@ -97,7 +99,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<Category> updateCategory(
+    public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable Long categoryId,
-            @Valid @RequestBody Category category);
+            @Valid @RequestBody CategoryRequestDto categoryRequestDto);
 }

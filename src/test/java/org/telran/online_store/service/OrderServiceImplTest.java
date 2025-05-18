@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.exception.OrderNotFoundException;
@@ -84,7 +85,7 @@ class OrderServiceImplTest {
         Order order = Order.builder()
                 .deliveryAddress("Some Street 123")
                 .contactPhone("9876543210")
-                .deliveryMethod("Courier")
+                .deliveryMethod(DeliveryMethod.BY_CAR)
                 .status(OrderStatus.CREATED)
                 .build();
 
@@ -99,10 +100,10 @@ class OrderServiceImplTest {
     void testGetAllOrders() {
         // Создаём два заказа
         Order order1 = orderService.create(Order.builder()
-                .deliveryAddress("Addr 1").contactPhone("123").deliveryMethod("Courier").status(OrderStatus.CREATED).build());
+                .deliveryAddress("Addr 1").contactPhone("123").deliveryMethod(DeliveryMethod.BY_CAR).status(OrderStatus.CREATED).build());
 
         Order order2 = orderService.create(Order.builder()
-                .deliveryAddress("Addr 2").contactPhone("456").deliveryMethod("Pickup").status(OrderStatus.CREATED).build());
+                .deliveryAddress("Addr 2").contactPhone("456").deliveryMethod(DeliveryMethod.BY_PLANE).status(OrderStatus.CREATED).build());
 
         List<Order> all = orderService.getAll();
 
@@ -114,7 +115,7 @@ class OrderServiceImplTest {
     void testGetAllUserOrders() {
         // Создаём заказ от имени текущего пользователя
         orderService.create(Order.builder()
-                .deliveryAddress("User Address").contactPhone("777").deliveryMethod("Courier").status(OrderStatus.CREATED).build());
+                .deliveryAddress("User Address").contactPhone("777").deliveryMethod(DeliveryMethod.BY_CAR).status(OrderStatus.CREATED).build());
 
         List<Order> userOrders = orderService.getAllUserOrders();
 
@@ -137,7 +138,7 @@ class OrderServiceImplTest {
 
         // Создаём заказ, принадлежащий другому пользователю
         Order foreignOrder = Order.builder()
-                .deliveryAddress("Alien address").contactPhone("alien").deliveryMethod("Teleport").status(OrderStatus.CREATED)
+                .deliveryAddress("Alien address").contactPhone("alien").deliveryMethod(DeliveryMethod.BY_CAR).status(OrderStatus.CREATED)
                 .user(otherUser)
                 .build();
         foreignOrder = orderRepo.save(foreignOrder);

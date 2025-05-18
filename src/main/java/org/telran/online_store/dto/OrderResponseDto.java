@@ -2,6 +2,7 @@ package org.telran.online_store.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ public record OrderResponseDto(
         String deliveryAddress,
 
         @Schema(description = "Delivery method", example = "Per post")
-        String deliveryMethod,
+        DeliveryMethod deliveryMethod,
 
         @Schema(description = "Order status", example = "PAYMENT_PENDING")
         OrderStatus status,

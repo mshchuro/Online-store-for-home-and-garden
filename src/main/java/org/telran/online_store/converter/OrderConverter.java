@@ -30,7 +30,6 @@ public class OrderConverter implements Converter<OrderRequestDto, OrderResponseD
                 .build();
     }
 
-    // Не нужен
     @Override
     public Order toEntity(OrderRequestDto dto) {
         Order order = Order.builder()

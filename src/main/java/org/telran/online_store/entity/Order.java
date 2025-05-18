@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -33,7 +34,8 @@ public class Order {
 
     private String contactPhone;
 
-    private String deliveryMethod;
+    @Enumerated(EnumType.STRING)
+    private DeliveryMethod deliveryMethod;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

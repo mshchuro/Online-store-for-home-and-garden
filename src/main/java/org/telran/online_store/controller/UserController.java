@@ -13,6 +13,9 @@ import org.telran.online_store.converter.Converter;
 import org.telran.online_store.converter.UserRegistrationConverter;
 import org.telran.online_store.dto.*;
 import org.telran.online_store.entity.User;
+import org.telran.online_store.security.AuthenticationService;
+import org.telran.online_store.security.SignInRequest;
+import org.telran.online_store.security.SignInResponse;
 import org.telran.online_store.service.UserService;
 
 import java.util.List;
@@ -30,6 +33,13 @@ public class UserController implements UserApi{
     private final UserRegistrationConverter userRegistrationConverter;
 
     private final Converter<UserUpdateRequestDto, UserUpdateResponseDto, User> userConverter;
+
+    private final AuthenticationService authenticationService;
+
+    @PostMapping("/login")
+    public ResponseEntity<SignInResponse> login(@RequestBody SignInRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
 
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping()
