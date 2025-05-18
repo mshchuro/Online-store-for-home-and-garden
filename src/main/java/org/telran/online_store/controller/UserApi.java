@@ -16,10 +16,27 @@ import org.telran.online_store.dto.UserUpdateRequestDto;
 import org.telran.online_store.dto.UserUpdateResponseDto;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.handler.GlobalExceptionHandler;
+import org.telran.online_store.security.SignInRequest;
+import org.telran.online_store.security.SignInResponse;
 
 import java.util.List;
 
 public interface UserApi {
+
+    @Operation(
+            summary = "Login"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = SignInResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = GlobalExceptionHandler
+                            .UnauthorizedErrorResponse.class))
+            })
+    })
+    @PostMapping("/login")
+    public ResponseEntity<SignInResponse> login(@RequestBody SignInRequest request);
 
     @Operation(
             summary = "Allows to view all users' information",

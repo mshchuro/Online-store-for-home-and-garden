@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -16,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name="categories")
+@Builder
 public class Category {
 
     @Id

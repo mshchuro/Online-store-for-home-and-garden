@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.telran.online_store.converter.CategoryConverter;
+import org.telran.online_store.dto.CategoryRequestDto;
+import org.telran.online_store.dto.CategoryResponseDto;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.service.CategoryService;
@@ -29,26 +32,34 @@ public class CategoryController implements CategoryApi{
 
     private final CategoryService categoryService;
 
+    private final CategoryConverter categoryConverter;
+
     @GetMapping()
     @Override
-    public ResponseEntity<List<Category>> getAll() {
-        categoryService.getAllCategories();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<List<CategoryResponseDto>> getAll() {
+        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryResponseDto> dto = categories.stream()
+                .map(categoryConverter::toDto)
+                .toList();
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{categoryId}")
     @Override
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
-        Category getCategoryById = categoryService.getCategoryById(categoryId);
-        return ResponseEntity.status(HttpStatus.OK).body(getCategoryById);
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long categoryId) {
+        Category category = categoryService.getCategoryById(categoryId);
+        CategoryResponseDto dto = categoryConverter.toDto(category);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @Override
-    public ResponseEntity<Category> create(@Valid @RequestBody Category category) {
+    public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+        Category category = categoryConverter.toEntity(categoryRequestDto);
         Category createdCategory = categoryService.createCategory(category);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+        CategoryResponseDto responseDto = categoryConverter.toDto(createdCategory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @DeleteMapping("/{categoryId}")
@@ -62,10 +73,12 @@ public class CategoryController implements CategoryApi{
     @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @Override
-    public ResponseEntity<Category> updateCategory(
+    public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable Long categoryId,
-            @Valid @RequestBody Category category) {
+            @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+        Category category = categoryConverter.toEntity(categoryRequestDto);
         Category updatedCategory = categoryService.updateCategory(categoryId, category);
-        return ResponseEntity.ok(updatedCategory);
+        CategoryResponseDto responseDto = categoryConverter.toDto(updatedCategory);
+        return ResponseEntity.ok(responseDto);
     }
 }
