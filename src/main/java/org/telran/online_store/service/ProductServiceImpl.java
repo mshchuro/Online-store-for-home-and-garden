@@ -11,15 +11,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
+import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.repository.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -175,6 +174,27 @@ public class ProductServiceImpl implements ProductService {
     public List<String> getNotPaidProducts(Long days) {
         LocalDateTime thresholdDate = LocalDateTime.now().minusDays(days);
         return productRepository.findNotPaidProducts(thresholdDate);
+    }
+
+    @Override
+    public Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount) {
+        LocalDateTime from = switch (periodType) {
+            case HOUR -> LocalDateTime.now().minusHours(periodAmount);
+            case DAY -> LocalDateTime.now().minusDays(periodAmount);
+            case WEEK -> LocalDateTime.now().minusWeeks(periodAmount);
+            case MONTH -> LocalDateTime.now().minusMonths(periodAmount);
+        };
+
+        List<Object[]> rawData = orderItemRepository.getProfitData(from, periodType.name());
+
+        Map<String, BigDecimal> result = new LinkedHashMap<>();
+        for (Object[] row : rawData) {
+            String key = String.valueOf(row[0]); // formatted date
+            BigDecimal profit = (BigDecimal) row[1];
+            result.put(key, profit);
+        }
+
+        return result;
     }
 
     public static Specification<Product> filterBy(
