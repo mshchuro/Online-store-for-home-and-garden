@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
+import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.repository.*;
@@ -162,13 +163,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<String> getTopTenPurchasedProducts() {
         Pageable topTen = PageRequest.of(0, 10);
-        return productRepository.findTopTenPurchasedProducts(topTen);
+        return productRepository.findTopTen(OrderStatus.DELIVERED.name(), topTen);
     }
 
     @Override
     public List<String> getTopTenCancelledProducts() {
         Pageable topTen = PageRequest.of(0, 10);
-        return productRepository.findTopTenCancelledProducts(topTen);
+        return productRepository.findTopTen(OrderStatus.CANCELLED.name(), topTen);
     }
 
     @Override

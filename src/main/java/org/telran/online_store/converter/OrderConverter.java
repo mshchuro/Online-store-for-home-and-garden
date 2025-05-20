@@ -5,9 +5,11 @@ import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.OrderRequestDto;
 import org.telran.online_store.dto.OrderResponseDto;
 import org.telran.online_store.entity.Order;
+import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.enums.OrderStatus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -40,7 +42,8 @@ public class OrderConverter implements Converter<OrderRequestDto, OrderResponseD
                 .items(new ArrayList<>())
                 .build();
 
-        dto.items().forEach(i -> order.addItem(orderItemConverter.toEntity(i)));
+        List<OrderItem> items = order.getItems();
+        dto.items().forEach(i -> items.add(orderItemConverter.toEntity(i)));
 
         return order;
     }

@@ -15,6 +15,5 @@ public record OrderItemResponseDto(
         Integer quantity,
 
         @Schema(description = "Total price for an amount of products", example = "15.22")
-        BigDecimal priceAtPurchase
-) {
+        BigDecimal priceAtPurchase) {
 }

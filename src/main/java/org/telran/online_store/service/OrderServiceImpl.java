@@ -1,11 +1,13 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Order;
+import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.exception.OrderNotFoundException;
@@ -63,5 +65,10 @@ public class OrderServiceImpl implements OrderService {
                 new OrderNotFoundException("Order with id " + orderId + " is not found"));
         order.setStatus(newStatus);
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderItem> getTopFromOrders(OrderStatus orderStatus) {
+        return List.of();
     }
 }

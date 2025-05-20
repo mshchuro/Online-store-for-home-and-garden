@@ -29,6 +29,4 @@ public interface ProductService {
     List<String> getTopTenCancelledProducts();
 
     List<String> getNotPaidProducts(Long days);
-
-
 }

@@ -27,18 +27,10 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
     @Query("SELECT oi.product.name " +
            "FROM OrderItem oi " +
            "JOIN oi.order o " +
-           "WHERE o.status = 'DELIVERED' " +
-           "GROUP BY oi.product.name " +
-           "ORDER BY SUM(oi.quantity) DESC")
-    List<String> findTopTenPurchasedProducts(Pageable pageable);
-
-    @Query("SELECT oi.product.name " +
-           "FROM OrderItem oi " +
-           "JOIN oi.order o " +
-           "WHERE o.status = 'CANCELLED' " +
+           "WHERE o.status = :status " +
            "GROUP BY oi.product.name " +
            "ORDER BY COUNT(oi) DESC")
-    List<String> findTopTenCancelledProducts(Pageable pageable);
+    List<String> findTopTen(@Param(value = "status") String status, Pageable pageable);
 
     @Query("SELECT oi.product.name " +
            "FROM OrderItem oi " +

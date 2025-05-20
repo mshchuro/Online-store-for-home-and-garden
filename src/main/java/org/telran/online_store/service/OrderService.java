@@ -1,6 +1,7 @@
 package org.telran.online_store.service;
 
 import org.telran.online_store.entity.Order;
+import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.enums.OrderStatus;
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface OrderService {
     List<Order> getAllByStatus(OrderStatus orderStatus);
 
     void updateStatus(Long orderId, OrderStatus newStatus);
+
+    List<OrderItem> getTopFromOrders(OrderStatus orderStatus);
 }
