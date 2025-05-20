@@ -44,8 +44,7 @@ public class ProductConverter implements Converter<ProductRequestDto, ProductRes
                 .category(
                         productDto.categoryId() != null
                                 ? categoryService.getCategoryById(productDto.categoryId())
-                                : null
-                )
+                                : null)
                 .imageUrl(productDto.image())
                 .build();
     }

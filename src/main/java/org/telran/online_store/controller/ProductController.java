@@ -48,8 +48,7 @@ public class ProductController implements ProductApi{
 
             @Parameter(description = "examples for sorting:\n price:asc, name:desc, " +
                                      "createdAt:desc, discountPrice:desc, etc.")
-            @RequestParam(required = false) List<String> sort
-    ) {
+            @RequestParam(required = false) List<String> sort) {
         List<Product> products = productService.getAll(categoryId, minPrice, maxPrice, discount, sort);
         return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }

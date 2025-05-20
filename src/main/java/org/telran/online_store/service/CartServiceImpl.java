@@ -23,7 +23,6 @@ public class CartServiceImpl implements CartService {
 
     private final CartJpaRepository cartRepository;
 
-    @Autowired
     private CartItemJpaRepository cartItemRepository;
 
     private final UserService userService;
@@ -33,10 +32,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getCart() {
         Long currentUserId = userService.getCurrentUser().getId();
-        return Optional.ofNullable(cartRepository.findByUserId(currentUserId))
+        return cartRepository.findByUserId(currentUserId)
                 .orElseThrow(() ->
-                        new CartNotFoundException("Cart is not found")
-                );
+                        new CartNotFoundException("Cart is not found"));
     }
 
     @Override
@@ -45,13 +43,15 @@ public class CartServiceImpl implements CartService {
         User currentUser = userService.getCurrentUser();
         Product product = productService.getById(request.getProductId());
 
-        Cart cart = cartRepository.findByUser(currentUser).orElse(new Cart(null, currentUser, new ArrayList<>()));
+        Cart cart = cartRepository.findByUser(currentUser)
+                .orElse(Cart.builder().items(new ArrayList<>())
+                        .user(currentUser).build());
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getProduct().equals(product))
                 .findFirst()
                 .orElse(null);
         if (item == null) {
-            cart.getItems().add(new CartItem(null, cart, product, request.getQuantity()));
+            cart.getItems().add(new CartItem(cart, product, request.getQuantity()));
         } else {
             Integer quantity = item.getQuantity();
             item.setQuantity(quantity + request.getQuantity());
@@ -91,9 +91,12 @@ public class CartServiceImpl implements CartService {
         User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
-        cartItemRepository.removeCartItemByCart_Id(cart.getId());
-        cart.getItems().clear();
-        return cart;
+        cart.setItems(new ArrayList<>());
+        return cartRepository.save(cart);
+
+ //       cartItemRepository.removeCartItemByCart_Id(cart.getId());
+//        cart.getItems().clear();
+//        return cart;
         //cartItemRepository.removeCartItemByCart_Id(cart.getId());
         //return cartRepository.save(cart);
     }
