@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.telran.online_store.service.ProductService;
+import org.telran.online_store.entity.Product;
+import org.telran.online_store.service.ReportService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ import java.util.List;
 @RequestMapping("/v1/reports")
 public class ReportController {
 
-    private final ProductService productService;
+    private final ReportService reportService;
 
     @Operation(
             summary = "Top ten purchased products",
@@ -35,7 +37,8 @@ public class ReportController {
     @GetMapping("/topTenPurchasedProducts")
     public ResponseEntity<List<String>> getTopTenPurchasedProducts() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(productService.getTopTenPurchasedProducts());
+                .body(reportService.getTopOrdered().stream()
+                        .map(Product::getName).collect(Collectors.toList()));
     }
 
     @Operation(
@@ -48,7 +51,8 @@ public class ReportController {
     @GetMapping("/topTenCancelledProducts")
     public ResponseEntity<List<String>> getTopTenCancelledProducts() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(productService.getTopTenCancelledProducts());
+                .body(reportService.getTopCancelled().stream()
+                        .map(Product::getName).collect(Collectors.toList()));
     }
 
     @Operation(
@@ -61,6 +65,9 @@ public class ReportController {
     @GetMapping("/notPaidProducts/{days}")
     public ResponseEntity<List<String>> getNotPaidProducts(@PathVariable Long days) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(productService.getNotPaidProducts(days));
+                .body(reportService.getNotPaid(days)
+                        .stream()
+                        .map(Product::getName)
+                        .collect(Collectors.toList()));
     }
 }
