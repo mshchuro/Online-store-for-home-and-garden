@@ -17,6 +17,6 @@ public class CartItemConverter implements Converter<CartItemResponseDto, CartIte
 
     @Override
     public CartItem toEntity(CartItemResponseDto cartItemResponseDto) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

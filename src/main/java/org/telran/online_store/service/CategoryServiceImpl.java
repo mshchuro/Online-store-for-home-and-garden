@@ -44,8 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Long id) {
         List<Product> products = productService.getAllByCategoryId(id);
         products.forEach(product -> productService.updateCategory(product.getId(), null));
-        Category category = categoryRepository.findById(id).orElseThrow(()
-                -> new CategoryNotFoundException("Category with id " + id + " not found"));
+        Category category = getCategoryById(id);
         categoryRepository.deleteById(category.getId());
     }
 
@@ -53,11 +52,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Modifying
     @Transactional
     public Category updateCategory(Long id, Category category) {
-        Category fromDataBase = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
-
-        fromDataBase.setName(category.getName());
-        return categoryRepository.save(fromDataBase);
+        Category entity = getCategoryById(id);
+        entity.setName(category.getName());
+        return categoryRepository.save(entity);
 
     }
 

@@ -40,9 +40,9 @@ public class FavoriteController implements FavoriteApi{
     @PostMapping()
     @Override
     public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto) {
-        Favorite favorite = favoriteConverter.toEntity(requestDto);
-        Favorite saved = favoriteService.create(favorite);
-        return ResponseEntity.status(HttpStatus.CREATED).body(favoriteConverter.toDto(saved));
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(favoriteConverter.toDto(favoriteService.create(favoriteConverter.toEntity(requestDto))));
     }
 
     @DeleteMapping("/{favorite_id}")
