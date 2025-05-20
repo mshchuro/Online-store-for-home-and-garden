@@ -1,14 +1,9 @@
 package org.telran.online_store.config;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -18,14 +13,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.telran.online_store.security.CustomAuthenticationEntryPoint;
 import org.telran.online_store.security.JwtAuthFilter;
-
-import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -46,26 +37,19 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "v1/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "v1/reports/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "v1/reports/topTenPurchasedProducts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "v1/reports//topTenCancelledProducts").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/swagger-ui.html").permitAll()
                         .anyRequest().authenticated() //
                 )
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
-                                .authenticationEntryPoint(customAuthenticationEntryPoint)
-                                .accessDeniedHandler(accessDeniedHandler())
-                )
+                                .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) ->
-            response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase());
     }
 
     @Bean

@@ -10,6 +10,5 @@ public record CategoryResponseDto(
         Long id,
 
         @Schema(description = "Category name", example = "Flowers")
-        String name
-) {
+        String name) {
 }

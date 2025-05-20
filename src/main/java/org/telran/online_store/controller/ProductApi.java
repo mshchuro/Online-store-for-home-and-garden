@@ -6,25 +6,26 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.ProductRequestDto;
 import org.telran.online_store.dto.ProductResponseDto;
-import org.telran.online_store.entity.Product;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Tag(name = "Product management", description = "API endpoints for managing products")
+@SecurityRequirement(name = "bearerAuth")
 public interface ProductApi {
 
     @Operation(
             summary = "Allows to get a list of products",
             description = "Allows to filter products by category (categoryId), price range, discount \n" +
-                    "and perform sorting by fields"
+                          "and perform sorting by fields"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content =
@@ -32,7 +33,7 @@ public interface ProductApi {
                     @Schema(implementation = ProductResponseDto.class))})
     })
     @GetMapping()
-    public ResponseEntity<List<ProductResponseDto>> getAll(
+    ResponseEntity<List<ProductResponseDto>> getAll(
             @Parameter(description = "category ID for filtering")
             @RequestParam(required = false) Long categoryId,
 
@@ -46,7 +47,7 @@ public interface ProductApi {
             @RequestParam(required = false) Boolean discount,
 
             @Parameter(description = "examples for sorting:\n price:asc, name:desc, " +
-                    "createdAt:desc, discountPrice:desc, etc.")
+                                     "createdAt:desc, discountPrice:desc, etc.")
             @RequestParam(required = false) List<String> sort
     );
 
@@ -61,7 +62,7 @@ public interface ProductApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId);
+    ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId);
 
     @Operation(
             summary = "New product creating",
@@ -84,7 +85,7 @@ public interface ProductApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductRequestDto dto);
+    ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductRequestDto dto);
 
     @Operation(
             summary = "Product updating",
@@ -104,7 +105,7 @@ public interface ProductApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductRequestDto dto);
+    ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductRequestDto dto);
 
     @Operation(
             summary = "Product deleting",
@@ -119,5 +120,5 @@ public interface ProductApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<Void> deleteById(@PathVariable Long productId);
+    ResponseEntity<Void> deleteById(@PathVariable Long productId);
 }

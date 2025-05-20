@@ -24,7 +24,7 @@ public record ProductRequestDto(
         @Schema(description = "Product price", example = "15.55")
         BigDecimal price,
 
-        @DecimalMin(value = "0.0", inclusive = true, message = "Discount must not be negative")
+        @DecimalMin(value = "0.0", message = "Discount must not be negative")
         @Digits(integer = 10, fraction = 2, message = "Discount must be a valid amount (maximum 2 fractional digits)")
         @Schema(description = "discount", example = "1.55")
         BigDecimal discountPrice,
@@ -35,6 +35,5 @@ public record ProductRequestDto(
 
         @Pattern(regexp = "^/.*\\.(png|jpg|jpeg|gif)$", message = "Image must be a valid image path")
         @Schema(description = "image Url", example = "/peony.png")
-        String image)
-{
+        String image) {
 }

@@ -10,5 +10,5 @@ public record CartItemResponseDto(
         Long productId,
 
         @Schema(description = "Quantity", example = "2")
-        Integer quantity
-) {}
+        Integer quantity) {
+}

@@ -23,6 +23,6 @@ public class CartConverter implements Converter<AddToCartRequest, CartResponseDt
 
     @Override
     public Cart toEntity(AddToCartRequest addToCartRequest) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

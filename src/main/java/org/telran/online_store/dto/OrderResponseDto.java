@@ -14,7 +14,7 @@ public record OrderResponseDto(
         @Schema(description = "Order id", example = "1")
         Long id,
 
-        @Schema(description = "Contact phone", example = "")
+        @Schema(description = "Contact phone", example = "+222222222")
         String contactPhone,
 
         @Schema(description = "Delivery address", example = "Backer street, 221b")
@@ -32,12 +32,15 @@ public record OrderResponseDto(
         @Schema(description = "Time when the order has been updated", example = "2025-05-07T10:51:18.356189")
         LocalDateTime updatedAt,
 
-        @Schema(description = "List of order items", example = "\"items\": [\n" +
-                                                               "      {\n" +
-                                                               "        \"productId\": 1,\n" +
-                                                               "        \"quantity\": 1,\n" +
-                                                               "        \"priceAtPurchase\": 15.99\n" +
-                                                               "      }]")
-        List<OrderItemResponseDto> items
-) {
+        @Schema(description = "List of order items", example = """
+                                                                    "items": [
+                                                                        {
+                                                                        "productId": 1,
+                                                                        "quantity": 1,
+                                                                        "priceAtPurchase": 15.99
+                                                                        }
+                                                                      ]
+                                                                    """)
+
+        List<OrderItemResponseDto> items) {
 }

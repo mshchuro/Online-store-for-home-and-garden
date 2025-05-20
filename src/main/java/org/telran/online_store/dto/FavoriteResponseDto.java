@@ -13,6 +13,5 @@ public record FavoriteResponseDto(
         Long userId,
 
         @Schema(description = "Product Id", example = "1")
-        Long productId
-) {
+        Long productId) {
 }

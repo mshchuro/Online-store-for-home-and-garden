@@ -16,6 +16,5 @@ public record UserRegistrationResponse(
         String email,
 
         @Schema(description = "Phone", example = "+49 000 000 000")
-        String phone
-) {
+        String phone) {
 }

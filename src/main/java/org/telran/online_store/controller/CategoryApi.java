@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.CategoryRequestDto;
 import org.telran.online_store.dto.CategoryResponseDto;
@@ -17,6 +17,8 @@ import org.telran.online_store.handler.GlobalExceptionHandler;
 
 import java.util.List;
 
+@Tag(name = "Category", description = "API endpoints for product categories")
+@SecurityRequirement(name = "bearerAuth")
 public interface CategoryApi {
 
     @Operation(
@@ -28,7 +30,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = Category.class))})
     })
-    public ResponseEntity<List<CategoryResponseDto>> getAll();
+    ResponseEntity<List<CategoryResponseDto>> getAll();
 
     @Operation(
             summary = "Allows to get a category information by it's id"
@@ -41,7 +43,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long categoryId);
+    ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long categoryId);
 
     @Operation(
             summary = "New category creating",
@@ -58,7 +60,7 @@ public interface CategoryApi {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
-    public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto categoryRequestDto);
+    ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryRequestDto categoryRequestDto);
 
     @Operation(
             summary = "Category deleting",
@@ -76,7 +78,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<Void> deleteById(@PathVariable Long categoryId);
+    ResponseEntity<Void> deleteById(@PathVariable Long categoryId);
 
     @Operation(
             summary = "Updating category's name",
@@ -99,7 +101,7 @@ public interface CategoryApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<CategoryResponseDto> updateCategory(
+    ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable Long categoryId,
             @Valid @RequestBody CategoryRequestDto categoryRequestDto);
 }

@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Entity
+@Getter
+@Setter
 @Table(name = "cart_items")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class CartItem {
 
     @Id
@@ -30,5 +32,21 @@ public class CartItem {
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
+    }
+
+    public CartItem(Cart cart, Product product) {
+        this.cart = cart;
+        this.product = product;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CartItem item)) return false;
+        return Objects.equals(cart, item.cart) && Objects.equals(product, item.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cart, product);
     }
 }

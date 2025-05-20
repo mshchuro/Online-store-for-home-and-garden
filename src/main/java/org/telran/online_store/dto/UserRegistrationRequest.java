@@ -22,6 +22,5 @@ public record UserRegistrationRequest(
 
         @NotBlank
         @Schema(description = "Password")
-        String password
-) {
+        String password) {
 }

@@ -8,5 +8,6 @@ public record UserUpdateRequestDto(
 
         String phone,
 
-        UserRole userRole
-) {}
+        UserRole userRole) {
+
+}
