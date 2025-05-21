@@ -44,12 +44,10 @@ class FavoriteServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        // Очищаем базы перед каждым тестом
         favoriteRepo.deleteAll();
         productRepo.deleteAll();
         userRepo.deleteAll();
 
-        // Создаём тестового пользователя
         testUser = User.builder()
                 .name("Test User")
                 .email("test@example.com")
@@ -59,7 +57,6 @@ class FavoriteServiceImplTest {
                 .build();
         testUser = userRepo.save(testUser);
 
-        // Создаём тестовый продукт
         testProduct = Product.builder()
                 .name("Test Product")
                 .description("Description")
@@ -68,7 +65,6 @@ class FavoriteServiceImplTest {
                 .build();
         testProduct = productRepo.save(testProduct);
 
-        // Устанавливаем пользователя как текущего аутентифицированного
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -76,13 +72,11 @@ class FavoriteServiceImplTest {
 
     @Test
     void testCreateFavorite() {
-        // Создаём избранное и сохраняем
         Favorite favorite = new Favorite();
         favorite.setProduct(testProduct);
 
         Favorite saved = favoriteService.create(favorite);
 
-        // Проверяем, что избранное сохранено и привязано к текущему пользователю
         assertNotNull(saved.getId());
         assertEquals(testProduct.getId(), saved.getProduct().getId());
         assertEquals(testUser.getId(), saved.getUser().getId());
@@ -90,52 +84,42 @@ class FavoriteServiceImplTest {
 
     @Test
     void testGetAllFavorites() {
-        // Создаём одно избранное
         Favorite favorite = new Favorite();
         favorite.setProduct(testProduct);
         favoriteService.create(favorite);
 
-        // Проверяем, что `getAll()` возвращает список из одного элемента
         List<Favorite> favorites = favoriteService.getAll();
         assertEquals(1, favorites.size());
     }
 
     @Test
     void testDeleteFavorite() {
-        // Сохраняем избранное
         Favorite favorite = new Favorite();
         favorite.setProduct(testProduct);
         Favorite saved = favoriteService.create(favorite);
 
-        // Удаляем его
         favoriteService.delete(saved.getId());
 
-        // Проверяем, что оно удалено
         List<Favorite> remaining = favoriteService.getAll();
         assertEquals(0, remaining.size());
     }
 
     @Test
     void testDuplicateFavoriteThrowsException() {
-        // Создаём избранное
         Favorite favorite = new Favorite();
         favorite.setProduct(testProduct);
         favoriteService.create(favorite);
 
-        // Пытаемся создать дубликат
         Favorite duplicate = new Favorite();
         duplicate.setProduct(testProduct);
 
-        // Ожидаем FavoriteNotUniqueException
         assertThrows(FavoriteNotUniqueException.class, () -> favoriteService.create(duplicate));
     }
 
     @Test
     void testDeleteNonExistingFavoriteThrowsException() {
-        // Пытаемся удалить несуществующее избранное
         Long nonExistingId = 999L;
 
-        // Ожидаем FavoriteNotFoundException
         assertThrows(FavoriteNotFoundException.class, () -> favoriteService.delete(nonExistingId));
     }
 }

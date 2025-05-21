@@ -52,14 +52,11 @@ class CategoryServiceImplTest {
     }
     @Test
     void testGetCategoryByIdNotFound() {
-        // Попытка получить категорию с несуществующим ID
         Long nonExistentId = 999L;
 
-        // Проверяем, что выбрасывается исключение CategoryNotFoundException
         Exception exception = assertThrows(CategoryNotFoundException.class,
                 () -> categoryService.getCategoryById(nonExistentId));
 
-        // Проверка, что исключение содержит правильное сообщение
         assertTrue(exception.getMessage().contains("Category with id 999 not found"));
     }
 
@@ -84,36 +81,28 @@ class CategoryServiceImplTest {
     }
     @Test
     void testDeleteCategoryNotFound() {
-        // Попытка удалить категорию с несуществующим ID
         Long nonExistentId = 999L;
-
-        // Проверяем, что выбрасывается исключение CategoryNotFoundException
         Exception exception = assertThrows(CategoryNotFoundException.class,
                 () -> categoryService.deleteCategory(nonExistentId));
 
-        // Проверка, что исключение содержит правильное сообщение
         assertTrue(exception.getMessage().contains("Category with id 999 not found"));
     }
 
     @Test
     void testDeleteCategoryWithProducts() {
-        // Создаем новую категорию
         Category category = new Category();
         category.setName("Electronics");
         category = categoryService.createCategory(category);
 
-        // Создаем продукт и связываем его с категорией
         Product product = new Product();
         product.setName("Laptop");
         product.setCategory(category);
         productService.create(product);
 
-        // Удаляем категорию
         categoryService.deleteCategory(category.getId());
 
-        // Проверяем, что продукты больше не привязаны к этой категории
         Product updatedProduct = productService.getById(product.getId());
-        assertNull(updatedProduct.getCategory());  // Продукт не должен иметь категорию
+        assertNull(updatedProduct.getCategory());
     }
 
     @Test

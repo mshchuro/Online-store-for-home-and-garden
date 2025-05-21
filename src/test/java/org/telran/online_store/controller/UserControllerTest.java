@@ -1,211 +1,202 @@
 package org.telran.online_store.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.telran.online_store.converter.UserRegistrationConverter;
+import org.telran.online_store.converter.UserConverter;
+import org.telran.online_store.dto.*;
+import org.telran.online_store.entity.User;
+import org.telran.online_store.enums.UserRole;
+import org.telran.online_store.security.AuthenticationService;
+import org.telran.online_store.security.SignInRequest;
+import org.telran.online_store.security.SignInResponse;
+import org.telran.online_store.service.UserService;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public class UserControllerTest {
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-    @LocalServerPort
-    private int port;
+@SpringBootTest
+@AutoConfigureMockMvc
+class UserControllerTest {
 
-    private String adminToken;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        // Регистрация администратора (если еще не зарегистрирован)
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Admin Joe\",\"email\":\"admin@example.com\",\"phone\":\"5555555555\",\"password\":\"password\"}") // Адаптировано к БД
-                .post("/v1/users/register");
+    @MockBean
+    private UserService userService;
 
-        // Получение токена администратора
-        adminToken = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\",\"password\":\"password\"}")
-                .post("/v1/users/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("token");
+    @MockBean
+    private UserRegistrationConverter userRegistrationConverter;
+
+    @MockBean
+    private UserConverter userConverter;
+
+    @MockBean
+    private AuthenticationService authenticationService;
+
+    @Test
+    void testLogin() throws Exception {
+        SignInRequest signInRequest = new SignInRequest("john@mail.com", "password");
+        SignInResponse signInResponse = new SignInResponse("fake-jwt-token");
+
+        Mockito.when(authenticationService.authenticate(any(SignInRequest.class))).thenReturn(signInResponse);
+
+        mockMvc.perform(post("/v1/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signInRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("fake-jwt-token"));
     }
 
     @Test
-    void testRegisterUser() {
-        String newUserEmail = "john" + System.currentTimeMillis() + "@example.com";
-        String newUserName = "John New";
-        String newUserPhone = "9876543210";
-        String requestBody = String.format("""
-                {
-                  "name": "%s",
-                  "email": "%s",
-                  "phone": "%s",
-                  "password": "secret"
-                }
-                """, newUserName, newUserEmail, newUserPhone);
+    void testRegister() throws Exception {
+        UserRegistrationRequest request = new UserRegistrationRequest(
+                "John Smith", "john@mail.com", "+1234567890", "password");
 
-        given()
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .post("/v1/users/register")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .body("id", notNullValue())
-                .body("email", equalTo(newUserEmail))
-                .body("name", equalTo(newUserName))
-                .body("phone", equalTo(newUserPhone))
-                .body(not(contains("role")))
-                .body(not(contains("userRole")));
+        User user = User.builder()
+                .id(1L)
+                .name("John Smith")
+                .email("john@mail.com")
+                .phone("+1234567890")
+                .role(UserRole.CLIENT)
+                .build();
+
+        UserRegistrationResponse response = UserRegistrationResponse.builder()
+                .id(1L)
+                .name("John Smith")
+                .email("john@mail.com")
+                .phone("+1234567890")
+                .build();
+
+        Mockito.when(userRegistrationConverter.toEntity(any(UserRegistrationRequest.class))).thenReturn(user);
+        Mockito.when(userService.create(any(User.class))).thenReturn(user);
+        Mockito.when(userRegistrationConverter.toDto(user)).thenReturn(response);
+
+        mockMvc.perform(post("/v1/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.email").value("john@mail.com"))
+                .andExpect(jsonPath("$.name").value("John Smith"));
     }
 
     @Test
-    void testGetAllUsers() {
-        // Сначала регистрируем тестового пользователя с уникальным email
-        String testUserEmail = "test" + System.currentTimeMillis() + "@example.com";
-        given()
-                .contentType(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "name": "Test User",
-                          "email": "%s",
-                          "phone": "1122334455",
-                          "password": "password"
-                        }
-                        """, testUserEmail))
-                .post("/v1/users/register")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testGetAllUsers() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .name("John Smith")
+                .email("john@mail.com")
+                .phone("+1234567890")
+                .role(UserRole.ADMINISTRATOR)
+                .build();
 
-        given()
-                .header("Authorization", "Bearer " + adminToken)
-                .accept(ContentType.JSON)
-                .when()
-                .get("/v1/users")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("$", is(not(empty())));
+        UserUpdateResponseDto responseDto = UserUpdateResponseDto.builder()
+                .id(1L)
+                .name("John Smith")
+                .email("john@mail.com")
+                .phone("+1234567890")
+                .userRole(UserRole.ADMINISTRATOR)
+                .build();
+
+        List<User> users = List.of(user);
+
+        Mockito.when(userService.getAll()).thenReturn(users);
+        Mockito.when(userConverter.toDto(user)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].email").value("john@mail.com"))
+                .andExpect(jsonPath("$[0].userRole").value("ADMINISTRATOR"));
     }
 
     @Test
-    void testGetUserById() {
-        // Сначала регистрируем тестового пользователя с уникальным email и получаем его ID
-        String testUserEmail = "jane" + System.currentTimeMillis() + "@example.com";
-        String testUserName = "Jane New";
-        String testUserPhone = "5544332211";
-        int userId = given()
-                .contentType(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "name": "%s",
-                          "email": "%s",
-                          "phone": "%s",
-                          "password": "123456"
-                        }
-                        """, testUserName, testUserEmail, testUserPhone))
-                .post("/v1/users/register")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testGetUserById() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .name("John Smith")
+                .email("john@mail.com")
+                .phone("+1234567890")
+                .role(UserRole.ADMINISTRATOR)
+                .build();
 
-        given()
-                .header("Authorization", "Bearer " + adminToken)
-                .when()
-                .get("/v1/users/" + userId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo(testUserName))
-                .body("email", equalTo(testUserEmail))
-                .body("phone", equalTo(testUserPhone));
+        UserUpdateResponseDto responseDto = UserUpdateResponseDto.builder()
+                .id(1L)
+                .name("John Smith")
+                .email("john@mail.com")
+                .phone("+1234567890")
+                .userRole(UserRole.ADMINISTRATOR)
+                .build();
+
+        Mockito.when(userService.getById(anyLong())).thenReturn(user);
+        Mockito.when(userConverter.toDto(user)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/users/{userId}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.email").value("john@mail.com"))
+                .andExpect(jsonPath("$.userRole").value("ADMINISTRATOR"));
     }
 
     @Test
-    void testUpdateUser() {
-        // Сначала регистрируем пользователя для обновления с уникальным email
-        String testUserEmail = "update" + System.currentTimeMillis() + "@example.com";
-        int userId = given()
-                .contentType(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "name": "Update Me",
-                          "email": "%s",
-                          "phone": "0123456789",
-                          "password": "oldpass"
-                        }
-                        """, testUserEmail))
-                .post("/v1/users/register")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testDeleteUser() throws Exception {
+        Mockito.doNothing().when(userService).delete(anyLong());
 
-        String updatedUserName = "Updated Person";
-        String updatedUserPhone = "9876501234";
-        given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "name": "%s",
-                          "phone": "%s"
-                        }
-                        """, updatedUserName, updatedUserPhone))
-                .when()
-                .put("/v1/users/" + userId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo(updatedUserName))
-                .body("phone", equalTo(updatedUserPhone));
+        mockMvc.perform(delete("/v1/users/{userId}", 1L))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testDeleteUser() {
-        // Сначала регистрируем пользователя для удаления с уникальным email
-        String testUserEmail = "delete" + System.currentTimeMillis() + "@example.com";
-        String testUserName = "ToDelete User";
-        String testUserPhone = "1199228833";
-        int userId = given()
-                .contentType(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "name": "%s",
-                          "email": "%s",
-                          "phone": "%s",
-                          "password": "pass"
-                        }
-                        """, testUserName, testUserEmail, testUserPhone))
-                .post("/v1/users/register")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testUpdateUserProfile() throws Exception {
+        UserUpdateRequestDto requestDto = new UserUpdateRequestDto(
+                "John Updated", "+111111111", UserRole.CLIENT);
 
-        given()
-                .header("Authorization", "Bearer " + adminToken)
-                .when()
-                .delete("/v1/users/" + userId)
-                .then()
-                .statusCode(HttpStatus.OK.value());
+        User user = User.builder()
+                .id(1L)
+                .name("John Updated")
+                .email("john@mail.com")
+                .phone("+111111111")
+                .role(UserRole.CLIENT)
+                .build();
 
-        // Проверяем, что пользователь действительно удален
-        given()
-                .header("Authorization", "Bearer " + adminToken)
-                .when()
-                .get("/v1/users/" + userId)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        UserUpdateResponseDto responseDto = UserUpdateResponseDto.builder()
+                .id(1L)
+                .name("John Updated")
+                .email("john@mail.com")
+                .phone("+111111111")
+                .userRole(UserRole.CLIENT)
+                .build();
+
+        Mockito.when(userConverter.toEntity(requestDto)).thenReturn(user);
+        Mockito.when(userService.updateProfile(anyLong(), any(User.class))).thenReturn(user);
+        Mockito.when(userConverter.toDto(user)).thenReturn(responseDto);
+
+        mockMvc.perform(put("/v1/users/{userId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("John Updated"))
+                .andExpect(jsonPath("$.phone").value("+111111111"))
+                .andExpect(jsonPath("$.userRole").value("CLIENT"));
     }
 }

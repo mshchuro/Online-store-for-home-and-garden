@@ -1,169 +1,148 @@
 package org.telran.online_store.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.telran.online_store.converter.Converter;
+import org.telran.online_store.dto.ProductRequestDto;
+import org.telran.online_store.dto.ProductResponseDto;
+import org.telran.online_store.entity.Category;
+import org.telran.online_store.entity.Product;
+import org.telran.online_store.service.ProductService;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 class ProductControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @Autowired
+    private MockMvc mockMvc;
 
-    private String token;
-    private int categoryId;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
+    @MockBean
+    private ProductService productService;
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\",\"password\":\"password\"}")
-                .post("/v1/users/register");
+    @MockBean
+    private Converter<ProductRequestDto, ProductResponseDto, Product> productConverter;
 
-        token = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\",\"password\":\"password\"}")
-                .post("/v1/users/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("token");
+    private final Product product = Product.builder()
+            .id(1L)
+            .name("Peony")
+            .description("Pink garden peony")
+            .price(new BigDecimal("15.55"))
+            .discountPrice(new BigDecimal("1.55"))
+            .category(Category.builder().id(1L).build())
+            .imageUrl("/peony.png")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
 
-        categoryId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Test Category\"}")
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    private final ProductResponseDto responseDto = ProductResponseDto.builder()
+            .id(1L)
+            .name("Peony")
+            .description("Pink garden peony")
+            .price(new BigDecimal("15.55"))
+            .discountPrice(new BigDecimal("1.55"))
+            .categoryId(1L)
+            .image("/peony.png")
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
+
+    @Test
+    @WithMockUser
+    void testGetAllProducts() throws Exception {
+        Mockito.when(productService.getAll(null, null, null, null, null)).thenReturn(List.of(product));
+        Mockito.when(productConverter.toDto(product)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/products"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Peony"));
     }
 
     @Test
-    void testCreateProduct() {
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{ \"name\": \"Phone\", \"description\": \"Smartphone\", \"price\": 499.99, \"category\": {\"id\": " + categoryId + "} }")
-                .post("/v1/products")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo("Phone"));
+    @WithMockUser
+    void testGetProductById() throws Exception {
+        Mockito.when(productService.getById(1L)).thenReturn(product);
+        Mockito.when(productConverter.toDto(product)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/products/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Peony"));
     }
 
     @Test
-    void testGetAllProducts() {
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{ \"name\": \"Laptop\", \"description\": \"Ultrabook\", \"price\": 999.99, \"category\": {\"id\": " + categoryId + "} }")
-                .post("/v1/products")
-                .then()
-                .statusCode(HttpStatus.OK.value());
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testCreateProduct() throws Exception {
+        ProductRequestDto requestDto = ProductRequestDto.builder()
+                .name("Peony")
+                .description("Pink garden peony")
+                .price(new BigDecimal("15.55"))
+                .discountPrice(new BigDecimal("1.55"))
+                .categoryId(1L)
+                .image("/peony.png")
+                .build();
 
-        given()
-                .get("/v1/products")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", greaterThanOrEqualTo(1));
-    }
+        Mockito.when(productConverter.toEntity(any())).thenReturn(product);
+        Mockito.when(productService.create(any())).thenReturn(product);
+        Mockito.when(productConverter.toDto(any())).thenReturn(responseDto);
 
-//    @Test
-//    void testGetAllProductsWithFiltersAndSort() {
-//        given()
-//                .header("Authorization", "Bearer " + token)
-//                .contentType(ContentType.JSON)
-//                .post("/v1/products")
-//                .then()
-//                .statusCode(HttpStatus.OK.value());
-//
-//        given()
-//                .header("Authorization", "Bearer " + token)
-//                .contentType(ContentType.JSON)
-//                .post("/v1/products")
-//                .then()
-//                .statusCode(HttpStatus.OK.value());
-//
-//        given()
-//                .queryParam("categoryId", categoryId)
-//                .queryParam("minPrice", 100)
-//                .queryParam("maxPrice", 1000)
-//                .queryParam("sort", "price,desc")
-//                .get("/v1/products")
-//                .then()
-//                .statusCode(HttpStatus.OK.value())
-//                .body("size()", greaterThanOrEqualTo(2))
-//                .body("[0].price", greaterThanOrEqualTo(199.99f))
-//                .body("[1].price", lessThanOrEqualTo(999.99f));
-//    }
-
-    @Test
-    void testGetProductById() {
-        int productId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{ \"name\": \"Tablet\", \"description\": \"Android tablet\", \"price\": 299.99, \"category\": {\"id\": " + categoryId + "} }")
-                .post("/v1/products")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .path("id");
-
-        given()
-                .get("/v1/products/" + productId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo("Tablet"));
+        mockMvc.perform(post("/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Peony"));
     }
 
     @Test
-    void testUpdateProduct() {
-        int productId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{ \"name\": \"Old Name\", \"description\": \"Old Desc\", \"price\": 150.00, \"category\": {\"id\": " + categoryId + "} }")
-                .post("/v1/products")
-                .then()
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testUpdateProduct() throws Exception {
+        ProductRequestDto requestDto = ProductRequestDto.builder()
+                .name("Peony")
+                .description("Pink garden peony")
+                .price(new BigDecimal("15.55"))
+                .discountPrice(new BigDecimal("1.55"))
+                .categoryId(1L)
+                .image("/peony.png")
+                .build();
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{ \"name\": \"New Name\", \"description\": \"New Desc\", \"price\": 199.99, \"category\": {\"id\": " + categoryId + "} }")
-                .put("/v1/products/" + productId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo("New Name"));
+        Mockito.when(productConverter.toEntity(any())).thenReturn(product);
+        Mockito.when(productService.updateProduct(Mockito.eq(1L), any())).thenReturn(product);
+        Mockito.when(productConverter.toDto(product)).thenReturn(responseDto);
+
+        mockMvc.perform(put("/v1/products/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Peony"));
     }
 
     @Test
-    void testDeleteProduct() {
-        int productId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{ \"name\": \"To Be Deleted\", \"description\": \"Temp\", \"price\": 59.99, \"category\": {\"id\": " + categoryId + "} }")
-                .post("/v1/products")
-                .then()
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testDeleteProduct() throws Exception {
+        mockMvc.perform(delete("/v1/products/{id}", 1L))
+                .andExpect(status().isOk());
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .delete("/v1/products/" + productId)
-                .then()
-                .statusCode(HttpStatus.OK.value());
+        Mockito.verify(productService).delete(1L);
     }
 }

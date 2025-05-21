@@ -9,6 +9,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@Builder
 @Table(name = "cart_items")
 @NoArgsConstructor
 @AllArgsConstructor
