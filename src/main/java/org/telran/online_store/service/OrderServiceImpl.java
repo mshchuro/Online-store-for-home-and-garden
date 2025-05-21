@@ -63,13 +63,8 @@ public class OrderServiceImpl implements OrderService {
 
         for (OrderItem orderItem : orderItems) {
             for (CartItem cartItem : cartItems) {
-                if (orderItem.getProduct().equals(cartItem.getProduct())
-                    && orderItem.getQuantity().equals(cartItem.getQuantity())) {
+                if (orderItem.getProduct().equals(cartItem.getProduct())) {
                     cart.removeItem(cartItem);
-                }
-                if (orderItem.getProduct().equals(cartItem.getProduct())
-                    && orderItem.getQuantity() < cartItem.getQuantity()) {
-                    cartItem.setQuantity(cartItem.getQuantity() - orderItem.getQuantity());
                 }
             }
         }
