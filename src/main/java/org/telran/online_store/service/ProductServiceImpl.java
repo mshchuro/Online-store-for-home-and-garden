@@ -185,13 +185,20 @@ public class ProductServiceImpl implements ProductService {
             case MONTH -> LocalDateTime.now().minusMonths(periodAmount);
         };
 
-        List<Object[]> rawData = orderItemRepository.getProfitData(from, periodType.name());
+        List<Object[]> rawData = orderItemRepository.getProfitData(from);
 
         Map<String, BigDecimal> result = new LinkedHashMap<>();
+        int index = 1;
+        switch (periodType ) {
+            case MONTH -> index = 1;
+            case WEEK -> index = 2;
+            case DAY -> index = 3;
+            case HOUR -> index = 4;
+        }
         for (Object[] row : rawData) {
-            String key = String.valueOf(row[0]); // formatted date
-            BigDecimal profit = (BigDecimal) row[1];
-            result.put(key, profit);
+            String key = String.valueOf(row[index]); // formatted date
+            BigDecimal profit = (BigDecimal) row[0];
+            result.put(key, result.getOrDefault(key, new BigDecimal(0)).add(profit));
         }
 
         return result;

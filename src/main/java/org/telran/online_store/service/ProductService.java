@@ -33,5 +33,4 @@ public interface ProductService {
     List<String> getNotPaidProducts(Long days);
 
     Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount);
-
 }
