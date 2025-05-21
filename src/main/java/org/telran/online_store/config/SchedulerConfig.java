@@ -1,4 +1,4 @@
-package org.telran.online_store.scheduler;
+package org.telran.online_store.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
