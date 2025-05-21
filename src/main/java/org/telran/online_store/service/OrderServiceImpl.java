@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.telran.online_store.entity.Order;
-import org.telran.online_store.entity.OrderItem;
-import org.telran.online_store.entity.User;
+import org.telran.online_store.entity.*;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.exception.OrderNotFoundException;
 import org.telran.online_store.repository.OrderItemJpaRepository;
@@ -16,6 +14,7 @@ import org.telran.online_store.repository.OrderJpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -26,6 +25,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemJpaRepository orderItemRepository;
 
     private final UserService userService;
+
+    private final CartService cartService;
 
     @Override
     public List<Order> getAll() {
@@ -54,7 +55,27 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order create(Order order) {
         User currentUser = userService.getCurrentUser();
+
+        Cart cart = cartService.getCart();
+        Set<CartItem> cartItems = cart.getItems();
+
+        List<OrderItem> orderItems = order.getItems();
+
+        for (OrderItem orderItem : orderItems) {
+            for (CartItem cartItem : cartItems) {
+                if (orderItem.getProduct().equals(cartItem.getProduct())
+                    && orderItem.getQuantity().equals(cartItem.getQuantity())) {
+                    cart.removeItem(cartItem);
+                }
+                if (orderItem.getProduct().equals(cartItem.getProduct())
+                    && orderItem.getQuantity() < cartItem.getQuantity()) {
+                    cartItem.setQuantity(cartItem.getQuantity() - orderItem.getQuantity());
+                }
+            }
+        }
+
         order.setUser(currentUser);
+        cartService.save(cart);
         return orderRepository.save(order);
     }
 
