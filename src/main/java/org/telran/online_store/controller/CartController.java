@@ -1,7 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,8 +13,6 @@ import org.telran.online_store.service.CartService;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Cart", description = "API endpoints to view cart items, add a product to cart, delete cart items, clear cart. Authorisation is required for all end-points")
-@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/cart")
 public class CartController implements CartApi{
 

@@ -13,12 +13,13 @@ import java.util.List;
 @Builder
 public record OrderRequestDto(
 
-        @Schema(description = "List of order items", example = "\"items\": [\n" +
-                                                               "      {\n" +
-                                                               "        \"productId\": 1,\n" +
-                                                               "        \"quantity\": 1,\n" +
-                                                               "        \"priceAtPurchase\": 15.99\n" +
-                                                               "      }]")
+        @Schema(description = "List of order items", example = """
+                                                                { 
+                                                                "productId: 1,
+                                                                "quantity": 1,
+                                                                "priceAtPurchase": 15.99
+                                                                }
+                                                                """)
         List<OrderItemRequestDto> items,
 
         @NotBlank(message = "Delivery Address must not be blank")
@@ -33,6 +34,5 @@ public record OrderRequestDto(
         @NotBlank(message = "Contact Phone must not be blank")
         @Pattern(regexp = "^\\+\\d{10,15}$", message = "Phone number must be in international format, e.g. +1234567890")
         @Schema(description = "Contact Phone", example = "+1234567890")
-        String contactPhone
-) {
+        String contactPhone) {
 }

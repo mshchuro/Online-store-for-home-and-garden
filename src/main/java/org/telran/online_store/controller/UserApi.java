@@ -5,8 +5,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,14 @@ import org.telran.online_store.dto.UserRegistrationRequest;
 import org.telran.online_store.dto.UserRegistrationResponse;
 import org.telran.online_store.dto.UserUpdateRequestDto;
 import org.telran.online_store.dto.UserUpdateResponseDto;
-import org.telran.online_store.entity.User;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.security.SignInRequest;
 import org.telran.online_store.security.SignInResponse;
 
 import java.util.List;
 
+@Tag(name = "User management", description = "API endpoints for managing users")
+@SecurityRequirement(name = "bearerAuth")
 public interface UserApi {
 
     @Operation(
@@ -36,7 +38,7 @@ public interface UserApi {
             })
     })
     @PostMapping("/login")
-    public ResponseEntity<SignInResponse> login(@RequestBody SignInRequest request);
+    ResponseEntity<SignInResponse> login(@RequestBody SignInRequest request);
 
     @Operation(
             summary = "Allows to view all users' information",
@@ -51,7 +53,8 @@ public interface UserApi {
                             .UnauthorizedErrorResponse.class))
             })
     })
-    public ResponseEntity<List<UserUpdateResponseDto>> getAll();
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    ResponseEntity<List<UserUpdateResponseDto>> getAll();
 
     @Operation(
             summary = "New user registration",
@@ -66,7 +69,7 @@ public interface UserApi {
                     @Schema(implementation = GlobalExceptionHandler.ValidationErrorResponse.class))}),
             @ApiResponse(responseCode = "409", description = "User already exists")
     })
-    public ResponseEntity<UserRegistrationResponse> register(@Valid @RequestBody UserRegistrationRequest request);
+    ResponseEntity<UserRegistrationResponse> register(@Valid @RequestBody UserRegistrationRequest request);
 
     @Operation(
             summary = "Allows to view the user's information",
@@ -84,7 +87,7 @@ public interface UserApi {
                             .UnauthorizedErrorResponse.class))
             })
     })
-    public UserUpdateResponseDto getById(@PathVariable Long userId);
+    UserUpdateResponseDto getById(@PathVariable Long userId);
 
     @Operation(
             summary = "Allows to delete the user",
@@ -100,7 +103,7 @@ public interface UserApi {
                             .UnauthorizedErrorResponse.class))
             })
     })
-    public ResponseEntity<Void> deleteById(@PathVariable Long userId);
+    ResponseEntity<Void> deleteById(@PathVariable Long userId);
 
     @Operation(
             summary = "Allows to update the user's info",
@@ -121,5 +124,5 @@ public interface UserApi {
                             .UnauthorizedErrorResponse.class))
                     })
     })
-    public ResponseEntity<UserUpdateResponseDto> updateProfile(@PathVariable Long userId, @RequestBody UserUpdateRequestDto dto);
+    ResponseEntity<UserUpdateResponseDto> updateProfile(@PathVariable Long userId, @RequestBody UserUpdateRequestDto dto);
 }

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import org.telran.online_store.dto.AddToCartRequest;
 import org.telran.online_store.dto.CartResponseDto;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Cart", description = "API endpoints to view cart items, add a product to cart, delete cart items, clear cart. Authorisation is required for all end-points")
 public interface CartApi {
 
     @Operation(
@@ -26,7 +30,7 @@ public interface CartApi {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
-    public ResponseEntity<CartResponseDto> getAllItems();
+    ResponseEntity<CartResponseDto> getAllItems();
 
     @Operation(
             summary = "Adding a new item to cart",
@@ -46,7 +50,7 @@ public interface CartApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<CartResponseDto> createCartItem(@Valid @RequestBody AddToCartRequest addToCartRequest);
+    ResponseEntity<CartResponseDto> createCartItem(@Valid @RequestBody AddToCartRequest addToCartRequest);
 
     @Operation(
             summary = "Removing item from cart",
@@ -61,7 +65,7 @@ public interface CartApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<Void> deleteCartItem(@PathVariable Long productId);
+    ResponseEntity<Void> deleteCartItem(@PathVariable Long productId);
 
     @Operation(
             summary = "Clear cart",
@@ -77,5 +81,5 @@ public interface CartApi {
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
     @DeleteMapping()
-    public ResponseEntity<CartResponseDto> deleteCart();
+    ResponseEntity<CartResponseDto> deleteCart();
 }

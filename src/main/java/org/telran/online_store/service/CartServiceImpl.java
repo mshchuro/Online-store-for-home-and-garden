@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.dto.AddToCartRequest;
@@ -11,20 +10,15 @@ import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.CartItemNotFoundException;
 import org.telran.online_store.exception.CartNotFoundException;
-import org.telran.online_store.repository.CartItemJpaRepository;
 import org.telran.online_store.repository.CartJpaRepository;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.HashSet;
 
 @RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
 
     private final CartJpaRepository cartRepository;
-
-    @Autowired
-    private CartItemJpaRepository cartItemRepository;
 
     private final UserService userService;
 
@@ -33,10 +27,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getCart() {
         Long currentUserId = userService.getCurrentUser().getId();
-        return Optional.ofNullable(cartRepository.findByUserId(currentUserId))
+        return cartRepository.findByUserId(currentUserId)
                 .orElseThrow(() ->
-                        new CartNotFoundException("Cart is not found")
-                );
+                        new CartNotFoundException("Cart is not found"));
     }
 
     @Override
@@ -45,16 +38,22 @@ public class CartServiceImpl implements CartService {
         User currentUser = userService.getCurrentUser();
         Product product = productService.getById(request.getProductId());
 
-        Cart cart = cartRepository.findByUser(currentUser).orElse(new Cart(null, currentUser, new ArrayList<>()));
-        CartItem item = cart.getItems().stream()
-                .filter(cartItem -> cartItem.getProduct().equals(product))
-                .findFirst()
-                .orElse(null);
-        if (item == null) {
-            cart.getItems().add(new CartItem(null, cart, product, request.getQuantity()));
+        Cart cart = cartRepository.findByUser(currentUser)
+                .orElse(Cart.builder()
+                        .items(new HashSet<>())
+                        .user(currentUser)
+                        .build());
+
+        CartItem newItem = new CartItem(cart, product);
+
+        if (cart.getItems().contains(newItem)) {
+            CartItem existingItem = cart.getItems().stream()
+                    .filter(i -> i.equals(newItem))
+                    .findFirst()
+                    .orElseThrow();
+            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
         } else {
-            Integer quantity = item.getQuantity();
-            item.setQuantity(quantity + request.getQuantity());
+            cart.getItems().add(new CartItem(cart, product, request.getQuantity()));
         }
         return cartRepository.save(cart);
     }
@@ -65,25 +64,17 @@ public class CartServiceImpl implements CartService {
         User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
-        CartItem item = cart.getItems().stream()
-                .filter(cartItem -> cartItem.getProduct().getId().equals(productId))
-                .findFirst()
-                .orElseThrow(() -> new CartItemNotFoundException("Cart item is not found"));
-        if (item != null) {
-            cart.getItems().remove(item);
-            cartRepository.save(cart);
+
+        Product product = productService.getById(productId);
+        CartItem newItem = new CartItem(cart, product);
+
+        if (!cart.getItems().contains(newItem)) {
+            throw new CartItemNotFoundException("Cart item is not found");
         }
+
+        cart.getItems().remove(newItem);
+        cartRepository.save(cart);
     }
-
-//    @Override
-//    @Transactional
-//    public void clearCart() {
-//        User user = userService.getCurrentUser();
-//        Cart cart = cartRepository.findByUser(user).orElseThrow(()
-//                -> new CartNotFoundException("No such cart is found"));
-//        cartRepository.delete(cart);
-//    }
-
 
     @Override
     @Transactional
@@ -91,11 +82,8 @@ public class CartServiceImpl implements CartService {
         User user = userService.getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElseThrow(()
                 -> new CartNotFoundException("No such cart is found"));
-        cartItemRepository.removeCartItemByCart_Id(cart.getId());
-        cart.getItems().clear();
-        return cart;
-        //cartItemRepository.removeCartItemByCart_Id(cart.getId());
-        //return cartRepository.save(cart);
+        cart.setItems(new HashSet<>());
+        return cartRepository.save(cart);
     }
 }
 

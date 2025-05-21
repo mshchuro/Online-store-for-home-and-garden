@@ -5,17 +5,19 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.dto.FavoriteResponseDto;
-import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 
 import java.util.List;
 
+@Tag(name = "Favorite Product", description = "API endpoints for favorite products. Authorisation is required for all end-points")
+@SecurityRequirement(name = "bearerAuth")
 public interface FavoriteApi {
 
     @Operation(
@@ -30,7 +32,7 @@ public interface FavoriteApi {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
-    public ResponseEntity<List<FavoriteResponseDto>> getAll();
+    ResponseEntity<List<FavoriteResponseDto>> getAll();
 
     @Operation(
             summary = "Making a product favorite",
@@ -53,7 +55,7 @@ public interface FavoriteApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto);
+    ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto);
 
     @Operation(
             summary = "Favorite product deleting",
@@ -68,5 +70,5 @@ public interface FavoriteApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<Void> deleteById(@PathVariable Long favorite_id);
+    ResponseEntity<Void> deleteById(@PathVariable Long favorite_id);
 }

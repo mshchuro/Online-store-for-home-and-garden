@@ -1,8 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +19,8 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Product management", description = "API endpoints for managing products")
-@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/products")
-public class ProductController implements ProductApi{
+public class ProductController implements ProductApi {
 
     private final ProductService productService;
 
@@ -34,22 +29,11 @@ public class ProductController implements ProductApi{
     @GetMapping()
     @Override
     public ResponseEntity<List<ProductResponseDto>> getAll(
-            @Parameter(description = "category ID for filtering")
             @RequestParam(required = false) Long categoryId,
-
-            @Parameter(description = "minimum product price for filtering")
             @RequestParam(required = false) BigDecimal minPrice,
-
-            @Parameter(description = "maximum product price for filtering")
             @RequestParam(required = false) BigDecimal maxPrice,
-
-            @Parameter(description = "filter by availability of discount")
             @RequestParam(required = false) Boolean discount,
-
-            @Parameter(description = "examples for sorting:\n price:asc, name:desc, " +
-                                     "createdAt:desc, discountPrice:desc, etc.")
-            @RequestParam(required = false) List<String> sort
-    ) {
+            @RequestParam(required = false) List<String> sort) {
         List<Product> products = productService.getAll(categoryId, minPrice, maxPrice, discount, sort);
         return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }

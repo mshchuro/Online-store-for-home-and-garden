@@ -1,7 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +17,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Favorite Product", description = "API endpoints for favorite products. Authorisation is required for all end-points")
-@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/favorites")
 public class FavoriteController implements FavoriteApi{
 
@@ -40,9 +36,9 @@ public class FavoriteController implements FavoriteApi{
     @PostMapping()
     @Override
     public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto) {
-        Favorite favorite = favoriteConverter.toEntity(requestDto);
-        Favorite saved = favoriteService.create(favorite);
-        return ResponseEntity.status(HttpStatus.CREATED).body(favoriteConverter.toDto(saved));
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(favoriteConverter.toDto(favoriteService.create(favoriteConverter.toEntity(requestDto))));
     }
 
     @DeleteMapping("/{favorite_id}")

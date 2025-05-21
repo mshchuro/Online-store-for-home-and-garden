@@ -6,13 +6,13 @@ import org.telran.online_store.enums.UserRole;
 @Builder
 public record UserUpdateResponseDto(
 
-    Long id,
+        Long id,
 
-    String name,
+        String name,
 
-    String email,
+        String email,
 
-    String phone,
+        String phone,
 
-    UserRole userRole
-) {}
+        UserRole userRole) {
+}

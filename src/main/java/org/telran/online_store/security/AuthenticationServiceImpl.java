@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.service.UserService;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AuthenticationManager authenticationManager;

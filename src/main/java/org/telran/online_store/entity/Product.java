@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Entity
-@EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "products")
+@EntityListeners(AuditingEntityListener.class)
 public class Product {
 
     @Id
