@@ -13,6 +13,5 @@ public record OrderItemRequestDto(
 
         @NotNull(message = "Quantity must not be null")
         @Positive(message = "Quantity must be a positive number")
-        int quantity
-) {
+        int quantity) {
 }

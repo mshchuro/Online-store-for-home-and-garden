@@ -1,7 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +16,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Category", description = "API endpoints for product categories")
-@SecurityRequirement(name = "bearerAuth")
-
 @RequestMapping("/v1/categories")
 public class CategoryController implements CategoryApi{
 

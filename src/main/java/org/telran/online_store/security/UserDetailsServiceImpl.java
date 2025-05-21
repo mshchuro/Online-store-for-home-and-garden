@@ -14,8 +14,8 @@ import org.telran.online_store.service.UserService;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserService userService;

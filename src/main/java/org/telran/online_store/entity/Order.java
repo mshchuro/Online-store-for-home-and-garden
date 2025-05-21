@@ -16,8 +16,8 @@ import java.util.List;
 @Setter
 @Entity
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
@@ -48,4 +48,10 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
+
+    public Order addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+        return this;
+    }
 }

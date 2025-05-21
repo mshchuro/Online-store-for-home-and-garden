@@ -1,7 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +22,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "User management", description = "API endpoints for managing users")
-@SecurityRequirement(name = "bearerAuth")
 public class UserController implements UserApi{
 
     private final UserService userService;

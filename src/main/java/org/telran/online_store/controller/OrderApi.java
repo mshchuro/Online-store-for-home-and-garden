@@ -5,22 +5,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.telran.online_store.dto.OrderRequestDto;
 import org.telran.online_store.dto.OrderResponseDto;
-import org.telran.online_store.entity.Order;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 
 import java.util.List;
 
+@Tag(name = "Orders", description = "API endpoints for orders. Authorisation is required for all end-points")
+@SecurityRequirement(name = "bearerAuth")
 public interface OrderApi {
 
     @Operation(
@@ -35,7 +34,7 @@ public interface OrderApi {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
-    public ResponseEntity<List<OrderResponseDto>> getAllOrders();
+    ResponseEntity<List<OrderResponseDto>> getAllOrders();
 
     @Operation(
             summary = "Allows to view current user's orders history",
@@ -49,7 +48,7 @@ public interface OrderApi {
                     @Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.UnauthorizedErrorResponse.class))})
     })
-    public ResponseEntity<List<OrderResponseDto>> getUserHistory();
+    ResponseEntity<List<OrderResponseDto>> getUserHistory();
 
     @Operation(
             summary = "Getting current order status by its id",
@@ -64,7 +63,7 @@ public interface OrderApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<OrderStatus> getStatus(@PathVariable Long orderId);
+    ResponseEntity<OrderStatus> getStatus(@PathVariable Long orderId);
 
     @Operation(
             summary = "Creating a new order",
@@ -84,5 +83,5 @@ public interface OrderApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    public ResponseEntity<OrderResponseDto> create(@Valid @RequestBody OrderRequestDto dto);
+    ResponseEntity<OrderResponseDto> create(@Valid @RequestBody OrderRequestDto dto);
 }

@@ -13,6 +13,5 @@ public record CartResponseDto(
         Long cartId,
 
         @Schema(description = "List of cart items", example = "1")
-        List<CartItemResponseDto> items
-) {
+        List<CartItemResponseDto> items) {
 }

@@ -9,6 +9,5 @@ public record FavoriteRequestDto(
 
         @NotNull(message = "Product Id must not be blank")
         @Positive(message = "Product Id must be a positive number")
-        Long productId
-) {
+        Long productId) {
 }

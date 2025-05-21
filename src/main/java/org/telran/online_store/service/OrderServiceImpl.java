@@ -1,7 +1,7 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,10 @@ import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.exception.OrderNotFoundException;
+import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.OrderJpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,6 +22,8 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderJpaRepository orderRepository;
+
+    private final OrderItemJpaRepository orderItemRepository;
 
     private final UserService userService;
 
@@ -68,7 +72,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderItem> getTopFromOrders(OrderStatus orderStatus) {
-        return List.of();
+    public List<OrderItem> getTopFromOrders(Pageable pageable, OrderStatus orderStatus) {
+        return orderItemRepository.findTopByStatus(pageable, orderStatus);
+    }
+
+    @Override
+    public List<OrderItem> getNotPaid(LocalDateTime dateTime) {
+        return orderItemRepository.findNotPaidProducts(dateTime);
     }
 }

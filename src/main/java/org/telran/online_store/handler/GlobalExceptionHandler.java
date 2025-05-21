@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.telran.online_store.exception.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -52,6 +53,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<AccessDeniedResponse> handleAccessDeniedException(AccessDeniedException e) {
+        AccessDeniedResponse response = AccessDeniedResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .message(e.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     @Builder
     public record ValidationErrorResponse(
             @Schema(example = "400")
@@ -85,6 +96,15 @@ public class GlobalExceptionHandler {
             int status,
 
             @Schema(example = "Unauthorized: You must be logged in")
-            String message
-    ) {}
+            String message) {
+    }
+
+    @Builder
+    public record AccessDeniedResponse(
+            @Schema(example = "403")
+            int status,
+
+            @Schema(example = "Access denied")
+            String message) {
+    }
 }

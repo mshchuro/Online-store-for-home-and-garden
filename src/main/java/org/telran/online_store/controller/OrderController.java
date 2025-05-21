@@ -1,7 +1,5 @@
 package org.telran.online_store.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +17,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Orders", description = "API endpoints for orders. Authorisation is required for all end-points")
-@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/v1/orders")
 public class OrderController implements OrderApi{
 
