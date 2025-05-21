@@ -16,14 +16,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/reports")
-public class ReportController implements ReportApi{
+@PreAuthorize("hasRole('ADMINISTRATOR')")
+public class ReportController implements ReportApi {
 
     private final ReportService reportService;
 
-   @Override
+    @Override
     @GetMapping("/topTenPurchasedProducts")
     public ResponseEntity<List<String>> getTopTenPurchasedProducts() {
         return ResponseEntity.status(HttpStatus.OK)
@@ -32,6 +33,7 @@ public class ReportController implements ReportApi{
     }
 
     @Override
+   // @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/topTenCancelledProducts")
     public ResponseEntity<List<String>> getTopTenCancelledProducts() {
         return ResponseEntity.status(HttpStatus.OK)
@@ -40,7 +42,7 @@ public class ReportController implements ReportApi{
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMINISTRATOR')")
+   // @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/notPaidProducts/{days}")
     public ResponseEntity<List<String>> getNotPaidProducts(@PathVariable Long days) {
         return ResponseEntity.status(HttpStatus.OK)
