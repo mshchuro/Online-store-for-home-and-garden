@@ -17,14 +17,6 @@ public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
 
     void removeAllByProduct_Id(Long productId);
 
-    @Query("SELECT oi.product " +
-            "FROM OrderItem oi " +
-            "JOIN oi.order o " +
-            "WHERE o.status = :status " +
-            "GROUP BY oi.product " +
-            "ORDER BY COUNT (oi) DESC")
-    List<Product> findTopByStatus(Pageable pageable , OrderStatus status);
-
     @Query("SELECT oi " +
             "FROM OrderItem oi " +
             "JOIN oi.order o " +

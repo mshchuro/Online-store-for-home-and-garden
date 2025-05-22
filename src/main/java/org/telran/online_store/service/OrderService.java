@@ -23,7 +23,5 @@ public interface OrderService {
 
     void updateStatus(Long orderId, OrderStatus newStatus);
 
-    List<Product> getTopFromOrders(Pageable pageable, OrderStatus orderStatus);
-
     List<OrderItem> getNotPaid(LocalDateTime dateTime);
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ReportService;
 
@@ -26,23 +27,21 @@ public class ReportController implements ReportApi {
 
     @Override
     @GetMapping("/topTenPurchasedProducts")
-    public ResponseEntity<List<String>> getTopTenPurchasedProducts() {
+    public ResponseEntity<List<ProductReportDto>> getTopTenPurchasedProducts() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(reportService.getTopOrdered().stream()
-                        .map(Product::getName).collect(Collectors.toList()));
+                .body(reportService.getTopOrdered());
     }
 
     @Override
-   // @PreAuthorize("hasRole('ADMINISTRATOR')")
+    // @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/topTenCancelledProducts")
-    public ResponseEntity<List<String>> getTopTenCancelledProducts() {
+    public ResponseEntity<List<ProductReportDto>> getTopTenCancelledProducts() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(reportService.getTopCancelled().stream()
-                        .map(Product::getName).collect(Collectors.toList()));
+                .body(reportService.getTopCancelled());
     }
 
     @Override
-   // @PreAuthorize("hasRole('ADMINISTRATOR')")
+    // @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/notPaidProducts/{days}")
     public ResponseEntity<List<String>> getNotPaidProducts(@PathVariable Long days) {
         return ResponseEntity.status(HttpStatus.OK)

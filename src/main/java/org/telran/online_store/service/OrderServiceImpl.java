@@ -88,11 +88,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Product> getTopFromOrders(Pageable pageable, OrderStatus orderStatus) {
-        return orderItemRepository.findTopByStatus(pageable, orderStatus);
-    }
-
-    @Override
     public List<OrderItem> getNotPaid(LocalDateTime dateTime) {
         return orderItemRepository.findNotPaidProducts(dateTime);
     }
