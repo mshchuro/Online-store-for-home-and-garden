@@ -13,7 +13,9 @@ import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.OrderJpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
 
     private final CartService cartService;
+    private final ProductService productService;
 
     @Override
     public List<Order> getAll() {
@@ -61,12 +64,19 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> orderItems = order.getItems();
 
-        for (OrderItem orderItem : orderItems) {
-            for (CartItem cartItem : cartItems) {
-                if (orderItem.getProduct().equals(cartItem.getProduct())) {
-                    cart.removeItem(cartItem);
-                }
+        Map<Long, CartItem> map = new HashMap<>();
+        for (CartItem cartItem : cartItems) {
+            map.put(cartItem.getProduct().getId(), cartItem);
+        }
+
+        for (OrderItem orderItem: orderItems){
+            CartItem item = map.get(orderItem.getProduct().getId());
+            if(item == null){
+                continue;
             }
+            cartItems.remove(item);
+            map.remove(orderItem.getProduct().getId());
+
         }
 
         order.setUser(currentUser);
