@@ -3,6 +3,7 @@ package org.telran.online_store.service;
 import org.springframework.data.domain.Pageable;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.OrderItem;
+import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public interface OrderService {
 
     void updateStatus(Long orderId, OrderStatus newStatus);
 
-    List<OrderItem> getTopFromOrders(Pageable pageable, OrderStatus orderStatus);
+    List<Product> getTopFromOrders(Pageable pageable, OrderStatus orderStatus);
 
     List<OrderItem> getNotPaid(LocalDateTime dateTime);
 }

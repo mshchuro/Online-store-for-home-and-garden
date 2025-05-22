@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderItem> getTopFromOrders(Pageable pageable, OrderStatus orderStatus) {
+    public List<Product> getTopFromOrders(Pageable pageable, OrderStatus orderStatus) {
         return orderItemRepository.findTopByStatus(pageable, orderStatus);
     }
 

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.telran.online_store.entity.OrderItem;
+import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -16,13 +17,13 @@ public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
 
     void removeAllByProduct_Id(Long productId);
 
-    @Query("SELECT oi " +
+    @Query("SELECT oi.product " +
             "FROM OrderItem oi " +
             "JOIN oi.order o " +
             "WHERE o.status = :status " +
-            "GROUP BY oi " +
+            "GROUP BY oi.product " +
             "ORDER BY COUNT (oi) DESC")
-    List<OrderItem> findTopByStatus(Pageable pageable , OrderStatus status);
+    List<Product> findTopByStatus(Pageable pageable , OrderStatus status);
 
     @Query("SELECT oi " +
             "FROM OrderItem oi " +
