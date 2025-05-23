@@ -7,10 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.*;
 import org.telran.online_store.enums.OrderStatus;
+import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.OrderNotFoundException;
 import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.OrderJpaRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +27,13 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderJpaRepository orderRepository;
 
-    private final OrderItemJpaRepository orderItemRepository;
-
     private final UserService userService;
 
     private final CartService cartService;
+  
     private final ProductService productService;
+  
+    private final OrderItemJpaRepository orderItemRepository;
 
     @Override
     public List<Order> getAll() {
@@ -94,6 +99,39 @@ public class OrderServiceImpl implements OrderService {
                 new OrderNotFoundException("Order with id " + orderId + " is not found"));
         order.setStatus(newStatus);
         orderRepository.save(order);
+    }
+
+    @Override
+    public Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount) {
+            LocalDateTime from = switch (periodType) {
+                case HOUR -> LocalDateTime.now().minusHours(periodAmount);
+                case DAY -> LocalDateTime.now().minusDays(periodAmount);
+                case WEEK -> LocalDateTime.now().minusWeeks(periodAmount);
+                case MONTH -> LocalDateTime.now().minusMonths(periodAmount);
+            };
+
+            List<Object[]> rawData = orderItemRepository.getProfitData(from);
+
+            Map<String, BigDecimal> result = new LinkedHashMap<>();
+            int index = 1;
+            switch (periodType) {
+                case MONTH -> index = 1;
+                case WEEK -> index = 2;
+                case DAY -> index = 3;
+                case HOUR -> index = 4;
+            }
+            for (Object[] row : rawData) {
+                String key = String.valueOf(row[index]); // formatted date
+                BigDecimal profit = (BigDecimal) row[0];
+                result.put(key, result.getOrDefault(key, new BigDecimal(0)).add(profit));
+            }
+
+            return result;
+    }
+
+    @Override
+    public List<OrderItem> getTopFromOrders(Pageable pageable, OrderStatus orderStatus) {
+        return orderItemRepository.findTopByStatus(pageable, orderStatus);
     }
 
     @Override
