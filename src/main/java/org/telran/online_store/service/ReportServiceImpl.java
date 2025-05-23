@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.OrderStatus;
+import org.telran.online_store.enums.PeriodType;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,5 +52,10 @@ public class ReportServiceImpl implements ReportService {
                 .stream()
                 .map(OrderItem::getProduct)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount) {
+        return orderService.getProfitReport(periodType, periodAmount);
     }
 }

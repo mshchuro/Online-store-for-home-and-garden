@@ -69,4 +69,10 @@ public class ProductController implements ProductApi {
         productService.delete(productId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/product-of-the-day")
+    public ResponseEntity<ProductResponseDto> getProductOfTheDay() {
+        Product product = productService.getProductOfTheDay();
+        return ResponseEntity.ok(productConverter.toDto(product));
+    }
 }
