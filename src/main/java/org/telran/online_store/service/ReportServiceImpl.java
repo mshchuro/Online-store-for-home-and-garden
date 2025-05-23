@@ -59,6 +59,7 @@ public class ReportServiceImpl implements ReportService {
         return resultList
                 .stream()
                 .map(p -> new ProductReportDto((Long) p[0], (String) p[1], (Long) p[9])).toList();
+    }
 
     @Override
     public Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount) {

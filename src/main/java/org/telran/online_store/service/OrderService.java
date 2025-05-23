@@ -28,7 +28,5 @@ public interface OrderService {
 
     Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount);
 
-    List<OrderItem> getTopFromOrders(Pageable pageable, OrderStatus orderStatus);
-
     List<OrderItem> getNotPaid(LocalDateTime dateTime);
 }
