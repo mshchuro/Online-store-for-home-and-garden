@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.telran.online_store.AbstractTests;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
@@ -24,55 +25,55 @@ import java.math.BigDecimal;
 import java.util.List;
 
 
-@SpringBootTest
-@ActiveProfiles("test")
-class OrderServiceImplTest {
-
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private OrderJpaRepository orderRepo;
-
-    @Autowired
-    private UserJpaRepository userRepo;
-
-    @Autowired
-    private ProductJpaRepository productRepo;
-
-    @Autowired
-    private FavoriteJpaRepository favoriteRepo;
-
-    private User testUser;
-
-    @BeforeEach
-    void setUp() {
-        favoriteRepo.deleteAll();
-        productRepo.deleteAll();
-        orderRepo.deleteAll();
-        userRepo.deleteAll();
-
-        testUser = User.builder()
-                .name("Test User")
-                .email("test@example.com")
-                .phone("1234567890")
-                .password("password")
-                .role(UserRole.CLIENT)
-                .build();
-        testUser = userRepo.save(testUser);
-
-        Product testProduct = Product.builder()
-                .name("Test Product")
-                .description("Description")
-                .price(BigDecimal.valueOf(100))
-                .imageUrl("image.jpg")
-                .build();
-        testProduct = productRepo.save(testProduct);
-
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-    }
+//@SpringBootTest
+//@ActiveProfiles("test")
+    class OrderServiceImplTest extends AbstractTests {
+//
+//    @Autowired
+//    private OrderService orderService;
+//
+//    @Autowired
+//    private OrderJpaRepository orderRepo;
+//
+//    @Autowired
+//    private UserJpaRepository userRepo;
+//
+//    @Autowired
+//    private ProductJpaRepository productRepo;
+//
+//    @Autowired
+//    private FavoriteJpaRepository favoriteRepo;
+//
+//    private User testUser;
+//
+//    @BeforeEach
+//    void setUp() {
+//        orderRepo.deleteAll();
+//        favoriteRepo.deleteAll();
+//        productRepo.deleteAll();
+//        userRepo.deleteAll();
+//
+//        testUser = User.builder()
+//                .name("Test User")
+//                .email("test@example.com")
+//                .phone("1234567890")
+//                .password("password")
+//                .role(UserRole.CLIENT)
+//                .build();
+//        testUser = userRepo.save(testUser);
+//
+//        Product testProduct = Product.builder()
+//                .name("Test Product")
+//                .description("Description")
+//                .price(BigDecimal.valueOf(100))
+//                .imageUrl("image.jpg")
+//                .build();
+//        testProduct = productRepo.save(testProduct);
+//
+//        UsernamePasswordAuthenticationToken auth =
+//                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+//    }
 
     @Test
     void testCreateOrder() {

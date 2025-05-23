@@ -4,7 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.telran.online_store.AbstractTests;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.Product;
@@ -20,50 +23,63 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class ReportServiceImplTest {
-
-    @Autowired
-    private ReportService reportService;
-
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private UserJpaRepository userRepo;
-
-    @Autowired
-    private ProductJpaRepository productRepo;
-
-    @Autowired
-    private FavoriteJpaRepository favoriteRepo;
-
-    @Autowired
-    private OrderJpaRepository orderRepo;
-
-    @Autowired
-    private OrderItemJpaRepository orderItemRepo;
-
-    private User adminUser;
-
-    @BeforeEach
-    void setup() {
-        orderItemRepo.deleteAll();
-        orderRepo.deleteAll();
-        favoriteRepo.deleteAll();
-        productRepo.deleteAll();
-        userRepo.deleteAll();
-
-        adminUser = User.builder()
-                .name("Admin")
-                .email("admin@example.com")
-                .phone("0000000000")
-                .password("adminpass")
-                .role(UserRole.ADMINISTRATOR)
-                .build();
-        adminUser = userRepo.save(adminUser);
-    }
+//@SpringBootTest
+//@ActiveProfiles("test")
+    class ReportServiceImplTest extends AbstractTests {
+//
+//    @Autowired
+//    private ReportService reportService;
+//
+//    @Autowired
+//    private OrderService orderService;
+//
+//    @Autowired
+//    private UserJpaRepository userRepo;
+//
+//    @Autowired
+//    private ProductJpaRepository productRepo;
+//
+//    @Autowired
+//    private FavoriteJpaRepository favoriteRepo;
+//
+//    @Autowired
+//    private OrderJpaRepository orderRepo;
+//
+//    @Autowired
+//    private OrderItemJpaRepository orderItemRepo;
+//
+//    private User testUser;
+//    private Product testProduct;
+//
+//    @BeforeEach
+//    void setUp() {
+//        orderItemRepo.deleteAll();
+//        orderRepo.deleteAll();
+//        favoriteRepo.deleteAll();
+//        productRepo.deleteAll();
+//        userRepo.deleteAll();
+//
+//        testUser = User.builder()
+//                .name("Test User")
+//                .email("test@example.com")
+//                .phone("1234567890")
+//                .password("password")
+//                .role(UserRole.CLIENT)
+//                .build();
+//        testUser = userRepo.save(testUser);
+//
+//        testProduct = Product.builder()
+//                .name("Test Product")
+//                .description("Description")
+//                .price(BigDecimal.valueOf(100))
+//                .imageUrl("image.jpg")
+//                .build();
+//        testProduct = productRepo.save(testProduct);
+//
+//        UsernamePasswordAuthenticationToken auth =
+//                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+//    }
 
     @Test
     void testGetTopOrderedProducts() {
@@ -118,7 +134,6 @@ class ReportServiceImplTest {
                 .priceAtPurchase(product.getPrice())
                 .build();
         orderItemRepo.save(item);
-        orderItemRepo.flush();
 
         List<Product> result = reportService.getNotPaid(9L);
 
@@ -142,7 +157,7 @@ class ReportServiceImplTest {
                 .contactPhone("123456789")
                 .deliveryMethod(DeliveryMethod.BY_CAR)
                 .status(status)
-                .user(adminUser)
+                .user(testUser)
                 .build();
         return orderRepo.save(order);
     }

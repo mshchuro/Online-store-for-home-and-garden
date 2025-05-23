@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.telran.online_store.AbstractTests;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.exception.CategoryNotFoundException;
@@ -13,15 +14,15 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class CategoryServiceImplTest {
+//@SpringBootTest
+//@ActiveProfiles("test")
+class CategoryServiceImplTest extends AbstractTests {
 
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private ProductService productService;
+//    @Autowired
+//    private CategoryService categoryService;
+//
+//    @Autowired
+//    private ProductService productService;
 
     private Category cat1;
     private Category cat2;

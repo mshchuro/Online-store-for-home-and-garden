@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.telran.online_store.AbstractTests;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.exception.CategoryNotFoundException;
@@ -19,56 +20,56 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
-@Transactional
-public class ProductServiceImplTest {
+//@SpringBootTest
+//@Transactional
+public class ProductServiceImplTest extends AbstractTests {
 
-    @Autowired
-    private ProductServiceImpl productService;
-
-    @Autowired
-    private ProductJpaRepository productRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryRepository;
+//    @Autowired
+//    private ProductServiceImpl productService;
+//
+//    @Autowired
+//    private ProductJpaRepository productRepository;
+//
+//    @Autowired
+//    private CategoryJpaRepository categoryRepository;
 
     @BeforeEach
     public void setUp() {
         Category category = new Category();
         category.setName("Tools");
-        categoryRepository.save(category);
+        categoryRepo.save(category);
     }
 
     @Test
     public void testGetAll() {
         Category category1 = new Category();
         category1.setName("Tools");
-        category1 = categoryRepository.save(category1);
+        category1 = categoryRepo.save(category1);
 
         Category category2 = new Category();
         category2.setName("Gardening");
-        category2 = categoryRepository.save(category2);
+        category2 = categoryRepo.save(category2);
 
         Product product1 = new Product();
         product1.setName("Garden Shovel");
         product1.setPrice(new BigDecimal("25.50"));
         product1.setCategory(category1);
         product1.setDiscountPrice(new BigDecimal("20.00"));
-        productRepository.save(product1);
+        productRepo.save(product1);
 
         Product product2 = new Product();
         product2.setName("Lawn Mower");
         product2.setPrice(new BigDecimal("150.00"));
         product2.setCategory(category2);
         product2.setDiscountPrice(new BigDecimal("120.00"));
-        productRepository.save(product2);
+        productRepo.save(product2);
 
         Product product3 = new Product();
         product3.setName("Watering Can");
         product3.setPrice(new BigDecimal("15.00"));
         product3.setCategory(category1);
         product3.setDiscountPrice(new BigDecimal("10.00"));
-        productRepository.save(product3);
+        productRepo.save(product3);
 
         List<String> sort = List.of("price:asc");
 
@@ -101,13 +102,13 @@ public class ProductServiceImplTest {
     public void testGetProductById() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product = new Product();
         product.setName("Garden Shovel");
         product.setPrice(new BigDecimal("25.50"));
         product.setCategory(category);
-        product = productRepository.save(product);
+        product = productRepo.save(product);
 
         Product foundProduct = productService.getById(product.getId());
 
@@ -120,13 +121,13 @@ public class ProductServiceImplTest {
     public void testGetProductByName() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product = new Product();
         product.setName("Garden Shovel");
         product.setPrice(new BigDecimal("25.50"));
         product.setCategory(category);
-        productRepository.save(product);
+        productRepo.save(product);
 
         Product foundProduct = productService.getByName("Garden Shovel");
 
@@ -138,13 +139,13 @@ public class ProductServiceImplTest {
     public void testUpdateProduct() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product = new Product();
         product.setName("Shovel");
         product.setPrice(new BigDecimal("30.00"));
         product.setCategory(category);
-        product = productRepository.save(product);
+        product = productRepo.save(product);
 
         Product updatedProduct = new Product();
         updatedProduct.setDescription("Updated Description");
@@ -152,7 +153,7 @@ public class ProductServiceImplTest {
         updatedProduct.setDiscountPrice(new BigDecimal("30.00"));
         productService.updateProduct(product.getId(), updatedProduct);
 
-        Product foundProduct = productRepository.findById(product.getId()).orElseThrow();
+        Product foundProduct = productRepo.findById(product.getId()).orElseThrow();
         assertEquals("Updated Description", foundProduct.getDescription());
         assertEquals(new BigDecimal("35.00"), foundProduct.getPrice());
         assertEquals(new BigDecimal("30.00"), foundProduct.getDiscountPrice());
@@ -162,21 +163,21 @@ public class ProductServiceImplTest {
     public void testGetAllWithFilters() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product1 = new Product();
         product1.setName("Garden Shovel");
         product1.setPrice(new BigDecimal("25.50"));
         product1.setDiscountPrice(new BigDecimal("20.00"));
         product1.setCategory(category);
-        productRepository.save(product1);
+        productRepo.save(product1);
 
         Product product2 = new Product();
         product2.setName("Lawn Mower");
         product2.setPrice(new BigDecimal("150.00"));
         product2.setDiscountPrice(new BigDecimal("130.00"));
         product2.setCategory(category);
-        productRepository.save(product2);
+        productRepo.save(product2);
 
         List<Product> products = productService.getAll(category.getId(), new BigDecimal("10.00"), new BigDecimal("100.00"), null, null);
 
@@ -195,19 +196,19 @@ public class ProductServiceImplTest {
     public void testGetAllWithSort() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product1 = new Product();
         product1.setName("Shovel");
         product1.setPrice(new BigDecimal("30.00"));
         product1.setCategory(category);
-        productRepository.save(product1);
+        productRepo.save(product1);
 
         Product product2 = new Product();
         product2.setName("Hammer");
         product2.setPrice(new BigDecimal("20.00"));
         product2.setCategory(category);
-        productRepository.save(product2);
+        productRepo.save(product2);
 
         List<String> sort = new ArrayList<>();
         sort.add("price:desc");
@@ -221,17 +222,17 @@ public class ProductServiceImplTest {
     public void testDeleteProduct() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product = new Product();
         product.setName("Garden Shovel");
         product.setPrice(new BigDecimal("25.50"));
         product.setCategory(category);
-        product = productRepository.save(product);
+        product = productRepo.save(product);
 
         productService.delete(product.getId());
 
-        assertFalse(productRepository.existsById(product.getId()));
+        assertFalse(productRepo.existsById(product.getId()));
     }
 
     @Test
@@ -245,21 +246,21 @@ public class ProductServiceImplTest {
     public void testUpdateCategory() {
         Category category1 = new Category();
         category1.setName("Tools");
-        category1 = categoryRepository.save(category1);
+        category1 = categoryRepo.save(category1);
 
         Category category2 = new Category();
         category2.setName("Garden");
-        category2 = categoryRepository.save(category2);
+        category2 = categoryRepo.save(category2);
 
         Product product = new Product();
         product.setName("Shovel");
         product.setPrice(new BigDecimal("30.00"));
         product.setCategory(category1);
-        product = productRepository.save(product);
+        product = productRepo.save(product);
 
         productService.updateCategory(product.getId(), category2);
 
-        Product updatedProduct = productRepository.findById(product.getId()).orElseThrow();
+        Product updatedProduct = productRepo.findById(product.getId()).orElseThrow();
         assertEquals(category2.getId(), updatedProduct.getCategory().getId());
     }
 
@@ -267,19 +268,19 @@ public class ProductServiceImplTest {
     public void testGetAllByCategoryId() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Product product1 = new Product();
         product1.setName("Shovel");
         product1.setPrice(new BigDecimal("30.00"));
         product1.setCategory(category);
-        productRepository.save(product1);
+        productRepo.save(product1);
 
         Product product2 = new Product();
         product2.setName("Hammer");
         product2.setPrice(new BigDecimal("20.00"));
         product2.setCategory(category);
-        productRepository.save(product2);
+        productRepo.save(product2);
 
         List<Product> productsByCategory = productService.getAllByCategoryId(category.getId());
 
@@ -304,7 +305,7 @@ public class ProductServiceImplTest {
     public void testUpdateCategoryProductNotFound() {
         Category category = new Category();
         category.setName("Tools");
-        category = categoryRepository.save(category);
+        category = categoryRepo.save(category);
 
         Category finalCategory = category;
         assertThrows(ProductNotFoundException.class, () -> {
@@ -317,7 +318,7 @@ public class ProductServiceImplTest {
         product.setName("Shovel");
         product.setPrice(new BigDecimal("30.00"));
 
-        product = productRepository.save(product);
+        product = productRepo.save(product);
 
         Long invalidCategoryId = 999L;
 
