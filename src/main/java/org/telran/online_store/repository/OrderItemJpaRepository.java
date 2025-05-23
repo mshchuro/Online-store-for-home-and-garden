@@ -1,8 +1,15 @@
 package org.telran.online_store.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.telran.online_store.entity.OrderItem;
+import org.telran.online_store.enums.OrderStatus;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
@@ -45,7 +52,6 @@ public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
                      WHERE t2.status = 'DELIVERED'
                      AND t2.updated_at > :fromDate) as sales
     GROUP BY month, week, days, hours""", nativeQuery = true )
-
     List<Object[]> getProfitData(@Param("fromDate") LocalDateTime fromDate);
 
     @Query("SELECT oi " +

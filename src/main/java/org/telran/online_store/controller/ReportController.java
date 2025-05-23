@@ -1,5 +1,8 @@
 package org.telran.online_store.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,4 +59,20 @@ public class ReportController implements ReportApi {
                         .map(Product::getName)
                         .collect(Collectors.toList()));
     }
+
+    @Operation(
+            summary = "Profit Report",
+            description = "Returns total profit for a given period grouped by hour/day/week/month"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok")
+    })
+    @GetMapping("/profit")
+    public ResponseEntity<Map<String, BigDecimal>> getProfitReport(
+            @RequestParam PeriodType periodType,
+            @RequestParam Long periodAmount
+    ) {
+        return ResponseEntity.ok(reportService.getProfitReport(periodType, periodAmount));
+    }
 }
+

@@ -2,6 +2,7 @@ package org.telran.online_store.service;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,6 +12,7 @@ import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.CategoryNotFoundException;
+import org.telran.online_store.exception.DiscountNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
 import org.telran.online_store.repository.CartItemJpaRepository;
 import org.telran.online_store.repository.CategoryJpaRepository;
@@ -25,8 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
+
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductJpaRepository productRepository;
@@ -163,52 +166,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-    @Override
-    public List<String> getTopTenPurchasedProducts() {
-        Pageable topTen = PageRequest.of(0, 10);
-        return productRepository.findTopTenPurchasedProducts(topTen);
-    }
-
-    @Override
-    public List<String> getTopTenCancelledProducts() {
-        Pageable topTen = PageRequest.of(0, 10);
-        return productRepository.findTopTenCancelledProducts(topTen);
-    }
-
-    @Override
-    public List<String> getNotPaidProducts(Long days) {
-        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(days);
-        return productRepository.findNotPaidProducts(thresholdDate);
-    }
-
-    @Override
-    public Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount) {
-        LocalDateTime from = switch (periodType) {
-            case HOUR -> LocalDateTime.now().minusHours(periodAmount);
-            case DAY -> LocalDateTime.now().minusDays(periodAmount);
-            case WEEK -> LocalDateTime.now().minusWeeks(periodAmount);
-            case MONTH -> LocalDateTime.now().minusMonths(periodAmount);
-        };
-
-        List<Object[]> rawData = orderItemRepository.getProfitData(from);
-
-        Map<String, BigDecimal> result = new LinkedHashMap<>();
-        int index = 1;
-        switch (periodType ) {
-            case MONTH -> index = 1;
-            case WEEK -> index = 2;
-            case DAY -> index = 3;
-            case HOUR -> index = 4;
-        }
-        for (Object[] row : rawData) {
-            String key = String.valueOf(row[index]); // formatted date
-            BigDecimal profit = (BigDecimal) row[0];
-            result.put(key, result.getOrDefault(key, new BigDecimal(0)).add(profit));
-        }
-
-        return result;
-    }
-
     public static Specification<Product> filterBy(
             Long categoryId,
             BigDecimal minPrice,
@@ -243,5 +200,31 @@ public class ProductServiceImpl implements ProductService {
 
             return predicate;
         };
+    }
+
+    @Override
+    public Product getProductOfTheDay() {
+        List<Product> productsWithDiscounts = productRepository.productsWithDiscounts();
+        if (productsWithDiscounts.isEmpty()) {
+            throw new DiscountNotFoundException("There are no products with discount");
+        }
+
+        BigDecimal maxDiscount = BigDecimal.ZERO;
+
+        for (Product product : productsWithDiscounts) {
+            if (product.getDiscountPrice().compareTo(maxDiscount) > 0) {
+                maxDiscount = product.getDiscountPrice();
+            }
+        }
+
+        List<Product> productsOfTheDay = new ArrayList<>();
+        for (Product product : productsWithDiscounts) {
+            if (product.getDiscountPrice().compareTo(maxDiscount) == 0) {
+                productsOfTheDay.add(product);
+            }
+        }
+
+        Random random = new Random();
+        return productsOfTheDay.get(random.nextInt(productsOfTheDay.size()));
     }
 }

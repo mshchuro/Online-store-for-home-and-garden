@@ -89,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
 
             Map<String, BigDecimal> result = new LinkedHashMap<>();
             int index = 1;
-            switch (periodType ) {
+            switch (periodType) {
                 case MONTH -> index = 1;
                 case WEEK -> index = 2;
                 case DAY -> index = 3;
