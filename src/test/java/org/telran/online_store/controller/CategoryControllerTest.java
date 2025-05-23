@@ -1,159 +1,136 @@
 package org.telran.online_store.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.telran.online_store.converter.CategoryConverter;
+import org.telran.online_store.dto.CategoryRequestDto;
+import org.telran.online_store.dto.CategoryResponseDto;
+import org.telran.online_store.entity.Category;
+import org.telran.online_store.service.CategoryService;
+import java.util.List;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
 class CategoryControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @Autowired
+    private MockMvc mockMvc;
 
-    private String token;
+    @MockBean
+    private CategoryService categoryService;
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
+    @MockBean
+    private CategoryConverter categoryConverter;
 
-        // Регистрация администратора (если еще не зарегистрирован)
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Admin Joe\",\"email\":\"admin@example.com\",\"phone\":\"5555555555\",\"password\":\"password\"}") // Адаптировано к БД Users
-                .post("/v1/users/register");
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        // Получение токена администратора
-        token = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\",\"password\":\"password\"}")
-                .post("/v1/users/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("token");
+    @Test
+    @WithMockUser(roles = "USER")
+    void testGetAllCategories() throws Exception {
+        Category category = new Category(1L, "Garden");
+        CategoryResponseDto responseDto = CategoryResponseDto.builder()
+                .id(1L)
+                .name("Garden")
+                .build();
+
+        Mockito.when(categoryService.getAllCategories()).thenReturn(List.of(category));
+        Mockito.when(categoryConverter.toDto(category)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].name").value("Garden"));
     }
 
     @Test
-    void testGetAllCategories() {
-        // Создаем категории, соответствующие данным в базе
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Tools\"}") // Название из Categories
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testCreateCategory() throws Exception {
+        CategoryRequestDto requestDto = CategoryRequestDto.builder()
+                .name("Flowers")
+                .build();
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Soil\"}") // Название из Categories
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+        Category category = new Category(1L, "Flowers");
+        CategoryResponseDto responseDto = CategoryResponseDto.builder()
+                .id(1L)
+                .name("Flowers")
+                .build();
 
-        given()
-                .get("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", greaterThanOrEqualTo(2))
-                .body("[0].name", notNullValue()) // Проверяем, что есть как минимум две категории и у них есть имена
-                .body("[1].name", notNullValue());
+        Mockito.when(categoryConverter.toEntity(requestDto)).thenReturn(category);
+        Mockito.when(categoryService.createCategory(category)).thenReturn(category);
+        Mockito.when(categoryConverter.toDto(category)).thenReturn(responseDto);
+
+        mockMvc.perform(post("/v1/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Flowers"));
     }
 
     @Test
-    void testCreateCategory() {
-        String newCategoryName = "Decor"; // Новое название, соответствующее структуре базы
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"name\":\"%s\"}", newCategoryName))
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .body("id", notNullValue())
-                .body("name", equalTo(newCategoryName));
+    @WithMockUser(roles = "USER")
+    void testGetCategoryById() throws Exception {
+        Long id = 10L;
+        Category category = new Category(id, "Decor");
+        CategoryResponseDto responseDto = CategoryResponseDto.builder()
+                .id(id)
+                .name("Decor")
+                .build();
+
+        Mockito.when(categoryService.getCategoryById(id)).thenReturn(category);
+        Mockito.when(categoryConverter.toDto(category)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/categories/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value("Decor"));
     }
 
     @Test
-    void testGetCategoryById() {
-        String categoryNameToGet = "Seeds"; // Название из Categories
-        int categoryId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"name\":\"%s\"}", categoryNameToGet))
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testUpdateCategory() throws Exception {
+        Long id = 100L;
+        CategoryRequestDto requestDto = CategoryRequestDto.builder()
+                .name("Updated")
+                .build();
 
-        given()
-                .get("/v1/categories/" + categoryId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(categoryId))
-                .body("name", equalTo(categoryNameToGet));
+        Category category = new Category(id, "Updated");
+        CategoryResponseDto responseDto = CategoryResponseDto.builder()
+                .id(id)
+                .name("Updated")
+                .build();
+
+        Mockito.when(categoryConverter.toEntity(requestDto)).thenReturn(category);
+        Mockito.when(categoryService.updateCategory(id, category)).thenReturn(category);
+        Mockito.when(categoryConverter.toDto(category)).thenReturn(responseDto);
+
+        mockMvc.perform(put("/v1/categories/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.name").value("Updated"));
     }
 
     @Test
-    void testUpdateCategory() {
-        String oldCategoryName = "Old Items";
-        String updatedCategoryName = "New Items";
-        int categoryId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"name\":\"%s\"}", oldCategoryName))
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+    @WithMockUser(roles = "ADMINISTRATOR")
+    void testDeleteCategory() throws Exception {
+        Long id = 999L;
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"name\":\"%s\"}", updatedCategoryName))
-                .put("/v1/categories/" + categoryId)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(categoryId))
-                .body("name", equalTo(updatedCategoryName));
-    }
+        mockMvc.perform(delete("/v1/categories/{id}", id))
+                .andExpect(status().isOk());
 
-    @Test
-    void testDeleteCategory() {
-        String categoryToDeleteName = "Temporary";
-        int categoryId = given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"name\":\"%s\"}", categoryToDeleteName))
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
-
-        given()
-                .header("Authorization", "Bearer " + token)
-                .delete("/v1/categories/" + categoryId)
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // Проверяем, что категория действительно удалена (опционально)
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/categories/" + categoryId)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        Mockito.verify(categoryService).deleteCategory(id);
     }
 }

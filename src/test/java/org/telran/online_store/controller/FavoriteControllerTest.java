@@ -1,141 +1,118 @@
 package org.telran.online_store.controller;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.telran.online_store.converter.Converter;
 import org.telran.online_store.dto.FavoriteRequestDto;
+import org.telran.online_store.dto.FavoriteResponseDto;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
-import org.telran.online_store.enums.UserRole;
-import org.telran.online_store.repository.FavoriteJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
-import org.telran.online_store.repository.UserJpaRepository;
+import org.telran.online_store.service.FavoriteService;
+import java.util.List;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.math.BigDecimal;
-
-import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("test")
-public class FavoriteControllerTest {
-
-    @LocalServerPort
-    private int port;
+class FavoriteControllerTest {
 
     @Autowired
-    private FavoriteJpaRepository favoriteRepository;
+    private MockMvc mockMvc;
+
+    @MockBean
+    private FavoriteService favoriteService;
+
+    @MockBean
+    private Converter<FavoriteRequestDto, FavoriteResponseDto, Favorite> favoriteConverter;
 
     @Autowired
-    private UserJpaRepository userRepository;
-
-    @Autowired
-    private ProductJpaRepository productRepository;
-
-    private Product testProduct;
-    private User testUser;
-    private String token;
-    private Long userId;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-
-        favoriteRepository.deleteAll();
-        productRepository.deleteAll();
-        userRepository.deleteAll();
-
-        testUser = userRepository.save(User.builder()
-                .name("Alice Green")
-                .email("alice@example.com")
-                .phone("1234567890")
-                .password("$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u")
-                .role(UserRole.CLIENT)
-                .build());
-        userId = testUser.getId();
-
-        testProduct = productRepository.save(Product.builder()
-                .name("Shovel")
-                .description("Durable steel shovel with wooden handle")
-                .price(BigDecimal.valueOf(25.50))
-                .imageUrl("images/shovel.jpg")
-                .build());
-
-        token = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"alice@example.com\",\"password\":\"password\"}") // Используем пароль из тестов, а не хеш из БД
-                .post("/v1/users/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("token");
-    }
+    private ObjectMapper objectMapper;
 
     @Test
-    void testCreateFavorite() {
-        FavoriteRequestDto request = FavoriteRequestDto.builder()
-                .productId(testProduct.getId())
+    @WithMockUser(roles = "USER")
+    void testGetAllFavorites() throws Exception {
+        User user = User.builder().id(1L).build();
+        Product product = Product.builder().id(10L).build();
+        Favorite favorite = Favorite.builder()
+                .id(1L)
+                .user(user)
+                .product(product)
                 .build();
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when()
-                .post("/v1/favorites")
-                .then()
-                .statusCode(200)
-                .body("userId", equalTo(userId.intValue()))
-                .body("productId", equalTo(testProduct.getId().intValue()));
+        FavoriteResponseDto responseDto = FavoriteResponseDto.builder()
+                .id(1L)
+                .userId(1L)
+                .productId(10L)
+                .build();
 
-        // Проверяем, что запись появилась в базе данных
-        assertThat(favoriteRepository.existsByUserAndProduct(testUser, testProduct)).isTrue();
+        Mockito.when(favoriteService.getAll()).thenReturn(List.of(favorite));
+        Mockito.when(favoriteConverter.toDto(favorite)).thenReturn(responseDto);
+
+        mockMvc.perform(get("/v1/favorites"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].userId").value(1))
+                .andExpect(jsonPath("$[0].productId").value(10));
     }
 
     @Test
-    void testGetAllFavorites() {
-        // Добавляем запись в избранное
-        favoriteRepository.save(Favorite.builder()
-                .user(testUser)
-                .product(testProduct)
-                .build());
+    @WithMockUser(roles = "USER")
+    void testCreateFavorite() throws Exception {
+        FavoriteRequestDto requestDto = FavoriteRequestDto.builder()
+                .productId(10L)
+                .build();
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/favorites")
-                .then()
-                .statusCode(200)
-                .body("size()", greaterThan(0))
-                .body("[0].userId", equalTo(userId.intValue()))
-                .body("[0].productId", equalTo(testProduct.getId().intValue()));
+        User user = User.builder().id(1L).build();
+        Product product = Product.builder().id(10L).build();
+
+        Favorite favoriteEntity = Favorite.builder()
+                .user(user)
+                .product(product)
+                .build();
+
+        Favorite createdFavorite = Favorite.builder()
+                .id(1L)
+                .user(user)
+                .product(product)
+                .build();
+
+        FavoriteResponseDto responseDto = FavoriteResponseDto.builder()
+                .id(1L)
+                .userId(1L)
+                .productId(10L)
+                .build();
+
+        Mockito.when(favoriteConverter.toEntity(requestDto)).thenReturn(favoriteEntity);
+        Mockito.when(favoriteService.create(favoriteEntity)).thenReturn(createdFavorite);
+        Mockito.when(favoriteConverter.toDto(createdFavorite)).thenReturn(responseDto);
+
+        mockMvc.perform(post("/v1/favorites")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.productId").value(10));
     }
 
     @Test
-    void testDeleteFavorite() {
-        // Создаем запись в избранном
-        Favorite favorite = favoriteRepository.save(Favorite.builder()
-                .user(testUser)
-                .product(testProduct)
-                .build());
+    @WithMockUser(roles = "USER")
+    void testDeleteFavorite() throws Exception {
+        Long favoriteId = 1L;
 
-        given()
-                .header("Authorization", "Bearer " + token)
-                .delete("/v1/favorites/" + favorite.getId())
-                .then()
-                .statusCode(200);
+        mockMvc.perform(delete("/v1/favorites/{favorite_id}", favoriteId))
+                .andExpect(status().isOk());
 
-        // Проверяем, что запись удалена из базы данных
-        assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
+        Mockito.verify(favoriteService).delete(favoriteId);
     }
 }

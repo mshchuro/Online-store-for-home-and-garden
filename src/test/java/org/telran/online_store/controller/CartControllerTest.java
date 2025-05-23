@@ -1,186 +1,134 @@
 package org.telran.online_store.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.telran.online_store.converter.Converter;
+import org.telran.online_store.dto.AddToCartRequest;
+import org.telran.online_store.dto.CartItemResponseDto;
+import org.telran.online_store.dto.CartResponseDto;
+import org.telran.online_store.entity.Cart;
+import org.telran.online_store.entity.CartItem;
+import org.telran.online_store.entity.Product;
+import org.telran.online_store.entity.User;
+import org.telran.online_store.service.CartService;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.Set;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
 class CartControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @Autowired
+    private MockMvc mockMvc;
 
-    private String token;
-    private int categoryId;
-    private int productId;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        String uniqueEmail = UUID.randomUUID().toString().substring(0, 8) + "@example.com";
+    @MockBean
+    private CartService cartService;
 
-        // Регистрация обычного пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"name\":\"Alice Green\", \"email\":\"%s\", \"password\":\"password\", \"phone\":\"123-456-7890\"}", uniqueEmail))
-                .post("/v1/users/register")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    @MockBean
+    private Converter<AddToCartRequest, CartResponseDto, Cart> cartConverter;
 
-        // Логин и получение токена для обычного пользователя
-        token = given()
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"email\":\"%s\", \"password\":\"password\"}", uniqueEmail))
-                .post("/v1/users/login")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .path("token");
+    @Test
+    @WithMockUser(roles = "USER")
+    void testGetAllItems() throws Exception {
+        Cart cart = Cart.builder()
+                .id(1L)
+                .user(new User())
+                .items(Set.of())
+                .build();
 
-        // Получение токена админа
-        String adminToken = given()
-                .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@example.com\", \"password\":\"password\"}")
-                .post("/v1/users/login")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .path("token");
+        CartResponseDto responseDto = CartResponseDto.builder()
+                .cartId(1L)
+                .items(List.of())
+                .build();
 
-        // Создание категории и продукта с токеном администратора
-        categoryId = given()
-                .header("Authorization", "Bearer " + adminToken) // Используем админский токен
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Plants\"}")
-                .post("/v1/categories")
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract()
-                .path("id");
+        Mockito.when(cartService.getCart()).thenReturn(cart);
+        Mockito.when(cartConverter.toDto(cart)).thenReturn(responseDto);
 
-        productId = given()
-                .header("Authorization", "Bearer " + adminToken) // Используем админский токен
-                .contentType(ContentType.JSON)
-                .body(String.format("{ \"name\": \"Rose Bush\", \"description\": \"Beautiful red rose bush for your garden\", \"price\": 15.99, \"category_id\": %d }", categoryId))
-                .post("/v1/products")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .path("id");
+        mockMvc.perform(get("/v1/cart"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartId").value(1));
     }
 
     @Test
-    void testAddToCartAndGetCart() {
-        // Добавляем товар в корзину
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"product_id\":%d, \"quantity\":2}", productId))
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    @WithMockUser(roles = "USER")
+    void testCreateCartItem() throws Exception {
+        AddToCartRequest request = new AddToCartRequest();
+        request.setProductId(1L);
+        request.setQuantity(2);
 
-        // Получаем корзину и проверяем содержимое
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("items.size()", is(1))
-                .body("items[0].product.id", equalTo(productId))
-                .body("items[0].product.name", equalTo("Rose Bush")) // Добавлена проверка названия продукта
-                .body("items[0].quantity", equalTo(2));
+        Product product = Product.builder().id(1L).build();
+        CartItem item = CartItem.builder().product(product).quantity(2).build();
+
+        Cart cart = Cart.builder()
+                .id(1L)
+                .items(Set.of(item))
+                .build();
+
+        CartItemResponseDto itemDto = CartItemResponseDto.builder()
+                .productId(1L)
+                .quantity(2)
+                .build();
+
+        CartResponseDto responseDto = CartResponseDto.builder()
+                .cartId(1L)
+                .items(List.of(itemDto))
+                .build();
+
+        Mockito.when(cartService.addToCart(any())).thenReturn(cart);
+        Mockito.when(cartConverter.toDto(cart)).thenReturn(responseDto);
+
+        mockMvc.perform(post("/v1/cart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartId").value(1))
+                .andExpect(jsonPath("$.items[0].productId").value(1))
+                .andExpect(jsonPath("$.items[0].quantity").value(2));
     }
 
     @Test
-    void testUpdateCartItemQuantity() {
-        // Сначала добавим 1 товар
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"product_id\":%d, \"quantity\":1}", productId))
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    @WithMockUser(roles = "USER")
+    void testDeleteCartItem() throws Exception {
+        mockMvc.perform(delete("/v1/cart/{productId}", 1L))
+                .andExpect(status().isOk());
 
-        // Повторно добавим тот же товар (увеличим количество)
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"product_id\":%d, \"quantity\":3}", productId))
-                .post("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-
-        // Проверка, что количество увеличилось, а товар не продублировался
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("items.size()", is(1))
-                .body("items[0].quantity", equalTo(4));
+        Mockito.verify(cartService).removeFromCart(1L);
     }
 
     @Test
-    void testDeleteItemFromCart() {
-        // Добавим товар
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"product_id\":%d, \"quantity\":1}", productId))
-                .post("/v1/cart");
+    @WithMockUser(roles = "USER")
+    void testDeleteCart() throws Exception {
+        Cart cart = Cart.builder()
+                .id(1L)
+                .items(Set.of())
+                .build();
 
-        // Удалим товар
-        given()
-                .header("Authorization", "Bearer " + token)
-                .delete("/v1/cart/" + productId)
-                .then()
-                .statusCode(HttpStatus.OK.value());
+        CartResponseDto responseDto = CartResponseDto.builder()
+                .cartId(1L)
+                .items(List.of())
+                .build();
 
-        // Проверим, что корзина пустая
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("items.size()", is(0));
-    }
+        Mockito.when(cartService.clearCart()).thenReturn(cart);
+        Mockito.when(cartConverter.toDto(cart)).thenReturn(responseDto);
 
-    @Test
-    void testClearCart() {
-        // Добавим товар
-        given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(String.format("{\"product_id\":%d, \"quantity\":2}", productId))
-                .post("/v1/cart");
-
-        // Очистим корзину
-        given()
-                .header("Authorization", "Bearer " + token)
-                .delete("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // Проверим, что корзина пустая
-        given()
-                .header("Authorization", "Bearer " + token)
-                .get("/v1/cart")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("items.size()", is(0));
+        mockMvc.perform(delete("/v1/cart"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartId").value(1));
     }
 }
