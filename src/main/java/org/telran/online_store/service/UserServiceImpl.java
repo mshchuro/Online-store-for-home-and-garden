@@ -13,8 +13,8 @@ import org.telran.online_store.repository.UserJpaRepository;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserJpaRepository userRepository;

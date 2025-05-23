@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.telran.online_store.dto.ProductReportDto;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface ReportApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok")
     })
-    ResponseEntity<List<String>> getTopTenPurchasedProducts();
+    ResponseEntity<List<ProductReportDto>> getTopTenPurchasedProducts();
 
     @Operation(
             summary = "Top ten cancelled products",
@@ -30,7 +31,7 @@ public interface ReportApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok")
     })
-    ResponseEntity<List<String>> getTopTenCancelledProducts();
+    ResponseEntity<List<ProductReportDto>> getTopTenCancelledProducts();
 
     @Operation(
             summary = "Not paid products",

@@ -15,6 +15,11 @@ import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.repository.*;
 
+import org.telran.online_store.repository.CartItemJpaRepository;
+import org.telran.online_store.repository.CartJpaRepository;
+import org.telran.online_store.repository.ProductJpaRepository;
+import org.telran.online_store.repository.UserJpaRepository;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -91,6 +96,10 @@ import static org.junit.jupiter.api.Assertions.*;
         var cart = cartService.getCart();
         assertNotNull(cart);
         assertEquals(1, cart.getItems().size());
+      
+        CartItem cartItem = cart.getItems().get(0);
+        assertEquals(product.getId(), cartItem.getProduct().getId());
+        assertEquals(2, cartItem.getQuantity());
     }
 
     @Test
@@ -155,5 +164,6 @@ import static org.junit.jupiter.api.Assertions.*;
         var cart = cartService.getCart();
         assertNotNull(cart);
         assertEquals(1, cart.getItems().size());
+        assertEquals(3, cart.getItems().get(0).getQuantity());
     }
 }

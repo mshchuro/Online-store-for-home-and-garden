@@ -85,6 +85,11 @@ public class CartServiceImpl implements CartService {
         cart.setItems(new HashSet<>());
         return cartRepository.save(cart);
     }
+
+    @Override
+    public Cart save(Cart cart) {
+        return cartRepository.save(cart);
+    }
 }
 
 
