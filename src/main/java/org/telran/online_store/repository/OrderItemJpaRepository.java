@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.telran.online_store.entity.OrderItem;
+import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -53,14 +54,6 @@ public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
                      AND t2.updated_at > :fromDate) as sales
     GROUP BY month, week, days, hours""", nativeQuery = true )
     List<Object[]> getProfitData(@Param("fromDate") LocalDateTime fromDate);
-
-    @Query("SELECT oi " +
-            "FROM OrderItem oi " +
-            "JOIN oi.order o " +
-            "WHERE o.status = :status " +
-            "GROUP BY oi " +
-            "ORDER BY COUNT (oi) DESC")
-    List<OrderItem> findTopByStatus(Pageable pageable , OrderStatus status);
 
     @Query("SELECT oi " +
             "FROM OrderItem oi " +

@@ -13,4 +13,6 @@ public interface CartService {
     void removeFromCart(Long productId);
 
     Cart clearCart();
+
+    Cart save(Cart cart);
 }

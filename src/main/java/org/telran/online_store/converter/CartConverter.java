@@ -6,6 +6,8 @@ import org.telran.online_store.dto.AddToCartRequest;
 import org.telran.online_store.dto.CartResponseDto;
 import org.telran.online_store.entity.Cart;
 
+import java.util.HashSet;
+
 @Component
 @RequiredArgsConstructor
 public class CartConverter implements Converter<AddToCartRequest, CartResponseDto, Cart> {

@@ -1,14 +1,11 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.telran.online_store.entity.Order;
-import org.telran.online_store.entity.OrderItem;
-import org.telran.online_store.entity.User;
+import org.telran.online_store.entity.*;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.OrderNotFoundException;
@@ -19,8 +16,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +29,10 @@ public class OrderServiceImpl implements OrderService {
 
     private final UserService userService;
 
+    private final CartService cartService;
+  
+    private final ProductService productService;
+  
     private final OrderItemJpaRepository orderItemRepository;
 
     @Override
@@ -59,7 +62,29 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order create(Order order) {
         User currentUser = userService.getCurrentUser();
+
+        Cart cart = cartService.getCart();
+        Set<CartItem> cartItems = cart.getItems();
+
+        List<OrderItem> orderItems = order.getItems();
+
+        Map<Long, CartItem> map = new HashMap<>();
+        for (CartItem cartItem : cartItems) {
+            map.put(cartItem.getProduct().getId(), cartItem);
+        }
+
+        for (OrderItem orderItem: orderItems){
+            CartItem item = map.get(orderItem.getProduct().getId());
+            if(item == null){
+                continue;
+            }
+            cartItems.remove(item);
+            map.remove(orderItem.getProduct().getId());
+
+        }
+
         order.setUser(currentUser);
+        cartService.save(cart);
         return orderRepository.save(order);
     }
 
