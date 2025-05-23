@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

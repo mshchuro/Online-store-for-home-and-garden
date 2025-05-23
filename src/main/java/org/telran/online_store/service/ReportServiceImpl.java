@@ -2,9 +2,7 @@ package org.telran.online_store.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.entity.OrderItem;
@@ -16,20 +14,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    private EntityManager entityManager;
-
-    private static final int PAGE_NUMBER = 0;
-
-    private static final int PAGE_SIZE = 10;
+    private final EntityManager entityManager;
 
     private final OrderService orderService;
-
-    public ReportServiceImpl(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     public List<ProductReportDto> getTopOrdered() {
         return getTopProductsByOrderStatus(OrderStatus.DELIVERED);
