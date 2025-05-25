@@ -12,7 +12,7 @@ public record UserRegistrationRequest(
         String name,
 
         @NotBlank
-        @Email
+        @Email(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
         @Schema(description = "Email", example = "smith@mail.com")
         String email,
 
