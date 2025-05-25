@@ -165,8 +165,7 @@ public class ProductServiceImpl implements ProductService {
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
-            Boolean discount
-    ) {
+            Boolean discount ) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 

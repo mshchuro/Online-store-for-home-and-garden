@@ -35,21 +35,21 @@
 
 ## Technology Stack
 
-| Layer                 | Technology                     |
-|----------------------|--------------------------------|
-| Backend Framework     | Spring Boot 2.x                |
-| Language              | Java 11+                       |
-| Database              | PostgreSQL                     |
-| ORM                   | Spring Data JPA / Hibernate    |
-| Authentication        | Spring Security + JWT          |
-| Migrations            | Liquibase / Flyway             |
-| Documentation         | Swagger / OpenAPI              |
-| Containerization      | Docker                         |
-| API Format            | RESTful, JSON                  |
+| Layer                 | Technology                   |
+|----------------------|------------------------------|
+| Backend Framework     | Spring Boot 3.3.8            |
+| Language              | Java 17                      |
+| Database              | PostgreSQL, H2 (for testing) |
+| ORM                   | Spring Data JPA / Hibernate  |
+| Authentication        | Spring Security + JWT        |
+| Migrations            | Liquibase / Flyway           |
+| Documentation         | Swagger / OpenAPI            |
+| Containerization      | Docker                       |
+| API Format            | RESTful, JSON                |
 
 ---
 
 ### Team Members:
 - [Maksims Ščurovskis]  (mshchurovskiy@gmail.com) Team Lead
-- [Yuliya Fralova] ()
-- [Vlada Isačenkova ] ()
+- [Yuliya Fralova] (jmabracodabra@gmail.com)
+- [Vlada Isačenkova ] (vlada.is.95@inbox.lv)
