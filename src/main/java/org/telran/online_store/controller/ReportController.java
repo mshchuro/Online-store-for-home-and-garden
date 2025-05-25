@@ -41,7 +41,6 @@ public class ReportController implements ReportApi {
     }
 
     @Override
-    // @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/topTenCancelledProducts")
     public ResponseEntity<List<ProductReportDto>> getTopTenCancelledProducts() {
         return ResponseEntity.status(HttpStatus.OK)
@@ -49,28 +48,16 @@ public class ReportController implements ReportApi {
     }
 
     @Override
-    // @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/notPaidProducts/{days}")
-    public ResponseEntity<List<String>> getNotPaidProducts(@PathVariable Long days) {
+    public ResponseEntity<List<ProductReportDto>> getNotPaidProducts(@PathVariable Long days) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(reportService.getNotPaid(days)
-                        .stream()
-                        .map(Product::getName)
-                        .collect(Collectors.toList()));
+                .body(reportService.getNotPaid(days));
     }
 
-    @Operation(
-            summary = "Profit Report",
-            description = "Returns total profit for a given period grouped by hour/day/week/month"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok")
-    })
     @GetMapping("/profit")
     public ResponseEntity<Map<String, BigDecimal>> getProfitReport(
             @RequestParam PeriodType periodType,
-            @RequestParam Long periodAmount
-    ) {
+            @RequestParam Long periodAmount) {
         return ResponseEntity.ok(reportService.getProfitReport(periodType, periodAmount));
     }
 }

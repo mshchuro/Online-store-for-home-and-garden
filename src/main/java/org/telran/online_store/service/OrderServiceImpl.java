@@ -129,9 +129,4 @@ public class OrderServiceImpl implements OrderService {
 
             return result;
     }
-
-    @Override
-    public List<OrderItem> getNotPaid(LocalDateTime dateTime) {
-        return orderItemRepository.findNotPaidProducts(dateTime);
-    }
 }
