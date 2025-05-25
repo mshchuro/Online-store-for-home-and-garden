@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.enums.PeriodType;
-
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

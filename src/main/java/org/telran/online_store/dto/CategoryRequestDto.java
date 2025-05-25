@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-//@JsonIgnoreProperties(ignoreUnknown = false) Надо ли?
 public record CategoryRequestDto(
 
         @NotBlank(message = "Category name must not be blank")

@@ -20,7 +20,6 @@ public class CartController implements CartApi{
 
     private final Converter<AddToCartRequest, CartResponseDto, Cart> cartConverter;
 
-
     @GetMapping()
     @Override
     public ResponseEntity<CartResponseDto> getAllItems() {

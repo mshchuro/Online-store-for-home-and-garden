@@ -11,7 +11,6 @@ import org.telran.online_store.dto.CategoryRequestDto;
 import org.telran.online_store.dto.CategoryResponseDto;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.service.CategoryService;
-
 import java.util.List;
 
 @RestController

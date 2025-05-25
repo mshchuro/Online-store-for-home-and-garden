@@ -18,7 +18,6 @@ import org.telran.online_store.dto.UserUpdateResponseDto;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 import org.telran.online_store.security.SignInRequest;
 import org.telran.online_store.security.SignInResponse;
-
 import java.util.List;
 
 @Tag(name = "User management", description = "API endpoints for managing users")
