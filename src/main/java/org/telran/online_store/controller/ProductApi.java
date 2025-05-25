@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.ProductRequestDto;
 import org.telran.online_store.dto.ProductResponseDto;
 import org.telran.online_store.handler.GlobalExceptionHandler;
-
 import java.math.BigDecimal;
 import java.util.List;
 

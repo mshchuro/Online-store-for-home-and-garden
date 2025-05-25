@@ -5,12 +5,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
-
 import org.telran.online_store.entity.Product;
-
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.repository.CategoryJpaRepository;
-
 import java.util.List;
 
 @RequiredArgsConstructor

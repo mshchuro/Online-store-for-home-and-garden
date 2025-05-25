@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.UserNotFoundException;
 import org.telran.online_store.exception.UserNotUniqueException;
 import org.telran.online_store.repository.UserJpaRepository;
-
 import java.util.List;
 
 @Service

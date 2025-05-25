@@ -2,7 +2,6 @@ package org.telran.online_store.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Entity

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.UserNotFoundException;
 import org.telran.online_store.service.UserService;
-
 import java.util.List;
 
 @Slf4j

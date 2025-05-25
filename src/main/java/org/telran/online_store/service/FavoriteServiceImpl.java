@@ -9,7 +9,6 @@ import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.*;
 import org.telran.online_store.repository.FavoriteJpaRepository;
-
 import java.util.List;
 
 @RequiredArgsConstructor
