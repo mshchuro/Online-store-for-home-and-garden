@@ -1,79 +1,17 @@
 package org.telran.online_store.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.AbstractTests;
 import org.telran.online_store.entity.Order;
-import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.exception.OrderNotFoundException;
-import org.telran.online_store.repository.FavoriteJpaRepository;
-import org.telran.online_store.repository.OrderJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
-import org.telran.online_store.repository.UserJpaRepository;
-
-import java.math.BigDecimal;
 import java.util.List;
 
-
-//@SpringBootTest
-//@ActiveProfiles("test")
     class OrderServiceImplTest extends AbstractTests {
-//
-//    @Autowired
-//    private OrderService orderService;
-//
-//    @Autowired
-//    private OrderJpaRepository orderRepo;
-//
-//    @Autowired
-//    private UserJpaRepository userRepo;
-//
-//    @Autowired
-//    private ProductJpaRepository productRepo;
-//
-//    @Autowired
-//    private FavoriteJpaRepository favoriteRepo;
-//
-//    private User testUser;
-//
-//    @BeforeEach
-//    void setUp() {
-//        orderRepo.deleteAll();
-//        favoriteRepo.deleteAll();
-//        productRepo.deleteAll();
-//        userRepo.deleteAll();
-//
-//        testUser = User.builder()
-//                .name("Test User")
-//                .email("test@example.com")
-//                .phone("1234567890")
-//                .password("password")
-//                .role(UserRole.CLIENT)
-//                .build();
-//        testUser = userRepo.save(testUser);
-//
-//        Product testProduct = Product.builder()
-//                .name("Test Product")
-//                .description("Description")
-//                .price(BigDecimal.valueOf(100))
-//                .imageUrl("image.jpg")
-//                .build();
-//        testProduct = productRepo.save(testProduct);
-//
-//        UsernamePasswordAuthenticationToken auth =
-//                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//    }
 
     @Test
     void testCreateOrder() {

@@ -1,85 +1,21 @@
 package org.telran.online_store.service;
 
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.AbstractTests;
+import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
-import org.telran.online_store.enums.UserRole;
-import org.telran.online_store.repository.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-//@SpringBootTest
-//@ActiveProfiles("test")
+
     class ReportServiceImplTest extends AbstractTests {
-//
-//    @Autowired
-//    private ReportService reportService;
-//
-//    @Autowired
-//    private OrderService orderService;
-//
-//    @Autowired
-//    private UserJpaRepository userRepo;
-//
-//    @Autowired
-//    private ProductJpaRepository productRepo;
-//
-//    @Autowired
-//    private FavoriteJpaRepository favoriteRepo;
-//
-//    @Autowired
-//    private OrderJpaRepository orderRepo;
-//
-//    @Autowired
-//    private OrderItemJpaRepository orderItemRepo;
-//
-//    private User testUser;
-//    private Product testProduct;
-//
-//    @BeforeEach
-//    void setUp() {
-//        orderItemRepo.deleteAll();
-//        orderRepo.deleteAll();
-//        favoriteRepo.deleteAll();
-//        productRepo.deleteAll();
-//        userRepo.deleteAll();
-//
-//        testUser = User.builder()
-//                .name("Test User")
-//                .email("test@example.com")
-//                .phone("1234567890")
-//                .password("password")
-//                .role(UserRole.CLIENT)
-//                .build();
-//        testUser = userRepo.save(testUser);
-//
-//        testProduct = Product.builder()
-//                .name("Test Product")
-//                .description("Description")
-//                .price(BigDecimal.valueOf(100))
-//                .imageUrl("image.jpg")
-//                .build();
-//        testProduct = productRepo.save(testProduct);
-//
-//        UsernamePasswordAuthenticationToken auth =
-//                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//    }
 
     @Test
     void testGetTopOrderedProducts() {
@@ -95,9 +31,10 @@ import static org.junit.jupiter.api.Assertions.*;
                 .build();
         orderItemRepo.save(item);
 
-        List<Product> topOrdered = reportService.getTopOrdered();
-        assertEquals(1, topOrdered.size());
-        assertEquals(product.getId(), topOrdered.get(0).getId());
+        List<ProductReportDto> topOrdered = reportService.getTopOrdered();
+        assertEquals(1, topOrdered.size(), "One ordered product expected");
+        assertEquals(product.getId(), topOrdered.get(0).id());
+        assertEquals(5L, topOrdered.get(0).count());
     }
 
     @Test
@@ -114,9 +51,10 @@ import static org.junit.jupiter.api.Assertions.*;
                 .build();
         orderItemRepo.save(item);
 
-        List<Product> topCancelled = reportService.getTopCancelled();
-        assertEquals(1, topCancelled.size());
-        assertEquals(product.getId(), topCancelled.get(0).getId());
+        List<ProductReportDto> topCancelled = reportService.getTopCancelled();
+        assertEquals(1, topCancelled.size(), "One cancelled product expected");
+        assertEquals(product.getId(), topCancelled.get(0).id());
+        assertEquals(3L, topCancelled.get(0).count());
     }
 
     @Test

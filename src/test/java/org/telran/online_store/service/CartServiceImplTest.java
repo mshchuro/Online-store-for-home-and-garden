@@ -1,89 +1,14 @@
 package org.telran.online_store.service;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.AbstractTests;
 import org.telran.online_store.dto.AddToCartRequest;
-import org.telran.online_store.entity.Product;
-import org.telran.online_store.entity.User;
-import org.telran.online_store.enums.UserRole;
-import org.telran.online_store.repository.*;
-
-import org.telran.online_store.repository.CartItemJpaRepository;
-import org.telran.online_store.repository.CartJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
-import org.telran.online_store.repository.UserJpaRepository;
-
-import java.math.BigDecimal;
-import java.util.List;
-
+import org.telran.online_store.entity.CartItem;
 import static org.junit.jupiter.api.Assertions.*;
 
-//@SpringBootTest
-//@ActiveProfiles("test")
 @Transactional
-    public class CartServiceImplTest extends AbstractTests {
-//
-//    @Autowired
-//    private CartService cartService;
-//
-//    @Autowired
-//    private UserJpaRepository userRepo;
-//
-//    @Autowired
-//    private ProductJpaRepository productRepo;
-//
-//    @Autowired
-//    private CartJpaRepository cartRepo;
-//
-//    @Autowired
-//    private OrderJpaRepository orderRepo;
-//
-//    @Autowired
-//    private FavoriteJpaRepository favoriteRepo;
-//
-//    @Autowired
-//    private CartItemJpaRepository cartItemRepo;
-//
-//    private User testUser;
-//    private Product testProduct;
-//
-//    @BeforeEach
-//    void setUp() {
-//        orderRepo.deleteAll();
-//        favoriteRepo.deleteAll();
-//        cartItemRepo.deleteAll();
-//        cartRepo.deleteAll();
-//        productRepo.deleteAll();
-//        userRepo.deleteAll();
-//
-//        testUser = User.builder()
-//                .name("Test User")
-//                .email("test@example.com")
-//                .phone("1234567890")
-//                .password("password")
-//                .role(UserRole.CLIENT)
-//                .build();
-//        testUser = userRepo.save(testUser);
-//
-//        testProduct = Product.builder()
-//                .name("Test Product")
-//                .description("Description")
-//                .price(BigDecimal.valueOf(100))
-//                .imageUrl("image.jpg")
-//                .build();
-//        testProduct = productRepo.save(testProduct);
-//
-//        UsernamePasswordAuthenticationToken auth =
-//                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//    }
+public class CartServiceImplTest extends AbstractTests {
 
     @Test
     public void testAddToCart() {
@@ -96,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
         var cart = cartService.getCart();
         assertNotNull(cart);
         assertEquals(1, cart.getItems().size());
-      
-        CartItem cartItem = cart.getItems().get(0);
-        assertEquals(product.getId(), cartItem.getProduct().getId());
+
+        CartItem cartItem = cart.getItems().iterator().next();
+        assertEquals(testProduct.getId(), cartItem.getProduct().getId());
         assertEquals(2, cartItem.getQuantity());
     }
 
@@ -164,6 +89,8 @@ import static org.junit.jupiter.api.Assertions.*;
         var cart = cartService.getCart();
         assertNotNull(cart);
         assertEquals(1, cart.getItems().size());
-        assertEquals(3, cart.getItems().get(0).getQuantity());
+
+        CartItem cartItem = cart.getItems().iterator().next();
+        assertEquals(3, cartItem.getQuantity());
     }
 }
