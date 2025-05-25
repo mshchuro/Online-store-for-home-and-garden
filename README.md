@@ -9,13 +9,13 @@
 - [rest api](https://confirmed-baron-2e5.notion.site/REST-API-f186cf63a46c4020b2237f73093922ab)
 
 ---
-## General description
+## Description of the project
 
 ### This is a full-featured backend service for an online store focused on home and garden products. Customers can browse the catalog, add products to the cart, and place orders. Admins manage the catalog, orders, discounts, and view sales analytics. Role-based access is implemented for users and administrators.
 
 ---
 
-## Screenshot of the project's main page
+## Main page screenshot
 
 ![Swagger UI](assets/swagger-screenshot.png)
 
