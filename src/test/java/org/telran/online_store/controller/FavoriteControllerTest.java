@@ -50,7 +50,6 @@ class FavoriteControllerTest {
 
         FavoriteResponseDto responseDto = FavoriteResponseDto.builder()
                 .id(1L)
-                .userId(1L)
                 .productId(10L)
                 .build();
 
@@ -61,7 +60,6 @@ class FavoriteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].userId").value(1))
                 .andExpect(jsonPath("$[0].productId").value(10));
     }
 
@@ -88,7 +86,6 @@ class FavoriteControllerTest {
 
         FavoriteResponseDto responseDto = FavoriteResponseDto.builder()
                 .id(1L)
-                .userId(1L)
                 .productId(10L)
                 .build();
 
@@ -101,7 +98,6 @@ class FavoriteControllerTest {
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.productId").value(10));
     }
 

@@ -35,7 +35,6 @@ public class FavoriteController implements FavoriteApi{
     @PostMapping()
     @Override
     public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto) {
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(favoriteConverter.toDto(favoriteService.create(favoriteConverter.toEntity(requestDto))));
     }
