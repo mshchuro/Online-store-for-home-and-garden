@@ -31,11 +31,4 @@ public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
                      AND t2.updated_at > :fromDate) as sales
     GROUP BY month, week, days, hours""", nativeQuery = true )
     List<Object[]> getProfitData(@Param("fromDate") LocalDateTime fromDate);
-
-    @Query("SELECT oi " +
-            "FROM OrderItem oi " +
-            "JOIN oi.order o " +
-            "WHERE o.status = 'PAYMENT_PENDING' AND o.updatedAt < :thresholdDate " +
-            "GROUP BY oi")
-    List<OrderItem> findNotPaidProducts(@Param(value = "thresholdDate") LocalDateTime thresholdDate);
 }

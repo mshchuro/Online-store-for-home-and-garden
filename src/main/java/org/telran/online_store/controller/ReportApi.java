@@ -45,7 +45,7 @@ public interface ReportApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok")
     })
-    ResponseEntity<List<String>> getNotPaidProducts(@PathVariable Long days);
+    ResponseEntity<List<ProductReportDto>> getNotPaidProducts(@PathVariable Long days);
 
     @Operation(
             summary = "Profit Report",
@@ -57,6 +57,5 @@ public interface ReportApi {
     @GetMapping("/profit")
     ResponseEntity<Map<String, BigDecimal>> getProfitReport(
             @RequestParam PeriodType periodType,
-            @RequestParam Long periodAmount
-    );
+            @RequestParam Long periodAmount);
 }

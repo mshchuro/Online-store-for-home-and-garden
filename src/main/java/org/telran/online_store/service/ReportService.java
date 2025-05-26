@@ -13,7 +13,7 @@ public interface ReportService {
 
     List<ProductReportDto> getTopCancelled();
 
-    List<Product> getNotPaid(Long days);
+    List<ProductReportDto> getNotPaid(Long days);
 
     Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount);
 }

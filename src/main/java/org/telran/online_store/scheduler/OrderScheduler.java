@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.service.OrderService;
+
 import java.util.List;
 import java.util.Random;
 

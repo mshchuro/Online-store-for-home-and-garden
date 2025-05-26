@@ -64,6 +64,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleAllUnexpectedExceptions(Exception e) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("Internal server error: " + e.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @Builder
     public record ValidationErrorResponse(
             @Schema(example = "400")
@@ -106,6 +116,15 @@ public class GlobalExceptionHandler {
             int status,
 
             @Schema(example = "Access denied")
+            String message) {
+    }
+
+    @Builder
+    public record ErrorResponse(
+            @Schema(example = "500")
+            int status,
+
+            @Schema(example = "Internal server error")
             String message) {
     }
 }

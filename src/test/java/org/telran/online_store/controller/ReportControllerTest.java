@@ -1,6 +1,5 @@
 package org.telran.online_store.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,7 +9,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.telran.online_store.entity.Product;
+import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.service.ReportService;
 
 import java.util.List;
@@ -25,54 +24,50 @@ class ReportControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private ReportService reportService;
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
     void testGetTopTenPurchasedProducts() throws Exception {
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("Product A");
+        ProductReportDto productC = new ProductReportDto(3L, "Product C");
+        ProductReportDto productA = new ProductReportDto(1L, "Product A");
+        ProductReportDto productB = new ProductReportDto(2L, "Product B");
 
-        Mockito.when(reportService.getTopOrdered()).thenReturn(List.of(product));
+        Mockito.when(reportService.getTopOrdered()).thenReturn(
+                List.of(productC, productA, productB));
 
         mockMvc.perform(get("/v1/reports/topTenPurchasedProducts")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("Product A"));
+                .andExpect(jsonPath("$[0].name").value("Product C"))
+                .andExpect(jsonPath("$[1].name").value("Product A"))
+                .andExpect(jsonPath("$[2].name").value("Product B"));
     }
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
     void testGetTopTenCancelledProducts() throws Exception {
-        Product product = new Product();
-        product.setId(2L);
-        product.setName("Product B");
+        ProductReportDto product = new ProductReportDto(2L, "Product B");
 
         Mockito.when(reportService.getTopCancelled()).thenReturn(List.of(product));
 
         mockMvc.perform(get("/v1/reports/topTenCancelledProducts")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("Product B"));
+                .andExpect(jsonPath("$[0].name").value("Product B"));
     }
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
     void testGetNotPaidProducts() throws Exception {
-        Product product = new Product();
-        product.setId(3L);
-        product.setName("Product C");
+        ProductReportDto product = new ProductReportDto(3L, "Product C");
 
-        Mockito.when(reportService.getNotPaid(7L)).thenReturn(List.of(product));
+        Mockito.when(reportService.getNotPaid(Mockito.anyLong())).thenReturn(List.of(product));
 
         mockMvc.perform(get("/v1/reports/notPaidProducts/{days}", 7L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("Product C"));
+                .andExpect(jsonPath("$[0].name").value("Product C"));
     }
 }

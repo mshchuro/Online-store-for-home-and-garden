@@ -24,6 +24,4 @@ public interface OrderService {
     void updateStatus(Long orderId, OrderStatus newStatus);
 
     Map<String, BigDecimal> getProfitReport(PeriodType periodType, Long periodAmount);
-
-    List<OrderItem> getNotPaid(LocalDateTime dateTime);
 }

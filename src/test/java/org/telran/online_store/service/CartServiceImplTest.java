@@ -10,6 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.telran.online_store.AbstractTests;
 import org.telran.online_store.dto.AddToCartRequest;
+import org.telran.online_store.entity.Cart;
+import org.telran.online_store.entity.CartItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.UserRole;
@@ -97,8 +99,8 @@ import static org.junit.jupiter.api.Assertions.*;
         assertNotNull(cart);
         assertEquals(1, cart.getItems().size());
       
-        CartItem cartItem = cart.getItems().get(0);
-        assertEquals(product.getId(), cartItem.getProduct().getId());
+        CartItem cartItem = cart.getItems().iterator().next();
+        assertEquals(testProduct.getId(), cartItem.getProduct().getId());
         assertEquals(2, cartItem.getQuantity());
     }
 
@@ -161,9 +163,11 @@ import static org.junit.jupiter.api.Assertions.*;
         request.setQuantity(3);
         cartService.addToCart(request);
 
-        var cart = cartService.getCart();
+        Cart cart = cartService.getCart();
+        CartItem item = cart.getItems().iterator().next();
+
         assertNotNull(cart);
         assertEquals(1, cart.getItems().size());
-        assertEquals(3, cart.getItems().get(0).getQuantity());
+        assertEquals(3, item.getQuantity());
     }
 }
