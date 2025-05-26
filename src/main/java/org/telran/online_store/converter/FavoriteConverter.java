@@ -19,7 +19,6 @@ public class FavoriteConverter implements Converter<FavoriteRequestDto, Favorite
         return FavoriteResponseDto
                 .builder()
                 .id(favorite.getId())
-                .userId(favorite.getUser().getId())
                 .productId(favorite.getProduct().getId())
                 .build();
     }

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.ProductRequestDto;
 import org.telran.online_store.dto.ProductResponseDto;
+import org.telran.online_store.dto.ProductUpdateRequestDto;
 import org.telran.online_store.handler.GlobalExceptionHandler;
 import java.math.BigDecimal;
 import java.util.List;
@@ -104,7 +105,7 @@ public interface ProductApi {
                     {@Content(mediaType = "application/json", schema =
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
-    ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductRequestDto dto);
+    ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductUpdateRequestDto dto);
 
     @Operation(
             summary = "Product deleting",

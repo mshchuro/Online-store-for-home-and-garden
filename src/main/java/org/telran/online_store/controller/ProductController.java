@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.converter.Converter;
+import org.telran.online_store.converter.ProductUpdateConverter;
 import org.telran.online_store.dto.ProductRequestDto;
 import org.telran.online_store.dto.ProductResponseDto;
+import org.telran.online_store.dto.ProductUpdateRequestDto;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ProductService;
 
@@ -25,6 +27,7 @@ public class ProductController implements ProductApi {
     private final ProductService productService;
 
     private final Converter<ProductRequestDto, ProductResponseDto, Product> productConverter;
+    private final ProductUpdateConverter productUpdateConverter;
 
     @GetMapping()
     @Override
@@ -57,9 +60,9 @@ public class ProductController implements ProductApi {
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @Override
-    public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductRequestDto dto) {
-        Product product = productService.updateProduct(productId, productConverter.toEntity(dto));
-        return ResponseEntity.ok(productConverter.toDto(product));
+    public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductUpdateRequestDto dto) {
+        Product product = productService.updateProduct(productId, productUpdateConverter.toEntity(dto));
+        return ResponseEntity.ok(productUpdateConverter.toDto(product));
     }
 
     @DeleteMapping("/{productId}")
