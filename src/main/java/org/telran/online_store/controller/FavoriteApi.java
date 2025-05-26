@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.dto.FavoriteResponseDto;
 import org.telran.online_store.handler.GlobalExceptionHandler;
-
 import java.util.List;
 
 @Tag(name = "Favorite Product", description = "API endpoints for favorite products. Authorisation is required for all end-points")

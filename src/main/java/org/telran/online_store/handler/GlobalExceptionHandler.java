@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.telran.online_store.exception.*;
-
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(e.getMessage())
                 .build();
+
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -60,6 +60,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.FORBIDDEN.value())
                 .message(e.getMessage())
                 .build();
+
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 

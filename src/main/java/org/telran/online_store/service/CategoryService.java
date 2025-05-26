@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import org.telran.online_store.entity.Category;
-
 import java.util.List;
 
 public interface CategoryService {

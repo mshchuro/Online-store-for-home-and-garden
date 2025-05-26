@@ -2,7 +2,6 @@ package org.telran.online_store.service;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.DiscountNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
@@ -19,14 +17,11 @@ import org.telran.online_store.repository.CategoryJpaRepository;
 import org.telran.online_store.repository.FavoriteJpaRepository;
 import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -170,8 +165,7 @@ public class ProductServiceImpl implements ProductService {
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
-            Boolean discount
-    ) {
+            Boolean discount ) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 

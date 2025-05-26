@@ -11,7 +11,6 @@ import org.telran.online_store.dto.FavoriteRequestDto;
 import org.telran.online_store.dto.FavoriteResponseDto;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.service.FavoriteService;
-
 import java.util.List;
 
 @Slf4j

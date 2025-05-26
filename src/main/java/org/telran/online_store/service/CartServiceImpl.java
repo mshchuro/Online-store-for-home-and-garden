@@ -11,7 +11,6 @@ import org.telran.online_store.entity.User;
 import org.telran.online_store.exception.CartItemNotFoundException;
 import org.telran.online_store.exception.CartNotFoundException;
 import org.telran.online_store.repository.CartJpaRepository;
-
 import java.util.HashSet;
 
 @RequiredArgsConstructor

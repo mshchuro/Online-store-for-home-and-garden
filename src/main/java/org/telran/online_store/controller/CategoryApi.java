@@ -14,7 +14,6 @@ import org.telran.online_store.dto.CategoryRequestDto;
 import org.telran.online_store.dto.CategoryResponseDto;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.handler.GlobalExceptionHandler;
-
 import java.util.List;
 
 @Tag(name = "Category", description = "API endpoints for product categories")
