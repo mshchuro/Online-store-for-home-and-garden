@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.telran.online_store.dto.ProductRequestDto;
 import org.telran.online_store.dto.ProductResponseDto;
 import org.telran.online_store.dto.ProductUpdateRequestDto;
+import org.telran.online_store.entity.Product;
 import org.telran.online_store.handler.GlobalExceptionHandler;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -121,4 +123,16 @@ public interface ProductApi {
                     @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
     })
     ResponseEntity<Void> deleteById(@PathVariable Long productId);
+
+    @Operation(
+            summary = "Product of the day",
+            description = "Shows a product with maximum discount"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "404", description = "Not found", content =
+                    {@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = GlobalExceptionHandler.NotFoundErrorResponse.class))})
+    })
+    ResponseEntity<ProductResponseDto> getProductOfTheDay();
 }

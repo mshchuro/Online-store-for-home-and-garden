@@ -17,6 +17,7 @@ import org.telran.online_store.repository.CategoryJpaRepository;
 import org.telran.online_store.repository.FavoriteJpaRepository;
 import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
+
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.ArrayList;
@@ -165,11 +166,11 @@ public class ProductServiceImpl implements ProductService {
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
-            Boolean discount ) {
+            Boolean discount) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 
-            if(categoryId != null){
+            if (categoryId != null) {
                 predicate = cb.and(predicate, cb.equal(root.get("category").get("id"), categoryId));
             }
 
@@ -186,7 +187,7 @@ public class ProductServiceImpl implements ProductService {
                         cb.isNotNull(root.get("discountPrice")),
                         cb.lessThan(root.get("discountPrice"), root.get("price"))
                 );
-            } else if (discount != null){
+            } else if (discount != null) {
                 predicate = cb.or(
                         cb.isNull(root.get("discountPrice"))
                 );
@@ -198,27 +199,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductOfTheDay() {
-        List<Product> productsWithDiscounts = productRepository.productsWithDiscounts();
-        if (productsWithDiscounts.isEmpty()) {
+        List<Product> productsWithMaxDiscounts = productRepository.productsWithDiscounts();
+        if (productsWithMaxDiscounts.isEmpty()) {
             throw new DiscountNotFoundException("There are no products with discount");
         }
+        return productsWithMaxDiscounts.get(new Random().nextInt(productsWithMaxDiscounts.size()));
 
-        BigDecimal maxDiscount = BigDecimal.ZERO;
-
-        for (Product product : productsWithDiscounts) {
-            if (product.getDiscountPrice().compareTo(maxDiscount) > 0) {
-                maxDiscount = product.getDiscountPrice();
-            }
-        }
-
-        List<Product> productsOfTheDay = new ArrayList<>();
-        for (Product product : productsWithDiscounts) {
-            if (product.getDiscountPrice().compareTo(maxDiscount) == 0) {
-                productsOfTheDay.add(product);
-            }
-        }
-
-        Random random = new Random();
-        return productsOfTheDay.get(random.nextInt(productsOfTheDay.size()));
     }
 }

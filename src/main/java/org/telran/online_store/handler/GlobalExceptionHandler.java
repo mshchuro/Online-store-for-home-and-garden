@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.telran.online_store.exception.*;
+
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ProductNotFoundException.class, UserNotFoundException.class
-            , CategoryNotFoundException.class, FavoriteNotFoundException.class, OrderNotFoundException.class,
-            CartNotFoundException.class, CartItemNotFoundException.class})
+    @ExceptionHandler({ProductNotFoundException.class, UserNotFoundException.class,
+            CategoryNotFoundException.class, FavoriteNotFoundException.class, OrderNotFoundException.class,
+            CartNotFoundException.class, CartItemNotFoundException.class, DiscountNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<NotFoundErrorResponse> handleEntityNotFoundException(Exception e) {
         NotFoundErrorResponse response = NotFoundErrorResponse.builder()
