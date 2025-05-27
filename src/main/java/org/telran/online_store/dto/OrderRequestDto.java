@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 public record OrderRequestDto(
 
+        @NotNull
         @Schema(description = "List of order items", example = """
                                                                 {"productId: 1,
                                                                 "quantity": 1,
