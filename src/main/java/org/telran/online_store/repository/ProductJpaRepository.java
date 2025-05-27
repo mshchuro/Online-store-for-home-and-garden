@@ -26,6 +26,4 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
             """)
     List<Product> productsWithDiscounts();
 
-//    @Query("SELECT product FROM Product product WHERE product.discountPrice > 0")
-//    List<Product> productsWithDiscounts();
 }

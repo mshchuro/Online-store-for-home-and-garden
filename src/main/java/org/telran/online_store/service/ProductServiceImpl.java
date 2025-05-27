@@ -4,7 +4,6 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
@@ -68,7 +67,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Modifying
     @Transactional
     public Product create(Product product) {
         Long categoryId = Optional.ofNullable(product.getCategory()).map(Category::getId).orElse(null);
@@ -93,7 +91,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Modifying
     @Transactional
     public Product updateProduct(Long id, Product product) {
         Product existingProduct = productRepository.findById(id)
@@ -147,6 +144,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void updateCategory(Long id, Category category) {
         Product product = getById(id);
         product.setCategory(category);

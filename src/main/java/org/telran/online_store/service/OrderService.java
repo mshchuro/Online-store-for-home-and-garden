@@ -1,11 +1,9 @@
 package org.telran.online_store.service;
 
 import org.telran.online_store.entity.Order;
-import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.enums.OrderStatus;
 import org.telran.online_store.enums.PeriodType;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 

@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    @Modifying
     @Transactional
     public Favorite create(Favorite favorite) {
         favorite.setUser(userService.getCurrentUser());

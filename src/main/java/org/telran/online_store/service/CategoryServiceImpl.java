@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
@@ -24,7 +23,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Modifying
     @Transactional
     public Category createCategory(Category category) {
         return categoryRepository.save(category);
@@ -46,7 +44,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Modifying
     @Transactional
     public Category updateCategory(Long id, Category category) {
         Category entity = getCategoryById(id);

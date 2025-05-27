@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
 
-    void removeAllByProduct_Id(Long productId);
-
     @Query( value = """
     SELECT
     sum(sales.total),
