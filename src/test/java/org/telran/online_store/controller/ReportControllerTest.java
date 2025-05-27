@@ -1,6 +1,5 @@
 package org.telran.online_store.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.telran.online_store.dto.ProductReportDto;
-import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.service.ReportService;
 
@@ -31,16 +29,13 @@ class ReportControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private ReportService reportService;
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
     void testGetTopTenPurchasedProducts() throws Exception {
-        ProductReportDto dto = new ProductReportDto(1L, "Product A", 10L);
+        ProductReportDto dto = new ProductReportDto(1L, "Product A");
 
         Mockito.when(reportService.getTopOrdered()).thenReturn(List.of(dto));
 
@@ -48,14 +43,13 @@ class ReportControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("Product A"))
-                .andExpect(jsonPath("$[0].count").value(10));
+                .andExpect(jsonPath("$[0].name").value("Product A"));
     }
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
     void testGetTopTenCancelledProducts() throws Exception {
-        ProductReportDto dto = new ProductReportDto(2L, "Product B", 5L);
+        ProductReportDto dto = new ProductReportDto(2L, "Product B");
 
         Mockito.when(reportService.getTopCancelled()).thenReturn(List.of(dto));
 
@@ -63,23 +57,21 @@ class ReportControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(2))
-                .andExpect(jsonPath("$[0].name").value("Product B"))
-                .andExpect(jsonPath("$[0].count").value(5));
+                .andExpect(jsonPath("$[0].name").value("Product B"));
     }
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
     void testGetNotPaidProducts() throws Exception {
-        Product product = Product.builder()
-                .id(3L)
-                .name("Product C")
-                .build();
+        ProductReportDto dto = new ProductReportDto(3L, "Product C");
 
-        Mockito.when(reportService.getNotPaid(7L)).thenReturn(List.of(product));
+        Mockito.when(reportService.getNotPaid(7L)).thenReturn(List.of(dto));
+
         mockMvc.perform(get("/v1/reports/notPaidProducts/{days}", 7L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("Product C"));
+                .andExpect(jsonPath("$[0].id").value(3))
+                .andExpect(jsonPath("$[0].name").value("Product C"));
     }
 
     @Test

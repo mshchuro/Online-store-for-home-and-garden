@@ -1,5 +1,6 @@
 package org.telran.online_store;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public abstract class AbstractTests {
+public abstract class AbstractServicesTests {
 
     @Autowired
     protected UserJpaRepository userRepo;
@@ -69,7 +70,9 @@ public abstract class AbstractTests {
     protected Product testProduct;
 
     @BeforeEach
+    @Transactional
     void setUp() {
+        orderItemRepo.deleteAll();
         orderRepo.deleteAll();
         favoriteRepo.deleteAll();
         cartItemRepo.deleteAll();

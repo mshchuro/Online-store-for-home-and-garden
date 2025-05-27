@@ -1,15 +1,16 @@
 package org.telran.online_store.service;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.entity.Favorite;
 import org.telran.online_store.exception.FavoriteNotUniqueException;
 import org.telran.online_store.exception.FavoriteNotFoundException;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-
-class FavoriteServiceImplTest extends AbstractTests {
+@Transactional
+class FavoriteServiceImplTest extends AbstractServicesTests {
 
     @Test
     void testCreateFavorite() {

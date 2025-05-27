@@ -2,13 +2,13 @@ package org.telran.online_store.service;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.dto.AddToCartRequest;
 import org.telran.online_store.entity.CartItem;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-public class CartServiceImplTest extends AbstractTests {
+public class CartServiceImplTest extends AbstractServicesTests {
 
     @Test
     public void testAddToCart() {

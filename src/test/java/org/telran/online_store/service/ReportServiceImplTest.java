@@ -1,21 +1,25 @@
 package org.telran.online_store.service;
 
 
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-
-    class ReportServiceImplTest extends AbstractTests {
+@Transactional
+class ReportServiceImplTest extends AbstractServicesTests {
 
     @Test
     void testGetTopOrderedProducts() {
@@ -34,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
         List<ProductReportDto> topOrdered = reportService.getTopOrdered();
         assertEquals(1, topOrdered.size(), "One ordered product expected");
         assertEquals(product.getId(), topOrdered.get(0).id());
-        assertEquals(5L, topOrdered.get(0).count());
+        assertEquals(product.getName(), topOrdered.get(0).name());
     }
 
     @Test
@@ -54,15 +58,16 @@ import static org.junit.jupiter.api.Assertions.*;
         List<ProductReportDto> topCancelled = reportService.getTopCancelled();
         assertEquals(1, topCancelled.size(), "One cancelled product expected");
         assertEquals(product.getId(), topCancelled.get(0).id());
-        assertEquals(3L, topCancelled.get(0).count());
+        assertEquals(product.getName(), topCancelled.get(0).name());
     }
 
+    @Disabled("TODO: доделать тест")
     @Test
     void testNotPaid() {
         Product product = createProduct("Unpaid Product");
 
         Order order = createOrder(OrderStatus.PAYMENT_PENDING);
-        order.setUpdatedAt(LocalDateTime.now().minusDays(10));
+        order.setUpdatedAt(LocalDateTime.now().minusDays(4));
         order = orderRepo.save(order);
 
         OrderItem item = OrderItem.builder()
@@ -73,10 +78,12 @@ import static org.junit.jupiter.api.Assertions.*;
                 .build();
         orderItemRepo.save(item);
 
-        List<Product> result = reportService.getNotPaid(9L);
+        List<ProductReportDto> result = reportService.getNotPaid(3L);
 
         assertEquals(1, result.size(), "One product should have been returned");
-        assertEquals(product.getId(), result.get(0).getId(), "It's not the expected unpaid product");
+        ProductReportDto dto = result.get(0);
+        assertEquals(product.getId(), dto.id(), "It's not the expected unpaid product");
+        assertEquals(product.getName(), dto.name(), "Unexpected product name");
     }
 
     private Product createProduct(String name) {

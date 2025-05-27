@@ -1,7 +1,8 @@
 package org.telran.online_store.service;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.UserRole;
 import org.telran.online_store.exception.UserNotFoundException;
@@ -10,7 +11,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-    public class UserServiceImplTest extends AbstractTests {
+@Transactional
+    public class UserServiceImplTest extends AbstractServicesTests {
 
     @Test
     public void testGetAllUsers() {

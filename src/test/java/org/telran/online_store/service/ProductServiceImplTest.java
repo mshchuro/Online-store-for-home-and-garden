@@ -1,9 +1,11 @@
 package org.telran.online_store.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.exception.CategoryNotFoundException;
@@ -12,7 +14,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductServiceImplTest extends AbstractTests {
+@Transactional
+public class ProductServiceImplTest extends AbstractServicesTests {
 
     @BeforeEach
     public void setUp() {
@@ -105,15 +108,15 @@ public class ProductServiceImplTest extends AbstractTests {
         category = categoryRepo.save(category);
 
         Product product = new Product();
-        product.setName("Garden Shovel");
+        product.setName("Garden Shovel 123");
         product.setPrice(new BigDecimal("25.50"));
         product.setCategory(category);
         productRepo.save(product);
 
-        Product foundProduct = productService.getByName("Garden Shovel");
+        Product foundProduct = productService.getByName("Garden Shovel 123");
 
         assertNotNull(foundProduct);
-        assertEquals("Garden Shovel", foundProduct.getName());
+        assertEquals("Garden Shovel 123", foundProduct.getName());
     }
 
     @Test
