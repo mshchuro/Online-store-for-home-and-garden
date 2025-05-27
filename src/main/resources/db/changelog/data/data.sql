@@ -1,34 +1,46 @@
 -- USERS
 INSERT INTO Users (name, email, phone, password, role)
-VALUES ('Alice Green', 'alice@example.com', '1234567890', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'CLIENT'),
-       ('Bob Gardener', 'bob@example.com', '0987654321', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'CLIENT'),
-       ('Admin Joe', 'admin@example.com', '5555555555', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'ADMINISTRATOR');
+VALUES ('Alice Green', 'alice@example.com', '1234567890',
+        '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u', 'CLIENT'),
+       ('Bob Gardener', 'bob@example.com', '0987654321', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u',
+        'CLIENT'),
+       ('Admin Joe', 'admin@example.com', '5555555555', '$2a$10$nhJq7EkEQUuoOM1fBQ4vJ.kEXAh9RGZl30lSUlcValMMJ1g9wVT6u',
+        'ADMINISTRATOR');
 
 -- CATEGORIES
 INSERT INTO Categories (name)
-VALUES ('Plants'),
-       ('Tools'),
-       ('Soil'),
-       ('Seeds');
+VALUES ('Fertilizer'),
+       ('Protective products and septic tanks'),
+       ('Tools and equipment'),
+       ('Pots and planters');
 
 -- PRODUCTS
 INSERT INTO Products (name, description, price, category_id, image_url, discount_price, created_at, updated_at)
-VALUES ('Rose Bush', 'Beautiful red rose bush for your garden', 15.99, 1, 'images/rose_bush.jpg', NULL,
+VALUES ('Organic Compost', 'Rich organic compost for improving soil fertility', 12.99, 1, 'images/compost.jpg', NULL,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       ('Shovel', 'Durable steel shovel with wooden handle', 25.50, 2, 'images/shovel.jpg', 20.99, CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP),
-       ('Potting Soil', 'Nutrient-rich soil for pots and gardens', 10.00, 3, 'images/soil.jpg', NULL,
+       ('Slug Repellent', 'Eco-friendly slug and snail protection for gardens', 7.50, 2, 'images/slug_repellent.jpg',
+        5.99,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       ('Sunflower Seeds', 'Pack of 50 organic sunflower seeds', 3.49, 4, 'images/sunflower_seeds.jpg', NULL,
+       ('Septic Tank Treatment', 'Biological treatment for maintaining septic systems', 18.00, 2,
+        'images/septic_treatment.jpg', NULL,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       ('Garden Gloves', 'Waterproof gloves with anti-slip grip', 9.99, 2, 'images/gloves.jpg', NULL,
+       ('Garden Shovel', 'Heavy-duty shovel ideal for digging and planting', 25.50, 3, 'images/garden_shovel.jpg',
+        20.99,
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('Pruning Shears', 'Sharp and ergonomic pruning shears for trimming plants', 14.75, 3,
+        'images/pruning_shears.jpg',
+        NULL,
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('Clay Pot', 'Classic clay pot for indoor and outdoor plants', 8.99, 4, 'images/clay_pot.jpg', NULL,
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('Hanging Planter', 'Stylish hanging planter with rope support', 11.49, 4, 'images/hanging_planter.jpg', NULL,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- FAVORITES
-INSERT INTO Favorites (user_id, product_id)
-VALUES (1, 2),
-       (2, 1),
-       (3, 2);
+-- INSERT INTO Favorites (user_id, product_id)
+-- VALUES (1, 2),
+--        (2, 1),
+--        (3, 2);
 
 -- CART
 -- INSERT INTO Cart (CartID, UserID)
@@ -40,7 +52,6 @@ VALUES (1, 2),
 -- VALUES (1, 1, 1, 2),
 --        (2, 1, 3, 1),
 --        (3, 2, 4, 3);
-
 
 
 -- ORDERS

@@ -2,13 +2,10 @@ package org.telran.online_store.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
+
 import java.math.BigDecimal;
 
-@Builder
-public record ProductRequestDto(
-
-        @NotBlank(message = "Product name must not be blank")
+public record ProductUpdateRequestDto(
         @Size(min = 3, max = 255, message = "Product name must be at least 3 and at most 255 characters")
         @Schema(description = "Product name", example = "Flower")
         String name,
@@ -17,7 +14,6 @@ public record ProductRequestDto(
         @Schema(description = "Product description", example = "Garden peony pink")
         String description,
 
-        @NotNull(message = "Price must not be null")
         @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
         @Digits(integer = 10, fraction = 2, message = "Price must be a valid monetary amount")
         @Schema(description = "Product price", example = "15.55")

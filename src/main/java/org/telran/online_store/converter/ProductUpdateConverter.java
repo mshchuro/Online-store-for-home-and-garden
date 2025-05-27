@@ -4,14 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telran.online_store.dto.ProductRequestDto;
 import org.telran.online_store.dto.ProductResponseDto;
+import org.telran.online_store.dto.ProductUpdateRequestDto;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.CategoryService;
+
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class ProductConverter implements Converter<ProductRequestDto, ProductResponseDto, Product> {
+public class ProductUpdateConverter implements Converter<ProductUpdateRequestDto, ProductResponseDto, Product> {
 
     private final CategoryService categoryService;
 
@@ -32,7 +34,7 @@ public class ProductConverter implements Converter<ProductRequestDto, ProductRes
     }
 
     @Override
-    public Product toEntity(ProductRequestDto productDto) {
+    public Product toEntity(ProductUpdateRequestDto productDto) {
         return Product
                 .builder()
                 .name(productDto.name())

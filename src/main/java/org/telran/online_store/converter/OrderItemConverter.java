@@ -6,7 +6,6 @@ import org.telran.online_store.dto.OrderItemResponseDto;
 import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.service.ProductService;
-
 import java.math.BigDecimal;
 
 @Component
@@ -33,7 +32,6 @@ public class OrderItemConverter implements Converter<OrderItemRequestDto, OrderI
         Product product = productService.getById(orderItemRequestDto.productId());
         BigDecimal discount = product.getDiscountPrice() == null ? BigDecimal.ZERO : product.getDiscountPrice();
         int quantity = orderItemRequestDto.quantity();
-
         return OrderItem.builder()
                 .product(product)
                 .quantity(quantity)

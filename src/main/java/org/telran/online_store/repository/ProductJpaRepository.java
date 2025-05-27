@@ -18,6 +18,14 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 
     List<Product> findAllByCategory_Id(Long categoryId);
 
-    @Query("SELECT product FROM Product product WHERE product.discountPrice > 0")
+    @Query("""
+                SELECT p FROM Product p
+                WHERE p.discountPrice = (
+                    SELECT MAX(p2.discountPrice) FROM Product p2 WHERE p2.discountPrice > 0
+                )
+            """)
     List<Product> productsWithDiscounts();
+
+//    @Query("SELECT product FROM Product product WHERE product.discountPrice > 0")
+//    List<Product> productsWithDiscounts();
 }

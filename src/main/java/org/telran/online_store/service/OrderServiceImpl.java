@@ -1,7 +1,6 @@
 package org.telran.online_store.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -12,11 +11,9 @@ import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.OrderNotFoundException;
 import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.OrderJpaRepository;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,10 +125,5 @@ public class OrderServiceImpl implements OrderService {
             }
 
             return result;
-    }
-
-    @Override
-    public List<OrderItem> getNotPaid(LocalDateTime dateTime) {
-        return orderItemRepository.findNotPaidProducts(dateTime);
     }
 }

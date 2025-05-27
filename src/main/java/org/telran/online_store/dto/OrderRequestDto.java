@@ -7,15 +7,13 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.telran.online_store.enums.DeliveryMethod;
-
 import java.util.List;
 
 @Builder
 public record OrderRequestDto(
 
         @Schema(description = "List of order items", example = """
-                                                                { 
-                                                                "productId: 1,
+                                                                {"productId: 1,
                                                                 "quantity": 1,
                                                                 "priceAtPurchase": 15.99
                                                                 }

@@ -16,15 +16,16 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ProductNotFoundException.class, UserNotFoundException.class
-            , CategoryNotFoundException.class, FavoriteNotFoundException.class, OrderNotFoundException.class,
-            CartNotFoundException.class, CartItemNotFoundException.class})
+    @ExceptionHandler({ProductNotFoundException.class, UserNotFoundException.class,
+            CategoryNotFoundException.class, FavoriteNotFoundException.class, OrderNotFoundException.class,
+            CartNotFoundException.class, CartItemNotFoundException.class, DiscountNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<NotFoundErrorResponse> handleEntityNotFoundException(Exception e) {
         NotFoundErrorResponse response = NotFoundErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(e.getMessage())
                 .build();
+
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -60,7 +61,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.FORBIDDEN.value())
                 .message(e.getMessage())
                 .build();
+
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleAllUnexpectedExceptions(Exception e) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("Internal server error: " + e.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Builder
@@ -105,6 +117,15 @@ public class GlobalExceptionHandler {
             int status,
 
             @Schema(example = "Access denied")
+            String message) {
+    }
+
+    @Builder
+    public record ErrorResponse(
+            @Schema(example = "500")
+            int status,
+
+            @Schema(example = "Internal server error")
             String message) {
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

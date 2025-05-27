@@ -2,7 +2,6 @@ package org.telran.online_store.service;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.enums.PeriodType;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.DiscountNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
@@ -21,12 +19,10 @@ import org.telran.online_store.repository.OrderItemJpaRepository;
 import org.telran.online_store.repository.ProductJpaRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -170,12 +166,11 @@ public class ProductServiceImpl implements ProductService {
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
-            Boolean discount
-    ) {
+            Boolean discount) {
         return (root, query, cb) -> {
             Predicate predicate = cb.conjunction();
 
-            if(categoryId != null){
+            if (categoryId != null) {
                 predicate = cb.and(predicate, cb.equal(root.get("category").get("id"), categoryId));
             }
 
@@ -192,7 +187,7 @@ public class ProductServiceImpl implements ProductService {
                         cb.isNotNull(root.get("discountPrice")),
                         cb.lessThan(root.get("discountPrice"), root.get("price"))
                 );
-            } else if (discount != null){
+            } else if (discount != null) {
                 predicate = cb.or(
                         cb.isNull(root.get("discountPrice"))
                 );
@@ -204,27 +199,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductOfTheDay() {
-        List<Product> productsWithDiscounts = productRepository.productsWithDiscounts();
-        if (productsWithDiscounts.isEmpty()) {
+        List<Product> productsWithMaxDiscounts = productRepository.productsWithDiscounts();
+        if (productsWithMaxDiscounts.isEmpty()) {
             throw new DiscountNotFoundException("There are no products with discount");
         }
+        return productsWithMaxDiscounts.get(new Random().nextInt(productsWithMaxDiscounts.size()));
 
-        BigDecimal maxDiscount = BigDecimal.ZERO;
-
-        for (Product product : productsWithDiscounts) {
-            if (product.getDiscountPrice().compareTo(maxDiscount) > 0) {
-                maxDiscount = product.getDiscountPrice();
-            }
-        }
-
-        List<Product> productsOfTheDay = new ArrayList<>();
-        for (Product product : productsWithDiscounts) {
-            if (product.getDiscountPrice().compareTo(maxDiscount) == 0) {
-                productsOfTheDay.add(product);
-            }
-        }
-
-        Random random = new Random();
-        return productsOfTheDay.get(random.nextInt(productsOfTheDay.size()));
     }
 }
