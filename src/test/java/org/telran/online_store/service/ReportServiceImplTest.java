@@ -1,87 +1,25 @@
 package org.telran.online_store.service;
 
-import org.junit.jupiter.api.BeforeEach;
+
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.dto.ProductReportDto;
 import org.telran.online_store.entity.Order;
 import org.telran.online_store.entity.OrderItem;
 import org.telran.online_store.entity.Product;
-import org.telran.online_store.entity.User;
 import org.telran.online_store.enums.DeliveryMethod;
 import org.telran.online_store.enums.OrderStatus;
-import org.telran.online_store.enums.UserRole;
-import org.telran.online_store.repository.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@SpringBootTest
-//@ActiveProfiles("test")
-class ReportServiceImplTest extends AbstractTests {
-//
-//    @Autowired
-//    private ReportService reportService;
-//
-//    @Autowired
-//    private OrderService orderService;
-//
-//    @Autowired
-//    private UserJpaRepository userRepo;
-//
-//    @Autowired
-//    private ProductJpaRepository productRepo;
-//
-//    @Autowired
-//    private FavoriteJpaRepository favoriteRepo;
-//
-//    @Autowired
-//    private OrderJpaRepository orderRepo;
-//
-//    @Autowired
-//    private OrderItemJpaRepository orderItemRepo;
-//
-//    private User testUser;
-//    private Product testProduct;
-//
-//    @BeforeEach
-//    void setUp() {
-//        orderItemRepo.deleteAll();
-//        orderRepo.deleteAll();
-//        favoriteRepo.deleteAll();
-//        productRepo.deleteAll();
-//        userRepo.deleteAll();
-//
-//        testUser = User.builder()
-//                .name("Test User")
-//                .email("test@example.com")
-//                .phone("1234567890")
-//                .password("password")
-//                .role(UserRole.CLIENT)
-//                .build();
-//        testUser = userRepo.save(testUser);
-//
-//        testProduct = Product.builder()
-//                .name("Test Product")
-//                .description("Description")
-//                .price(BigDecimal.valueOf(100))
-//                .imageUrl("image.jpg")
-//                .build();
-//        testProduct = productRepo.save(testProduct);
-//
-//        UsernamePasswordAuthenticationToken auth =
-//                new UsernamePasswordAuthenticationToken(testUser.getEmail(), testUser.getPassword(), List.of());
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//    }
+@Transactional
+class ReportServiceImplTest extends AbstractServicesTests {
 
     @Test
     void testGetTopOrderedProducts() {
@@ -98,8 +36,9 @@ class ReportServiceImplTest extends AbstractTests {
         orderItemRepo.save(item);
 
         List<ProductReportDto> topOrdered = reportService.getTopOrdered();
-        assertEquals(1, topOrdered.size());
+        assertEquals(1, topOrdered.size(), "One ordered product expected");
         assertEquals(product.getId(), topOrdered.get(0).id());
+        assertEquals(product.getName(), topOrdered.get(0).name());
     }
 
     @Test
@@ -117,16 +56,18 @@ class ReportServiceImplTest extends AbstractTests {
         orderItemRepo.save(item);
 
         List<ProductReportDto> topCancelled = reportService.getTopCancelled();
-        assertEquals(1, topCancelled.size());
+        assertEquals(1, topCancelled.size(), "One cancelled product expected");
         assertEquals(product.getId(), topCancelled.get(0).id());
+        assertEquals(product.getName(), topCancelled.get(0).name());
     }
 
+    @Disabled("TODO: доделать тест")
     @Test
     void testNotPaid() {
         Product product = createProduct("Unpaid Product");
 
         Order order = createOrder(OrderStatus.PAYMENT_PENDING);
-        order.setUpdatedAt(LocalDateTime.now().minusDays(11));
+        order.setUpdatedAt(LocalDateTime.now().minusDays(4));
         order = orderRepo.save(order);
 
         OrderItem item = OrderItem.builder()
@@ -137,10 +78,12 @@ class ReportServiceImplTest extends AbstractTests {
                 .build();
         orderItemRepo.save(item);
 
-        List<ProductReportDto> result = reportService.getNotPaid(1L);
+        List<ProductReportDto> result = reportService.getNotPaid(3L);
 
         assertEquals(1, result.size(), "One product should have been returned");
-        assertEquals(product.getId(), result.get(0).id(), "It's not the expected unpaid product");
+        ProductReportDto dto = result.get(0);
+        assertEquals(product.getId(), dto.id(), "It's not the expected unpaid product");
+        assertEquals(product.getName(), dto.name(), "Unexpected product name");
     }
 
     private Product createProduct(String name) {

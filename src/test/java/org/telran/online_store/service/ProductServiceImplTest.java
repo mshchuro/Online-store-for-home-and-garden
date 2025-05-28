@@ -2,36 +2,20 @@ package org.telran.online_store.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import org.telran.online_store.AbstractTests;
+import org.telran.online_store.AbstractServicesTests;
 import org.telran.online_store.entity.Category;
 import org.telran.online_store.entity.Product;
 import org.telran.online_store.exception.CategoryNotFoundException;
 import org.telran.online_store.exception.ProductNotFoundException;
-import org.telran.online_store.repository.CategoryJpaRepository;
-import org.telran.online_store.repository.ProductJpaRepository;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-//@SpringBootTest
-//@Transactional
-public class ProductServiceImplTest extends AbstractTests {
-
-//    @Autowired
-//    private ProductServiceImpl productService;
-//
-//    @Autowired
-//    private ProductJpaRepository productRepository;
-//
-//    @Autowired
-//    private CategoryJpaRepository categoryRepository;
+@Transactional
+public class ProductServiceImplTest extends AbstractServicesTests {
 
     @BeforeEach
     public void setUp() {
@@ -124,15 +108,15 @@ public class ProductServiceImplTest extends AbstractTests {
         category = categoryRepo.save(category);
 
         Product product = new Product();
-        product.setName("Garden Shovel");
+        product.setName("Garden Shovel 123");
         product.setPrice(new BigDecimal("25.50"));
         product.setCategory(category);
         productRepo.save(product);
 
-        Product foundProduct = productService.getByName("Garden Shovel");
+        Product foundProduct = productService.getByName("Garden Shovel 123");
 
         assertNotNull(foundProduct);
-        assertEquals("Garden Shovel", foundProduct.getName());
+        assertEquals("Garden Shovel 123", foundProduct.getName());
     }
 
     @Test
@@ -187,9 +171,8 @@ public class ProductServiceImplTest extends AbstractTests {
 
     @Test
     public void testGetProductByIdNotFound() {
-        assertThrows(ProductNotFoundException.class, () -> {
-            productService.getById(999L);
-        });
+        assertThrows(ProductNotFoundException.class, () ->
+            productService.getById(999L));
     }
 
     @Test
@@ -237,9 +220,8 @@ public class ProductServiceImplTest extends AbstractTests {
 
     @Test
     public void testDeleteProductNotFound() {
-        assertThrows(ProductNotFoundException.class, () -> {
-            productService.delete(999L);
-        });
+        assertThrows(ProductNotFoundException.class, () ->
+            productService.delete(999L));
     }
 
     @Test
@@ -296,9 +278,8 @@ public class ProductServiceImplTest extends AbstractTests {
         product.setPrice(new BigDecimal("25.50"));
         product.setCategory(new Category(999L, "NonExistentCategory"));
 
-        assertThrows(CategoryNotFoundException.class, () -> {
-            productService.create(product);
-        });
+        assertThrows(CategoryNotFoundException.class, () ->
+            productService.create(product));
     }
 
     @Test
@@ -308,9 +289,8 @@ public class ProductServiceImplTest extends AbstractTests {
         category = categoryRepo.save(category);
 
         Category finalCategory = category;
-        assertThrows(ProductNotFoundException.class, () -> {
-            productService.updateCategory(999L, finalCategory);
-        });
+        assertThrows(ProductNotFoundException.class, () ->
+            productService.updateCategory(999L, finalCategory));
     }
     @Test
     public void testUpdateProductWithInvalidCategory() {
@@ -329,8 +309,7 @@ public class ProductServiceImplTest extends AbstractTests {
         productToUpdate.setCategory(category);
 
         Product finalProduct = product;
-        assertThrows(CategoryNotFoundException.class, () -> {
-            productService.updateProduct(finalProduct.getId(), productToUpdate);
-        });
+        assertThrows(CategoryNotFoundException.class, () ->
+            productService.updateProduct(finalProduct.getId(), productToUpdate));
     }
 }
