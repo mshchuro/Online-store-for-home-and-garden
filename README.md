@@ -17,7 +17,7 @@
 
 ## Main page screenshot
 
-![Swagger UI](assets/swagger-screenshot.png)
+![img.png](img.png)
 
 ---
 
