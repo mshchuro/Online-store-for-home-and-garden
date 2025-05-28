@@ -42,8 +42,7 @@
 | Database              | PostgreSQL, H2 (for testing) |
 | ORM                   | Spring Data JPA / Hibernate  |
 | Authentication        | Spring Security + JWT        |
-| Migrations            | Liquibase / Flyway           |
-| Documentation         | Swagger / OpenAPI            |
+| Documentation         | Swagger                      |
 | Containerization      | Docker                       |
 | API Format            | RESTful, JSON                |
 
