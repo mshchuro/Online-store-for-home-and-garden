@@ -35,32 +35,3 @@ VALUES ('Organic Compost', 'Rich organic compost for improving soil fertility', 
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('Hanging Planter', 'Stylish hanging planter with rope support', 11.49, 4, 'images/hanging_planter.jpg', NULL,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
--- FAVORITES
--- INSERT INTO Favorites (user_id, product_id)
--- VALUES (1, 2),
---        (2, 1),
---        (3, 2);
-
--- CART
--- INSERT INTO Cart (CartID, UserID)
--- VALUES (1, 1),
---        (2, 2);
-
--- CART ITEMS
--- INSERT INTO CartItems (CartItemID, CartID, ProductID, Quantity)
--- VALUES (1, 1, 1, 2),
---        (2, 1, 3, 1),
---        (3, 2, 4, 3);
-
-
--- ORDERS
--- INSERT INTO Orders (OrderID, UserID, CreatedAt, DeliveryAddress, ContactPhone, DeliveryMethod, Status, UpdatedAt)
--- VALUES (1, 1, CURRENT_TIMESTAMP, '123 Green Street', '1234567890', 'Courier', 'Delivered', CURRENT_TIMESTAMP),
---        (2, 2, CURRENT_TIMESTAMP, '456 Flower Road', '0987654321', 'Pickup', 'Processing', CURRENT_TIMESTAMP);
-
--- ORDER ITEMS
--- INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, PriceAtPurchase)
--- VALUES (1, 1, 1, 2, 15.99),
---        (2, 1, 3, 1, 10.00),
---        (3, 2, 4, 3, 3.49);

@@ -7,6 +7,6 @@ public record SignInRequest(
         @Schema(description = "email", example = "admin@example.com")
         String email,
 
-        @Schema(description = "Product id", example = "password")
+        @Schema(description = "password", example = "password")
         String password) {
 }
