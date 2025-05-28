@@ -26,6 +26,7 @@ public class FavoriteController implements FavoriteApi{
     @GetMapping
     @Override
     public ResponseEntity<List<FavoriteResponseDto>> getAll() {
+        log.info("Get all favorite");
         return ResponseEntity.ok(favoriteService.getAll()
                 .stream()
                 .map(favoriteConverter::toDto)
@@ -35,6 +36,7 @@ public class FavoriteController implements FavoriteApi{
     @PostMapping()
     @Override
     public ResponseEntity<FavoriteResponseDto> create(@Valid @RequestBody FavoriteRequestDto requestDto) {
+        log.info("Add to favorite: {}", requestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(favoriteConverter.toDto(favoriteService.create(favoriteConverter.toEntity(requestDto))));
     }
@@ -42,6 +44,7 @@ public class FavoriteController implements FavoriteApi{
     @DeleteMapping("/{favorite_id}")
     @Override
     public ResponseEntity<Void> deleteById(@PathVariable Long favorite_id) {
+        log.info("Deleting favorite with id: {}", favorite_id);
         favoriteService.delete(favorite_id);
         return ResponseEntity.ok().build();
     }

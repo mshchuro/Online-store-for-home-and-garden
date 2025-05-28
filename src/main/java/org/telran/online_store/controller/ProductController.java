@@ -37,6 +37,8 @@ public class ProductController implements ProductApi {
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean discount,
             @RequestParam(required = false) List<String> sort) {
+        log.info("Get all products with filters: categoryId={}, minPrice={}, maxPrice={}, discount={}, sort={}",
+                categoryId, minPrice, maxPrice, discount, sort);
         List<Product> products = productService.getAll(categoryId, minPrice, maxPrice, discount, sort);
         return ResponseEntity.ok(products.stream().map(productConverter::toDto).toList());
     }
@@ -44,6 +46,7 @@ public class ProductController implements ProductApi {
     @GetMapping("/{productId}")
     @Override
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long productId) {
+        log.info("Get product by id: {}", productId);
         Product product = productService.getById(productId);
         return ResponseEntity.ok(productConverter.toDto(product));
     }
@@ -52,6 +55,7 @@ public class ProductController implements ProductApi {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @Override
     public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody ProductRequestDto dto) {
+        log.info("Creating new product: {}", dto);
         Product product = productConverter.toEntity(dto);
         Product saved = productService.create(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(productConverter.toDto(saved));
@@ -61,6 +65,7 @@ public class ProductController implements ProductApi {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @Override
     public ResponseEntity<ProductResponseDto> update(@PathVariable Long productId, @Valid @RequestBody ProductUpdateRequestDto dto) {
+        log.info("Update product by id: {}, new data: {}", productId, dto);
         Product product = productService.updateProduct(productId, productUpdateConverter.toEntity(dto));
         return ResponseEntity.ok(productUpdateConverter.toDto(product));
     }
@@ -69,12 +74,14 @@ public class ProductController implements ProductApi {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @Override
     public ResponseEntity<Void> deleteById(@PathVariable Long productId) {
+        log.info("Deleting product by id: {}", productId);
         productService.delete(productId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/product-of-the-day")
     public ResponseEntity<ProductResponseDto> getProductOfTheDay() {
+        log.info("Get product of the day");
         Product product = productService.getProductOfTheDay();
         return ResponseEntity.ok(productConverter.toDto(product));
     }

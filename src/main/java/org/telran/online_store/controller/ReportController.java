@@ -29,6 +29,7 @@ public class ReportController implements ReportApi {
     @Override
     @GetMapping("/topTenPurchasedProducts")
     public ResponseEntity<List<ProductReportDto>> getTopTenPurchasedProducts() {
+        log.info("Get report: Top 10 purchased products");
         return ResponseEntity.status(HttpStatus.OK)
                 .body(reportService.getTopOrdered());
     }
@@ -36,6 +37,7 @@ public class ReportController implements ReportApi {
     @Override
     @GetMapping("/topTenCancelledProducts")
     public ResponseEntity<List<ProductReportDto>> getTopTenCancelledProducts() {
+        log.info("Get report: Top 10 cancelled products");
         return ResponseEntity.status(HttpStatus.OK)
                 .body(reportService.getTopCancelled());
     }
@@ -43,6 +45,7 @@ public class ReportController implements ReportApi {
     @Override
     @GetMapping("/notPaidProducts/{days}")
     public ResponseEntity<List<ProductReportDto>> getNotPaidProducts(@PathVariable Long days) {
+        log.info("Get report: Not paid products by {} days", days);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(reportService.getNotPaid(days));
     }
@@ -52,6 +55,7 @@ public class ReportController implements ReportApi {
     public ResponseEntity<Map<String, BigDecimal>> getProfitReport(
             @RequestParam PeriodType periodType,
             @RequestParam Long periodAmount) {
+        log.info("Get profit report: period = {}, period amount = {}", periodType, periodAmount);
         return ResponseEntity.ok(reportService.getProfitReport(periodType, periodAmount));
     }
 }

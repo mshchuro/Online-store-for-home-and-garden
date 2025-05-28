@@ -33,6 +33,7 @@ public class UserController implements UserApi{
 
     @PostMapping("/login")
     public ResponseEntity<SignInResponse> login(@RequestBody SignInRequest request) {
+        log.info("User login: {}", request.email());
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
@@ -40,6 +41,7 @@ public class UserController implements UserApi{
     @GetMapping()
     @Override
     public ResponseEntity<List<UserUpdateResponseDto>> getAll() {
+        log.info("Get all users (only for Admin)");
         List<User> users = userService.getAll();
         List<UserUpdateResponseDto> list = users.stream().map(userConverter::toDto).toList();
         return ResponseEntity.ok(list);
@@ -48,6 +50,7 @@ public class UserController implements UserApi{
     @PostMapping("/register")
     @Override
     public ResponseEntity<UserRegistrationResponse> register(@Valid @RequestBody UserRegistrationRequest request) {
+        log.info("Registration of the new user: {}", request.email());
         User user = userRegistrationConverter.toEntity(request);
         User savedUser = userService.create(user);
         if (log.isDebugEnabled()) {
@@ -60,6 +63,7 @@ public class UserController implements UserApi{
     @GetMapping("/{userId}")
     @Override
     public UserUpdateResponseDto getById(@PathVariable Long userId) {
+        log.info("Get user by ID: {}", userId);
         return userConverter.toDto(userService.getById(userId));
     }
 
@@ -67,6 +71,7 @@ public class UserController implements UserApi{
     @DeleteMapping("/{userId}")
     @Override
     public ResponseEntity<Void> deleteById(@PathVariable Long userId) {
+        log.info("Deleting user by ID: {}", userId);
         userService.delete(userId);
         return ResponseEntity.ok().build();
     }
@@ -75,6 +80,7 @@ public class UserController implements UserApi{
     @PutMapping("/{userId}")
     @Override
     public ResponseEntity<UserUpdateResponseDto> updateProfile(@PathVariable Long userId, @RequestBody UserUpdateRequestDto dto) {
+        log.info("Updating user profile by ID: {}", userId);
         User user = userService.updateProfile(userId, userConverter.toEntity(dto));
         return ResponseEntity.ok(userConverter.toDto(user));
     }
